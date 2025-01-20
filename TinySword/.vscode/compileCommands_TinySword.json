@@ -1,0 +1,42 @@
+[
+	{
+		"file": "C:\\WorkSpace\\TinySword\\TinySword\\Source\\TinySword\\TinySword.Build.cs",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\cl.exe",
+			"@C:\\WorkSpace\\TinySword\\TinySword\\.vscode\\compileCommands_TinySword\\TinySword.255.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.1\\Engine\\Source"
+	},
+	{
+		"file": "C:\\WorkSpace\\TinySword\\TinySword\\Source\\TinySword\\TinySword.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\cl.exe",
+			"@C:\\WorkSpace\\TinySword\\TinySword\\.vscode\\compileCommands_TinySword\\TinySword.255.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.1\\Engine\\Source"
+	},
+	{
+		"file": "C:\\WorkSpace\\TinySword\\TinySword\\Source\\TinySword\\TinySword.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\cl.exe",
+			"@C:\\WorkSpace\\TinySword\\TinySword\\.vscode\\compileCommands_TinySword\\TinySword.255.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.1\\Engine\\Source"
+	},
+	{
+		"file": "C:\\WorkSpace\\TinySword\\TinySword\\Source\\TinySword\\TinySwordGameModeBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\cl.exe",
+			"@C:\\WorkSpace\\TinySword\\TinySword\\.vscode\\compileCommands_TinySword\\TinySword.255.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.1\\Engine\\Source"
+	},
+	{
+		"file": "C:\\WorkSpace\\TinySword\\TinySword\\Source\\TinySword\\TinySwordGameModeBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\cl.exe",
+			"@C:\\WorkSpace\\TinySword\\TinySword\\.vscode\\compileCommands_TinySword\\TinySword.255.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.1\\Engine\\Source"
+	}
+]

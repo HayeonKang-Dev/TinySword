@@ -1,0 +1,437 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "TinySword Win64 Debug Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Debug",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Debug Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Debug",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"TinySword Win64 Debug Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Debug Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Debug",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 DebugGame Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"DebugGame",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 DebugGame Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"DebugGame",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"TinySword Win64 DebugGame Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 DebugGame Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"DebugGame",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Development Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Development",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Development Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Development",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"TinySword Win64 Development Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Development Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Development",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Test Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Test",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Test Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Test",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"TinySword Win64 Test Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Test Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Test",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Shipping Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Shipping",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Shipping Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Shipping",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"TinySword Win64 Shipping Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySword Win64 Shipping Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"TinySword",
+				"Win64",
+				"Shipping",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySwordEditor Win64 Debug Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySwordEditor",
+				"Win64",
+				"Debug",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySwordEditor Win64 Debug Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySwordEditor",
+				"Win64",
+				"Debug",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"TinySwordEditor Win64 Debug Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySwordEditor Win64 Debug Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"TinySwordEditor",
+				"Win64",
+				"Debug",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySwordEditor Win64 DebugGame Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySwordEditor",
+				"Win64",
+				"DebugGame",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySwordEditor Win64 DebugGame Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySwordEditor",
+				"Win64",
+				"DebugGame",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"TinySwordEditor Win64 DebugGame Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySwordEditor Win64 DebugGame Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"TinySwordEditor",
+				"Win64",
+				"DebugGame",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySwordEditor Win64 Development Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySwordEditor",
+				"Win64",
+				"Development",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySwordEditor Win64 Development Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"TinySwordEditor",
+				"Win64",
+				"Development",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"TinySwordEditor Win64 Development Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		},
+		{
+			"label": "TinySwordEditor Win64 Development Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"TinySwordEditor",
+				"Win64",
+				"Development",
+				"C:\\WorkSpace\\TinySword\\TinySword\\TinySword.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.1"
+			}
+		}
+	]
+}
