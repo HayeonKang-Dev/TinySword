@@ -25,3 +25,7 @@ void ABaseMeat::Tick(float DeltaTime)
 
 }
 
+void ABaseMeat::SetTagId(int32 NewTagId)
+{
+	TagId = NewTagId;
+}

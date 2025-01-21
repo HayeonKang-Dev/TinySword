@@ -23,4 +23,12 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	int32 GetTagId() const {return TagId;}
+	
+	
+
+private:
+	int32 TagId;
+
+	void SetTagId(int32 NewTagId);
 };
