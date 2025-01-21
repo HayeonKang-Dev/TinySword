@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "TinySwordGameMode.h"
 #include "BaseGoldBag.generated.h"
 
 UCLASS()
@@ -23,4 +24,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	int32 GetTagId() const {return TagId;}
+
+	
+
+private:
+	int32 TagId; 
+
+	void SetGoldBagId();
+
+	ATinySwordGameMode* GameMode;
 };

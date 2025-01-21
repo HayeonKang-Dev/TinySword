@@ -2,6 +2,7 @@
 
 
 #include "BaseGoldBag.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABaseGoldBag::ABaseGoldBag()
@@ -16,6 +17,9 @@ void ABaseGoldBag::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GameMode = Cast<ATinySwordGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	SetGoldBagId();
 }
 
 // Called every frame
@@ -25,3 +29,13 @@ void ABaseGoldBag::Tick(float DeltaTime)
 
 }
 
+void ABaseGoldBag::SetGoldBagId()
+{
+	int32 id = 0; 
+	if (!GameMode->ReuseGoldBagId.IsEmpty()) GameMode->ReuseGoldBagId.Dequeue(id);
+	else id = GameMode->ActiveGoldBagId.Num() + 1; 
+
+	TagId = id; 
+	
+	GameMode->ActiveGoldBagId.Add(this, TagId);
+}
