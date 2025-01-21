@@ -4,6 +4,8 @@
 #include "BaseAISheep.h"
 #include "BaseMeat.h"
 #include "TinySwordGameMode.h"
+#include "SheepAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 void ABaseAISheep::BeginPlay()
@@ -46,6 +48,7 @@ void ABaseAISheep::SetupPlayerInputComponent(UInputComponent *PlayerInputCompone
 }
 
 
+
 void ABaseAISheep::MoveRight(float AxisValue)
 {
     AddMovementInput(GetActorRightVector() * AxisValue);
@@ -84,4 +87,24 @@ void ABaseAISheep::SpawnMeat()
         GameMode->ActiveMeatId.Add(SpawnedMeat, GetTagId());
     }
 
+}
+
+
+void ABaseAISheep::TakeDamageFrom(AActor *Attacker)
+{
+    if (Attacker == nullptr) return; 
+
+    FVector AttackLocation = Attacker->GetActorLocation(); 
+    ASheepAIController* sheepAIController = Cast<ASheepAIController>(GetController()); 
+    if (sheepAIController)
+    {
+        GetCharacterMovement()->MaxWalkSpeed = BoostedSpeed; 
+        GetWorld()->GetTimerManager().SetTimer(SpeedBoostTimerHandle, this, &ABaseAISheep::ResetSpeed, SpeedBoostDuration, false);
+        sheepAIController->FleeFrom(AttackLocation);
+    }
+}
+
+void ABaseAISheep::ResetSpeed()
+{
+    GetCharacterMovement()->MaxWalkSpeed = NormalSpeed; 
 }
