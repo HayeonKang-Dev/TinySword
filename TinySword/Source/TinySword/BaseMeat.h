@@ -25,10 +25,10 @@ public:
 
 	int32 GetTagId() const {return TagId;}
 	
-	
+	void SetTagId(int32 NewTagId);
 
 private:
 	int32 TagId;
 
-	void SetTagId(int32 NewTagId);
+	
 };
