@@ -5,7 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TinySwordGameMode.h"
+#include "PaperSpriteActor.h"
+#include "Components/CapsuleComponent.h"
+#include "PaperSpriteComponent.h" 
+#include "PaperZDAnimationComponent.h"
 #include "BaseGoldBag.generated.h"
+
+
 
 UCLASS()
 class TINYSWORD_API ABaseGoldBag : public AActor
@@ -34,4 +40,14 @@ private:
 	void SetGoldBagId();
 
 	ATinySwordGameMode* GameMode;
+
+
+	UPROPERTY(EditAnywhere)
+	UCapsuleComponent* collision; 
+
+	UPROPERTY(EditAnywhere)
+	UPaperSpriteComponent* paperSprite; 
+
+	UPROPERTY(EditAnywhere)
+	UPaperZDAnimationComponent* animationComponent; 
 };
