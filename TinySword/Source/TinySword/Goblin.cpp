@@ -7,6 +7,8 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "PaperFlipbookComponent.h"
+#include "PaperFlipbook.h" 
+
 
 
 void AGoblin::BeginPlay()
@@ -17,6 +19,9 @@ void AGoblin::BeginPlay()
     Money = 0; 
 
     OverlapComponent = FindComponentByClass<UCapsuleComponent>(); 
+    paperFlipbookComponent = FindComponentByClass<UPaperFlipbookComponent>();
+
+    //UPaperFlipbook* WalkAnim = LoadObject<UPaperFlipbook>(nullptr, TEXT("/Script/Paper2D.PaperFlipbook'/Game/Animations/Character/TNT_Blue_Walk.TNT_Blue_Walk'"));
 
     Timer = 0.0f; 
 }
@@ -45,6 +50,7 @@ void AGoblin::MoveRight(float Value)
     if (Value != 0.0f)
     {
         AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
+        //paperFlipbookComponent->SetFlipbook(WalkAnim);
     }
 }
 

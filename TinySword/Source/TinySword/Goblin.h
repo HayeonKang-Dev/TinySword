@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/DamageEvents.h"
 #include "PaperZDCharacter.h"
+#include "PaperFlipbookComponent.h"
 #include "Goblin.generated.h"
 
 /**
@@ -83,6 +84,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float Damage = 10; 
+
+	UPaperFlipbookComponent* paperFlipbookComponent;
+
 
 private:
 	void FlipCharacter(bool MoveDirec);
