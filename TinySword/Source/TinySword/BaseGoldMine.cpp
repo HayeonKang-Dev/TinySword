@@ -3,6 +3,7 @@
 
 #include "BaseGoldMine.h"
 #include "BaseGoldBag.h"
+#include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -10,6 +11,19 @@ ABaseGoldMine::ABaseGoldMine()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	RootSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootScene"));
+    RootComponent = RootSceneComponent;
+
+	paperSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("paperSprite")); 
+	paperSprite->SetupAttachment(RootComponent);
+
+	BoxCollider1 = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollider1"));
+	BoxCollider1->SetupAttachment(RootComponent);
+	
+	BoxCollider2 = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollider2"));
+	BoxCollider2->SetupAttachment(RootComponent);
+
 
 }
 
@@ -22,7 +36,6 @@ void ABaseGoldMine::BeginPlay()
 	Durability = MaxDurability;
 	
 }
-
 
 
 // Called every frame
@@ -77,4 +90,12 @@ void ABaseGoldMine::DropGoldBag()
 bool ABaseGoldMine::IsCollapse()
 {
     return Durability <= 0;
+}
+
+
+
+void ABaseGoldMine::UpdateSprite()
+{
+	if (IsCollapse() && collapseSprite != nullptr)
+		paperSprite->SetSprite(collapseSprite);
 }

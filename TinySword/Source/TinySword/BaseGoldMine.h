@@ -4,7 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PaperSpriteComponent.h" 
 #include "BaseGoldMine.generated.h"
+
+
+class UBoxComponent; 
+class UPaperFlipbookComponent; 
+class USceneComponent;
+
 
 UCLASS()
 class TINYSWORD_API ABaseGoldMine : public AActor
@@ -21,6 +28,9 @@ public:
 
 	float GetDurability() const {return Durability;}
 
+	UPROPERTY(EditAnywhere, Category="Sprite")
+	UPaperSprite* collapseSprite; 
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,6 +38,19 @@ protected:
 
 	void DropGoldBag();
 
+	UPROPERTY(EditAnywhere, Category="Components")
+	USceneComponent* RootSceneComponent; 
+
+	UPROPERTY(EditAnywhere)
+	UPaperSpriteComponent* paperSprite; 
+
+	UPROPERTY(EditAnywhere, Category="Components")
+	UBoxComponent* BoxCollider1; 
+
+	UPROPERTY(EditAnywhere, Category="Components")
+	UBoxComponent* BoxCollider2; 
+
+	void UpdateSprite();
 
 public:	
 	// Called every frame
