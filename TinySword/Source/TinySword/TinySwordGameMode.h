@@ -12,6 +12,8 @@
  */
 
 class ABaseGoldBag; 
+class ABaseAISheep; 
+class ABaseMeat; 
 
 UCLASS()
 class TINYSWORD_API ATinySwordGameMode : public AGameMode
@@ -26,6 +28,12 @@ public:
 	ABaseGoldBag* FindGoldBagById(const TMap<ABaseGoldBag*, int32>&Map, int32 TargetId);
 
 	TMap<int32, FVector> CastleMap;
+
+	TMap<ABaseAISheep*, int32> ActiveSheepId;
+    ABaseAISheep* FindSheepById(const TMap<ABaseAISheep*, int32>& Map, int32 TargetValue);
+
+	TMap<ABaseMeat*, int32> ActiveMeatId; 
+    ABaseMeat* FindMeatById(const TMap<ABaseMeat*, int32>&Map, int32 TargetValue);
 
 protected:
 	virtual void BeginPlay() override; 
