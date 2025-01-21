@@ -50,11 +50,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, Category="TagId")
-	int TagId = 0; 
-
 	int32 GetTagId() const {return TagId;}
-
 
 	float GetDurability() const {return Durability;}
 
@@ -66,5 +62,6 @@ private:
 
 	float MaxDurability = 100.0f; 
 	
-
+	UPROPERTY(EditAnywhere, Category="TagId")
+	int TagId = 0; 
 };
