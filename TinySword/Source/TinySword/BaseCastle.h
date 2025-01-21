@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PaperFlipbookComponent.h"
 #include "BaseCastle.generated.h"
 
 
@@ -41,6 +42,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Components")
 	UBoxComponent* BoxCollider2; 
 
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* CollapseFlipbook;
+
 
 public:	
 	// Called every frame
@@ -48,6 +52,14 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="TagId")
 	int TagId = 0; 
+
+	int32 GetTagId() const {return TagId;}
+
+	float Durability; 
+
+	float MaxDurability = 100.0f; 
+
+	float GetDurability() const {return Durability;}
 
 	bool IsCollapse();
 
