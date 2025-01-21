@@ -17,7 +17,9 @@ public:
 
 	bool IsCollapse();
 
-	float Durability; 
+	int32 GetTagId() const {return TagId;}
+
+	float GetDurability() const {return Durability;}
 
 
 protected:
@@ -26,8 +28,20 @@ protected:
 
 	void DropGoldBag();
 
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+
+private:
+	float Durability; 
+
+	float MaxDurability = 100.0f; 
+
+	UPROPERTY(EditAnywhere, Category="TagId")
+	int32 TagId; 
 
 };

@@ -11,12 +11,17 @@ ABaseGoldMine::ABaseGoldMine()
 
 }
 
+
 // Called when the game starts or when spawned
 void ABaseGoldMine::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Durability = MaxDurability;
 	
 }
+
+
 
 // Called every frame
 void ABaseGoldMine::Tick(float DeltaTime)
@@ -25,3 +30,28 @@ void ABaseGoldMine::Tick(float DeltaTime)
 
 }
 
+float ABaseGoldMine::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
+{
+	DamageAmount = FMath::Min(Durability, DamageAmount);
+	Durability -= DamageAmount;
+	if (Durability > 0) DropGoldBag();
+
+    return DamageAmount;
+}
+
+
+void ABaseGoldMine::DropGoldBag()
+{
+	int RandomValue = FMath::RandRange(0, 1);
+	if (RandomValue == 0)
+	{
+		// goldbag drop logic
+	}
+}
+
+
+
+bool ABaseGoldMine::IsCollapse()
+{
+    return Durability <= 0;
+}
