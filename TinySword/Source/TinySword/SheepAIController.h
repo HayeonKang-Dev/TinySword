@@ -4,14 +4,37 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "NavigationSystem.h"
 #include "SheepAIController.generated.h"
 
 /**
  * 
  */
+class ATinySwordGameMode; 
+
 UCLASS()
 class TINYSWORD_API ASheepAIController : public AAIController
 {
 	GENERATED_BODY()
-	
+
+public: 
+	bool IsDead() const; 
+
+	void FleeFrom(const FVector& AttackLocation); 
+
+	UNavigationSystemV1* NaviSystem; 
+
+protected: 
+	virtual void BeginPlay() override; 
+
+	virtual void OnPossess(APawn* InPawn) override; 
+
+	virtual void OnUnPossess() override; 
+
+private: 	
+	void MoveRandomPos(); 
+
+	FTimerHandle Timer; 
+
+	ATinySwordGameMode* GameMode; 
 };
