@@ -35,6 +35,7 @@ public:
 	
 
 private:
+	UPROPERTY(VisibleAnywhere)
 	int32 TagId; 
 
 	void SetGoldBagId();
