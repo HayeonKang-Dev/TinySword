@@ -2,6 +2,8 @@
 
 
 #include "BaseGoldMine.h"
+#include "BaseGoldBag.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ABaseGoldMine::ABaseGoldMine()
@@ -45,7 +47,28 @@ void ABaseGoldMine::DropGoldBag()
 	int RandomValue = FMath::RandRange(0, 1);
 	if (RandomValue == 0)
 	{
-		// goldbag drop logic
+		// drop goldbag logic
+		UObject* SpawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Blueprints/BP_GoldBag.BP_GoldBag"));
+		UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+		UWorld* World = GetWorld();
+		if (!SpawnActor || GeneratedBP || !GeneratedBP->GeneratedClass || !World) return;
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this; 
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; 
+
+		// fix z
+		FVector SpawnLocation = GetActorLocation(); 
+		SpawnLocation.Y += 60.0f; 
+		float RandomOffsetX = UKismetMathLibrary::RandomFloatInRange(-30.0f, 30.0f);
+		float RandomOffsetY = UKismetMathLibrary::RandomFloatInRange(-10.0f, 10.0f);
+		SpawnLocation.X += RandomOffsetX;
+		SpawnLocation.Y += RandomOffsetY;
+
+		AActor* SpawnedActor; 
+		SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnLocation, GetActorRotation(), SpawnParams);
+		ABaseGoldBag* SpawnedGoldBag = Cast<ABaseGoldBag>(SpawnedActor);
+
 	}
 }
 
