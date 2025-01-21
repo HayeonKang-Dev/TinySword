@@ -15,9 +15,16 @@ public:
 	// Sets default values for this actor's properties
 	ABaseGoldMine();
 
+	bool IsCollapse();
+
+	float Durability; 
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	void DropGoldBag();
 
 public:	
 	// Called every frame

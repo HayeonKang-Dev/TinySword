@@ -55,16 +55,16 @@ public:
 
 	int32 GetTagId() const {return TagId;}
 
-	float Durability; 
-
-	float MaxDurability = 100.0f; 
 
 	float GetDurability() const {return Durability;}
 
 	bool IsCollapse();
 
 	
+private:
+	float Durability; 
 
+	float MaxDurability = 100.0f; 
 	
 
 };
