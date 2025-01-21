@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/BoxComponent.h"
-#include "PaperSpriteComponent.h"
-#include "PaperFlipbookComponent.h"
 #include "BaseCastle.generated.h"
+
+
+class UBoxComponent; 
+class UPaperFlipbookComponent; 
+class USceneComponent;
 
 UCLASS()
 class TINYSWORD_API ABaseCastle : public AActor
@@ -27,6 +29,17 @@ protected:
 
 	void OnCollapse();
 
+	UPROPERTY(EditAnywhere, Category="Components")
+	USceneComponent* RootSceneComponent; 
+
+	UPROPERTY(EditAnywhere, Category="Components")
+	UPaperFlipbookComponent* PaperFlipbookComponent; 
+
+	UPROPERTY(EditAnywhere, Category="Components")
+	UBoxComponent* BoxCollider1; 
+
+	UPROPERTY(EditAnywhere, Category="Components")
+	UBoxComponent* BoxCollider2; 
 
 
 public:	
