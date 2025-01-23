@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PaperCharacter.h"
+#include "PaperFlipbookComponent.h"
 #include "BaseAISheep.generated.h"
 
 /**
@@ -17,7 +18,7 @@ class TINYSWORD_API ABaseAISheep : public APaperCharacter
 	GENERATED_BODY()
 
 public:
-	// virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -38,20 +39,37 @@ protected:
 
 	void ResetSpeed(); 
 
+	UPaperFlipbookComponent* paperFlipbookComponent;
+
 private:
 	void MoveRight(float AxisValue); 
 
 	ATinySwordGameMode* GameMode;
 
+	UPROPERTY(EditAnywhere, Category="Speed")
 	float BoostedSpeed = 100.0f; 
 
+	UPROPERTY(EditAnywhere, Category="Speed")
 	float NormalSpeed = 30.0f; 
 
+	UPROPERTY(EditAnywhere, Category="Speed")
 	float SpeedBoostDuration = 3.f; 
+
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* IdleAnim; 
+	
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* MoveAnim;
 
 	int32 TagId; 
 
+	UPROPERTY(VisibleAnywhere, Category="State")
 	float Health; 
 
 	float MaxHealth = 100; 
+
+	void FlipCharacter(float MoveDirec);
+
+	void UpdateAnimation();
 };

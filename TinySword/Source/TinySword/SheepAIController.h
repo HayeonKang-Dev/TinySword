@@ -37,4 +37,7 @@ private:
 	FTimerHandle Timer; 
 
 	ATinySwordGameMode* GameMode; 
+
+
+	
 };

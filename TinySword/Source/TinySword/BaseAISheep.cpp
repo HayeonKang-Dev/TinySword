@@ -12,16 +12,31 @@ void ABaseAISheep::BeginPlay()
 {
     Super::BeginPlay();
 
+    paperFlipbookComponent = FindComponentByClass<UPaperFlipbookComponent>();
+
     Health = MaxHealth; 
     GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
 
     GameMode->ActiveSheepId.Add(this, GetTagId());
 }
 
-// void ABaseAISheep::Tick(float DeltaTime)
-// {
-//     Super::Tick(float DeltaTime);
-// }
+void ABaseAISheep::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+    UpdateAnimation();
+
+    FVector Velocity = GetVelocity();
+    if (Velocity.SizeSquared() > 0.0f)
+    {
+        FlipCharacter(Velocity.X);
+    }
+
+    // Fix Rotation
+    FRotator CurrentRotation = GetActorRotation();
+    CurrentRotation.Pitch = 0.0f; 
+    CurrentRotation.Yaw = 0.0f; 
+    SetActorRotation(CurrentRotation);
+}
 
 float ABaseAISheep::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
@@ -31,7 +46,8 @@ float ABaseAISheep::TakeDamage(float DamageAmount, FDamageEvent const &DamageEve
     TSubclassOf<ABaseMeat> Meat = ABaseMeat::StaticClass(); 
     if (!IsDead())
     {
-        Health -= ActualDamage; 
+        Health -= ActualDamage;
+        TakeDamageFrom(DamageCauser); 
         if (IsDead())
         {
             SpawnMeat();
@@ -107,4 +123,40 @@ void ABaseAISheep::TakeDamageFrom(AActor *Attacker)
 void ABaseAISheep::ResetSpeed()
 {
     GetCharacterMovement()->MaxWalkSpeed = NormalSpeed; 
+}
+
+
+void ABaseAISheep::FlipCharacter(float MoveDirec)
+{
+    UPaperFlipbookComponent* SpriteComponent = FindComponentByClass<UPaperFlipbookComponent>(); 
+
+    if (SpriteComponent)
+    {
+        if (MoveDirec > 0.0f) SpriteComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+        else if (MoveDirec < 0.0f) SpriteComponent->SetRelativeScale3D(FVector(-1.0f, 1.0f, 1.0f));
+    }
+}
+
+void ABaseAISheep::UpdateAnimation()
+{
+    FVector Velocity = GetVelocity();
+
+    if (!Velocity.IsNearlyZero()) {
+        FVector MoveDirec = Velocity.GetSafeNormal();
+        //FlipCharacter(MoveDirec);
+    }
+
+    bool IsMoving = Velocity.SizeSquared() > KINDA_SMALL_NUMBER; 
+
+    if (IsMoving && MoveAnim && paperFlipbookComponent->GetFlipbook() != MoveAnim)
+    {
+        paperFlipbookComponent->SetFlipbook(MoveAnim);
+ 
+    }
+    else if (!IsMoving && IdleAnim && paperFlipbookComponent->GetFlipbook() != IdleAnim)
+    {
+        paperFlipbookComponent->SetFlipbook(IdleAnim);
+        
+        
+    }
 }
