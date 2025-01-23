@@ -45,5 +45,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UPaperFlipbook* SpawnAnim;
+
+	void PlaySpawnAnim(); 
 	
 };
