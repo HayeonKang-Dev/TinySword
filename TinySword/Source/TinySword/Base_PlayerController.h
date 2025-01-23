@@ -13,5 +13,11 @@ UCLASS()
 class TINYSWORD_API ABase_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 	
+private:
+	bool bShowMouseCursor;
 };

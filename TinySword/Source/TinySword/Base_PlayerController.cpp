@@ -2,4 +2,15 @@
 
 
 #include "Base_PlayerController.h"
+#include "GameFramework/InputSettings.h"
 
+void ABase_PlayerController::BeginPlay()
+{
+    Super::BeginPlay(); 
+
+    bShowMouseCursor = true; 
+
+    FInputModeGameAndUI InputMode; 
+    InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+    SetInputMode(InputMode);
+}
