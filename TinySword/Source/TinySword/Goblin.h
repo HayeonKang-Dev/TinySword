@@ -87,12 +87,32 @@ protected:
 
 	UPaperFlipbookComponent* paperFlipbookComponent;
 
+	
 
 private:
 	void FlipCharacter(bool MoveDirec);
 
-	// ATinySwordGameModeBase* GameMode; 
-
 	float Timer; 
 
+
+	// ATinySwordGameModeBase* GameMode; 
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* IdleAnim; 
+	
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* WalkAnim;
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* AttackAnim;
+
+	FTimerHandle TimerHandleAttack;
+
+	bool bIsAttacking; 
+
+	void UpdateAnimation();
+
+	void ResetToIdle();
+
+	void PlayAttackAnimation();
 };

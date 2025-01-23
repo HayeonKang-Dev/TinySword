@@ -30,8 +30,9 @@ void AGoblin::BeginPlay()
 void AGoblin::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    UE_LOG(LogTemp, Warning, TEXT("bIsAttacking: %s, Velocity: %s"), bIsAttacking ? TEXT("true") : TEXT("false"), *GetVelocity().ToString());
 
-    
+    UpdateAnimation();
 }
 
 // Control Character
@@ -50,7 +51,6 @@ void AGoblin::MoveRight(float Value)
     if (Value != 0.0f)
     {
         AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
-        //paperFlipbookComponent->SetFlipbook(WalkAnim);
     }
 }
 
@@ -62,6 +62,7 @@ void AGoblin::UpDown(float Value)
     }
 }
 
+// Animations
 void AGoblin::FlipCharacter(bool MoveDirec)
 {
     UPaperFlipbookComponent* SpriteComponent = FindComponentByClass<UPaperFlipbookComponent>(); 
@@ -73,6 +74,51 @@ void AGoblin::FlipCharacter(bool MoveDirec)
     }
 }
 
+void AGoblin::UpdateAnimation()
+{
+    if (bIsAttacking) return; 
+
+    FVector Velocity = GetVelocity();
+    bool IsMoving = Velocity.SizeSquared() > KINDA_SMALL_NUMBER; 
+
+    if (IsMoving && WalkAnim && paperFlipbookComponent->GetFlipbook() != WalkAnim)
+    {
+        paperFlipbookComponent->SetFlipbook(WalkAnim);
+ 
+    }
+    else if (!IsMoving && IdleAnim && paperFlipbookComponent->GetFlipbook() != IdleAnim)
+    {
+        paperFlipbookComponent->SetFlipbook(IdleAnim);
+        
+    }
+}
+
+
+void AGoblin::ResetToIdle()
+{
+    bIsAttacking = false; 
+    if (paperFlipbookComponent && IdleAnim) paperFlipbookComponent->SetFlipbook(IdleAnim);
+}
+
+void AGoblin::PlayAttackAnimation()
+{
+    if (bIsAttacking) return; 
+    bIsAttacking = true; 
+
+    if (paperFlipbookComponent && AttackAnim) paperFlipbookComponent->SetFlipbook(AttackAnim);
+
+    if (AttackAnim) 
+    {
+        float AnimDur = AttackAnim->GetTotalDuration();
+        GetWorldTimerManager().SetTimer(
+            TimerHandleAttack,
+            this,
+            &AGoblin::ResetToIdle,
+            AnimDur,
+            false
+        );
+    }
+}
 
 //////////////
 
@@ -102,6 +148,7 @@ bool AGoblin::IsDead() const
 
 void AGoblin::Attack()
 {
+    PlayAttackAnimation();
     IsAttack = true; 
     FVector Start, End;
 
