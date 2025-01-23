@@ -15,10 +15,10 @@ ABaseMeat::ABaseMeat()
 	collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("collision")); 
 	collision->SetupAttachment(RootComponent);
 
-	paperSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("paperSprite")); 
+	paperSprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("paperSprite")); 
 	paperSprite->SetupAttachment(RootComponent);
 
-	animationComponent =CreateDefaultSubobject<UPaperZDAnimationComponent>(TEXT("Animation")); 
+	// animationComponent =CreateDefaultSubobject<UPaperZDAnimationComponent>(TEXT("Animation")); 
 
 }
 

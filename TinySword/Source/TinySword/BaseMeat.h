@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "PaperSpriteComponent.h" 
 #include "PaperZDAnimationComponent.h"
+#include "PaperFlipbookComponent.h"
 #include "BaseMeat.generated.h"
 
 UCLASS()
@@ -37,9 +38,12 @@ private:
 	UCapsuleComponent* collision; 
 
 	UPROPERTY(EditAnywhere)
-	UPaperSpriteComponent* paperSprite; 
+	UPaperFlipbookComponent* paperSprite; 
 
-	UPROPERTY(EditAnywhere)
-	UPaperZDAnimationComponent* animationComponent; 
+	// UPROPERTY(EditAnywhere)
+	// UPaperZDAnimationComponent* animationComponent; 
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* SpawnAnim;
 	
 };
