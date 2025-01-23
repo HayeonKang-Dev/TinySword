@@ -15,10 +15,10 @@ ABaseMeat::ABaseMeat()
 	collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("collision")); 
 	collision->SetupAttachment(RootComponent);
 
-	paperSprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("paperSprite")); 
+	paperSprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("PaperSprite")); 
 	paperSprite->SetupAttachment(RootComponent);
 
-	// animationComponent =CreateDefaultSubobject<UPaperZDAnimationComponent>(TEXT("Animation")); 
+
 
 }
 
@@ -26,7 +26,7 @@ ABaseMeat::ABaseMeat()
 void ABaseMeat::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	PlaySpawnAnim();
 }
 
 // Called every frame
@@ -39,4 +39,14 @@ void ABaseMeat::Tick(float DeltaTime)
 void ABaseMeat::SetTagId(int32 NewTagId)
 {
 	TagId = NewTagId;
+}
+
+void ABaseMeat::PlaySpawnAnim()
+{
+	if (paperSprite && SpawnAnim)
+	{
+		paperSprite->SetLooping(false);
+		paperSprite->SetFlipbook(SpawnAnim);
+		paperSprite->Play();
+	}
 }
