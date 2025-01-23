@@ -30,7 +30,7 @@ void AGoblin::BeginPlay()
 void AGoblin::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    UE_LOG(LogTemp, Warning, TEXT("bIsAttacking: %s, Velocity: %s"), bIsAttacking ? TEXT("true") : TEXT("false"), *GetVelocity().ToString());
+    //UE_LOG(LogTemp, Warning, TEXT("bIsAttacking: %s, Velocity: %s"), bIsAttacking ? TEXT("true") : TEXT("false"), *GetVelocity().ToString());
 
     UpdateAnimation();
 
