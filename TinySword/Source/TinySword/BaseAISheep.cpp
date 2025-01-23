@@ -50,6 +50,7 @@ float ABaseAISheep::TakeDamage(float DamageAmount, FDamageEvent const &DamageEve
         TakeDamageFrom(DamageCauser); 
         if (IsDead())
         {
+            Destroy();
             SpawnMeat();
         }
     }
