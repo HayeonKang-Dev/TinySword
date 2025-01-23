@@ -8,7 +8,7 @@
 #include "PaperSpriteActor.h"
 #include "Components/CapsuleComponent.h"
 #include "PaperSpriteComponent.h" 
-#include "PaperZDAnimationComponent.h"
+#include "PaperFlipbookComponent.h"
 #include "BaseGoldBag.generated.h"
 
 
@@ -47,8 +47,13 @@ private:
 	UCapsuleComponent* collision; 
 
 	UPROPERTY(EditAnywhere)
-	UPaperSpriteComponent* paperSprite; 
+	UPaperFlipbookComponent* paperSprite; 
 
-	UPROPERTY(EditAnywhere)
-	UPaperZDAnimationComponent* animationComponent; 
+	// UPROPERTY(EditAnywhere)
+	// UPaperZDAnimationComponent* animationComponent; 
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* SpawnAnim;
+	
+	void PlaySpawnAnim();
 };

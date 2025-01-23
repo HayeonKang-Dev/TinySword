@@ -17,10 +17,10 @@ ABaseGoldBag::ABaseGoldBag()
 	collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("collision")); 
 	collision->SetupAttachment(RootComponent);
 
-	paperSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("paperSprite")); 
+	paperSprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("paperSprite")); 
 	paperSprite->SetupAttachment(RootComponent);
 
-	animationComponent =CreateDefaultSubobject<UPaperZDAnimationComponent>(TEXT("Animation")); 
+	// animationComponent =CreateDefaultSubobject<UPaperZDAnimationComponent>(TEXT("Animation")); 
 	
 
 }
@@ -29,6 +29,8 @@ ABaseGoldBag::ABaseGoldBag()
 void ABaseGoldBag::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PlaySpawnAnim();
 	
 	GameMode = Cast<ATinySwordGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
@@ -51,4 +53,14 @@ void ABaseGoldBag::SetGoldBagId()
 	TagId = id; 
 	
 	GameMode->ActiveGoldBagId.Add(this, TagId);
+}
+
+void ABaseGoldBag::PlaySpawnAnim()
+{
+	if (paperSprite && SpawnAnim)
+	{
+		paperSprite->SetLooping(false);
+		paperSprite->SetFlipbook(SpawnAnim);
+		paperSprite->Play();
+	}
 }
