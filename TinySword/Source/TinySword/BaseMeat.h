@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/CapsuleComponent.h"
+#include "PaperSpriteComponent.h" 
+#include "PaperZDAnimationComponent.h"
 #include "BaseMeat.generated.h"
 
 UCLASS()
@@ -30,5 +33,13 @@ public:
 private:
 	int32 TagId;
 
+	UPROPERTY(EditAnywhere)
+	UCapsuleComponent* collision; 
+
+	UPROPERTY(EditAnywhere)
+	UPaperSpriteComponent* paperSprite; 
+
+	UPROPERTY(EditAnywhere)
+	UPaperZDAnimationComponent* animationComponent; 
 	
 };

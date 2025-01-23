@@ -9,6 +9,17 @@ ABaseMeat::ABaseMeat()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	USceneComponent* SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+    RootComponent = SceneRoot;
+
+	collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("collision")); 
+	collision->SetupAttachment(RootComponent);
+
+	paperSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("paperSprite")); 
+	paperSprite->SetupAttachment(RootComponent);
+
+	animationComponent =CreateDefaultSubobject<UPaperZDAnimationComponent>(TEXT("Animation")); 
+
 }
 
 // Called when the game starts or when spawned
