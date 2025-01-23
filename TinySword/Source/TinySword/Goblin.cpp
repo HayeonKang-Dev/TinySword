@@ -8,6 +8,8 @@
 #include "GameFramework/Character.h"
 #include "PaperFlipbookComponent.h"
 #include "PaperFlipbook.h" 
+#include "BaseMeat.h"
+#include "BaseGoldBag.h"
 
 
 
@@ -135,6 +137,19 @@ void AGoblin::PlayAttackAnimation()
 void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
 {
     Super::NotifyActorBeginOverlap(OtherActor);
+
+    if (!OtherActor || OtherActor==this) return; 
+
+    if (OtherActor->IsA(ABaseMeat::StaticClass())) 
+    {
+        IncreaseHealth(10);
+        OtherActor->Destroy();
+    }
+    if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
+    {
+        IncreaseMoney(10);
+        OtherActor->Destroy();
+    }
 }
 
 void AGoblin::NotifyActorEndOverlap(AActor *OtherActor)
