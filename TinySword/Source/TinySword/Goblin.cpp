@@ -33,6 +33,7 @@ void AGoblin::Tick(float DeltaTime)
     UE_LOG(LogTemp, Warning, TEXT("bIsAttacking: %s, Velocity: %s"), bIsAttacking ? TEXT("true") : TEXT("false"), *GetVelocity().ToString());
 
     UpdateAnimation();
+
 }
 
 // Control Character
@@ -51,6 +52,7 @@ void AGoblin::MoveRight(float Value)
     if (Value != 0.0f)
     {
         AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
+        FlipCharacter(Value);
     }
 }
 
@@ -63,14 +65,14 @@ void AGoblin::UpDown(float Value)
 }
 
 // Animations
-void AGoblin::FlipCharacter(bool MoveDirec)
+void AGoblin::FlipCharacter(int MoveDirec)
 {
     UPaperFlipbookComponent* SpriteComponent = FindComponentByClass<UPaperFlipbookComponent>(); 
 
     if (SpriteComponent)
     {
-        if (MoveDirec) SpriteComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
-        else SpriteComponent->SetRelativeScale3D(FVector(-1.0f, 1.0f, 1.0f));
+        if (MoveDirec == 1) SpriteComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+        else if (MoveDirec == -1) SpriteComponent->SetRelativeScale3D(FVector(-1.0f, 1.0f, 1.0f));
     }
 }
 
@@ -79,6 +81,12 @@ void AGoblin::UpdateAnimation()
     if (bIsAttacking) return; 
 
     FVector Velocity = GetVelocity();
+
+    if (!Velocity.IsNearlyZero()) {
+        FVector MoveDirec = Velocity.GetSafeNormal();
+        //FlipCharacter(MoveDirec);
+    }
+
     bool IsMoving = Velocity.SizeSquared() > KINDA_SMALL_NUMBER; 
 
     if (IsMoving && WalkAnim && paperFlipbookComponent->GetFlipbook() != WalkAnim)
@@ -89,6 +97,7 @@ void AGoblin::UpdateAnimation()
     else if (!IsMoving && IdleAnim && paperFlipbookComponent->GetFlipbook() != IdleAnim)
     {
         paperFlipbookComponent->SetFlipbook(IdleAnim);
+        
         
     }
 }

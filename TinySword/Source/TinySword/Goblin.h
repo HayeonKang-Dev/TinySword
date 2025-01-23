@@ -90,7 +90,7 @@ protected:
 	
 
 private:
-	void FlipCharacter(bool MoveDirec);
+	void FlipCharacter(int MoveDirec);
 
 	float Timer; 
 
