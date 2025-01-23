@@ -60,6 +60,7 @@ public:
 
 
 private:
+	UPROPERTY(VisibleAnywhere, Category="State")
 	float Durability; 
 
 	float MaxDurability = 100.0f; 

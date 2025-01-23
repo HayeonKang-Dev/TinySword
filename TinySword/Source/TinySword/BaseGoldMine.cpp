@@ -61,10 +61,10 @@ void ABaseGoldMine::DropGoldBag()
 	if (RandomValue == 0)
 	{
 		// drop goldbag logic
-		UObject* SpawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Blueprints/BP_GoldBag.BP_GoldBag"));
+		UObject* SpawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/BP_GoldBag.BP_GoldBag'"));
 		UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
 		UWorld* World = GetWorld();
-		if (!SpawnActor || GeneratedBP || !GeneratedBP->GeneratedClass || !World) return;
+		if (!SpawnActor || !GeneratedBP || !GeneratedBP->GeneratedClass || !World) return;
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this; 
