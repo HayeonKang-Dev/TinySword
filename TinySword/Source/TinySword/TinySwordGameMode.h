@@ -14,6 +14,7 @@
 class ABaseGoldBag; 
 class ABaseAISheep; 
 class ABaseMeat; 
+class ABaseBomb;
 
 UCLASS()
 class TINYSWORD_API ATinySwordGameMode : public AGameMode
@@ -22,6 +23,9 @@ class TINYSWORD_API ATinySwordGameMode : public AGameMode
 	
 public:
 	virtual void Tick(float DeltaTime) override;
+
+	TMap<ABaseBomb*, int32> ActiveBombId;
+    TQueue<int32> ReuseBombId;
 
 	TMap<ABaseGoldBag*, int32> ActiveGoldBagId; 
 	TQueue<int32> ReuseGoldBagId;
