@@ -24,6 +24,8 @@ class TINYSWORD_API ATinySwordGameMode : public AGameMode
 public:
 	virtual void Tick(float DeltaTime) override;
 
+	TMap<int32, FVector>& GetCastleMap() { return CastleMap;}
+	
 	TMap<ABaseBomb*, int32> ActiveBombId;
     TQueue<int32> ReuseBombId;
 
@@ -43,5 +45,6 @@ protected:
 	virtual void BeginPlay() override; 
 
 private:
+	void FindCastlesLocation();
 	
 };
