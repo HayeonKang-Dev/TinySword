@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
+#include "Components/ProgressBar.h"
+
 #include "PlayingWidget.generated.h"
 
 
@@ -28,6 +30,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SpawnButton;
 
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* HPBar;
+
 	void OnSpawnButtonClicked(); 
 
 	bool DecreasePlayerMoney();
@@ -36,6 +41,7 @@ protected:
 
 	void SetBombIndex(); 
 
+	float GetHpBarPercent();
 private:
 	ATinySwordGameMode* GameMode; 
 

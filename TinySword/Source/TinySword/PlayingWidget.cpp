@@ -17,7 +17,8 @@ void UPlayingWidget::NativeConstruct()
     GameMode = Cast<ATinySwordGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
     controlledChar = Cast<AGoblin>(playerController->GetPawn());
 
-    if (SpawnButton) SpawnButton->OnClicked.AddDynamic(this, &UPlayingWidget::OnSpawnButtonClicked);    
+    if (SpawnButton) SpawnButton->OnClicked.AddDynamic(this, &UPlayingWidget::OnSpawnButtonClicked);   
+    if (HPBar) HPBar-> SetPercent(GetHpBarPercent());
 }
 
 void UPlayingWidget::OnSpawnButtonClicked()
@@ -97,4 +98,9 @@ void UPlayingWidget::SetBombIndex()
     else id = GameMode->ActiveBombId.Num() + 1; 
     SpawnedBomb->SetTagId(id); 
     GameMode->ActiveBombId.Add(SpawnedBomb, id);
+}
+
+float UPlayingWidget::GetHpBarPercent()
+{
+    return controlledChar->GetHealth() / 100.0f;
 }
