@@ -7,6 +7,7 @@
 #include "Engine/DamageEvents.h"
 #include "PaperZDCharacter.h"
 #include "PaperFlipbookComponent.h"
+#include "TinySwordPlayerController.h"
 #include "Goblin.generated.h"
 
 /**
@@ -115,4 +116,7 @@ private:
 	void ResetToIdle();
 
 	void PlayAttackAnimation();
+
+
+	ATinySwordPlayerController* playerController;
 };

@@ -9,13 +9,16 @@
 #include "PaperFlipbookComponent.h"
 #include "PaperFlipbook.h" 
 #include "BaseMeat.h"
+#include "BaseBomb.h"
 #include "BaseGoldBag.h"
-
+#include "PlayingWidget.h"
 
 
 void AGoblin::BeginPlay()
 {
     Super::BeginPlay(); 
+
+    playerController = Cast<ATinySwordPlayerController>(GetController());
 
     Health = MaxHealth; 
     Money = 0; 
@@ -131,6 +134,7 @@ void AGoblin::PlayAttackAnimation()
     }
 }
 
+
 //////////////
 
 //////////////
@@ -162,6 +166,23 @@ void AGoblin::NotifyActorEndOverlap(AActor *OtherActor)
 /////////////////
 float AGoblin::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
+    ABaseBomb* impactedBomb = Cast<ABaseBomb>(DamageCauser); 
+    if (impactedBomb && impactedBomb->GetTagId()==TagId) return 0.0f; 
+
+    float DamageToApply = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); 
+    DamageToApply = FMath::Min(Health, DamageToApply); 
+
+    if (!IsDead())
+    {
+        Health -= DamageToApply; 
+
+        if (IsDead())
+        {
+            HandleDeath(); 
+            GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        }
+    }
+
     return 0.0f;
 }
 
