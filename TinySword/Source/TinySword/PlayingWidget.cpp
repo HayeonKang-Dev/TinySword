@@ -16,13 +16,17 @@ void UPlayingWidget::NativeConstruct()
     playerController = Cast<ATinySwordPlayerController>(GetOwningPlayer()); 
     GameMode = Cast<ATinySwordGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
     controlledChar = Cast<AGoblin>(playerController->GetPawn());
+    SpawnButton = Cast<UButton>(GetWidgetFromName(TEXT("SpawnButton")));
+    HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HPBar"))); 
 
     if (SpawnButton) SpawnButton->OnClicked.AddDynamic(this, &UPlayingWidget::OnSpawnButtonClicked);   
-    if (HPBar) HPBar-> SetPercent(GetHpBarPercent());
+
 }
+
 
 void UPlayingWidget::OnSpawnButtonClicked()
 {
+    UE_LOG(LogTemp, Warning, TEXT("SpawnButton Clicked!"));
     if (DecreasePlayerMoney())
     {
         SpawnBomb();
@@ -102,5 +106,11 @@ void UPlayingWidget::SetBombIndex()
 
 float UPlayingWidget::GetHpBarPercent()
 {
-    return controlledChar->GetHealth() / 100.0f;
+    UE_LOG(LogTemp, Warning, TEXT("Health(%f) / MaxHealth(%f) = %f"), controlledChar->GetHealth(), 100.0f, controlledChar->GetHealth()/100.0f);
+    return controlledChar->GetHealthPercent();
+}
+
+void UPlayingWidget::UpdateHealthBar()
+{
+    if (HPBar) HPBar-> SetPercent(GetHpBarPercent());
 }

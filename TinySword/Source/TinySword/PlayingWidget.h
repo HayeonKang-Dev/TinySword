@@ -26,13 +26,18 @@ class TINYSWORD_API UPlayingWidget : public UUserWidget
 public: 
 	virtual void NativeConstruct() override; 
 
-protected: 
-	UPROPERTY(meta = (BindWidget))
-	class UButton* SpawnButton;
+	void UpdateHealthBar();
 
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HPBar;
 
+protected: 
+	UPROPERTY(meta = (BindWidget))
+	class UButton* SpawnButton;
+
+
+
+	UFUNCTION()
 	void OnSpawnButtonClicked(); 
 
 	bool DecreasePlayerMoney();
@@ -41,6 +46,7 @@ protected:
 
 	void SetBombIndex(); 
 
+	UFUNCTION()
 	float GetHpBarPercent();
 private:
 	ATinySwordGameMode* GameMode; 
