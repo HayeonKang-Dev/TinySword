@@ -4,6 +4,7 @@
 #include "TinySwordGameMode.h"
 #include "BaseCastle.h"
 #include "Kismet/GameplayStatics.h"
+#include "BaseBomb.h"
 
 void ATinySwordGameMode::BeginPlay()
 {
