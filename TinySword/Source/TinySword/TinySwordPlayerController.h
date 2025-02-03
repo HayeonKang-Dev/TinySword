@@ -16,6 +16,8 @@ class TINYSWORD_API ATinySwordPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public: 
+	UPROPERTY()
+	UPlayingWidget* playingWidget; 
 
 protected: 
 	virtual void BeginPlay() override; 
@@ -23,8 +25,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<class UPlayingWidget> PlayingWidgetClass; 
 
-	UPROPERTY()
-	class UPlayingWidget* PlayingWidgetInstance; 
+	// UPROPERTY()
+	// class UPlayingWidget* PlayingWidgetInstance; 
+	
 private:
 
 };

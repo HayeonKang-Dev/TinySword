@@ -11,7 +11,7 @@ void ATinySwordPlayerController::BeginPlay()
 
     if (PlayingWidgetClass)
     {
-        PlayingWidgetInstance = CreateWidget<UPlayingWidget>(this, PlayingWidgetClass);
-        if (PlayingWidgetInstance) PlayingWidgetInstance->AddToViewport(); // 위젯 화면 추가
+        playingWidget = CreateWidget<UPlayingWidget>(this, PlayingWidgetClass);
+        if (playingWidget) playingWidget->AddToViewport(); // 위젯 화면 추가
     }
 }
