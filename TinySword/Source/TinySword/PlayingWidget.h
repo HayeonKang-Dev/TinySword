@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"  
 
 #include "PlayingWidget.generated.h"
 
@@ -30,6 +31,10 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HPBar;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* moneyCount;
+
 
 protected: 
 	UPROPERTY(meta = (BindWidget))

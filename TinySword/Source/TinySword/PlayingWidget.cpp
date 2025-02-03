@@ -18,6 +18,7 @@ void UPlayingWidget::NativeConstruct()
     controlledChar = Cast<AGoblin>(playerController->GetPawn());
     SpawnButton = Cast<UButton>(GetWidgetFromName(TEXT("SpawnButton")));
     HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HPBar"))); 
+    moneyCount = Cast<UTextBlock>(GetWidgetFromName(TEXT("MoneyCount")));
 
     if (SpawnButton) SpawnButton->OnClicked.AddDynamic(this, &UPlayingWidget::OnSpawnButtonClicked);   
 
@@ -35,7 +36,10 @@ void UPlayingWidget::OnSpawnButtonClicked()
 
 bool UPlayingWidget::DecreasePlayerMoney()
 {
-    if (playerController && controlledChar) return controlledChar->DecreaseMoney(10);
+    if (playerController && controlledChar) 
+    {
+        return controlledChar->DecreaseMoney(10);
+    }
     return false;
 }
 
@@ -114,3 +118,4 @@ void UPlayingWidget::UpdateHealthBar()
 {
     if (HPBar) HPBar-> SetPercent(GetHpBarPercent());
 }
+
