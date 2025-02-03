@@ -67,6 +67,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	int GetMoneyCount() const; 
 
+	void UpdateMoneyCount(int money);
+
 
 	// Actions
 	UFUNCTION()

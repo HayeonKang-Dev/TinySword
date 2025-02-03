@@ -29,8 +29,12 @@ void AGoblin::BeginPlay()
     //UPaperFlipbook* WalkAnim = LoadObject<UPaperFlipbook>(nullptr, TEXT("/Script/Paper2D.PaperFlipbook'/Game/Animations/Character/TNT_Blue_Walk.TNT_Blue_Walk'"));
 
     Timer = 0.0f; 
-
-    playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
+    if (playerController)
+    {
+        playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
+        UpdateMoneyCount(Money);
+    }
+    
 
 }
 
@@ -156,6 +160,7 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
     if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
     {
         IncreaseMoney(10);
+        UpdateMoneyCount(Money);
         OtherActor->Destroy();
     }
 }
@@ -249,6 +254,7 @@ bool AGoblin::DecreaseMoney(float Amount)
 {
     if (Money < 10) return false;
     Money -= Amount;
+    UpdateMoneyCount(Money);
     return true;
 }
 
@@ -272,6 +278,11 @@ int AGoblin::GetMoneyCount() const
     return Money;
 }
 
+void AGoblin::UpdateMoneyCount(int money)
+{
+    FString moneyStr = FString::Printf(TEXT("%d"), money);
+    playerController->playingWidget->moneyCount->SetText(FText::FromString(moneyStr));
+}
 
 void AGoblin::HandleDeath()
 {
