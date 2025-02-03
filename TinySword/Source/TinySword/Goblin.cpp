@@ -29,6 +29,9 @@ void AGoblin::BeginPlay()
     //UPaperFlipbook* WalkAnim = LoadObject<UPaperFlipbook>(nullptr, TEXT("/Script/Paper2D.PaperFlipbook'/Game/Animations/Character/TNT_Blue_Walk.TNT_Blue_Walk'"));
 
     Timer = 0.0f; 
+
+    playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
+
 }
 
 
@@ -147,6 +150,7 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
     if (OtherActor->IsA(ABaseMeat::StaticClass())) 
     {
         IncreaseHealth(10);
+        playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
         OtherActor->Destroy();
     }
     if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
@@ -175,6 +179,7 @@ float AGoblin::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, A
     if (!IsDead())
     {
         Health -= DamageToApply; 
+        playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
 
         if (IsDead())
         {
