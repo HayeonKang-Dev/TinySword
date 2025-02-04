@@ -3,11 +3,13 @@
 
 #include "TinySwordPlayerController.h"
 #include "Blueprint/UserWidget.h"
-
+#include "TinySwordGameMode.h"
 
 void ATinySwordPlayerController::BeginPlay()
 {
     Super::BeginPlay();
+
+    GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
 
     bShowMouseCursor = true; 
     
@@ -18,7 +20,19 @@ void ATinySwordPlayerController::BeginPlay()
     }
 }
 
+
 void ATinySwordPlayerController::SetTagId(int32 newTagId)
 {
     TagId = newTagId;
+}
+
+
+void ATinySwordPlayerController::OnPossess(APawn *aPawn)
+{
+    Super::OnPossess(aPawn);
+}
+
+void ATinySwordPlayerController::OnUnPossess()
+{
+    Super::OnUnPossess();
 }

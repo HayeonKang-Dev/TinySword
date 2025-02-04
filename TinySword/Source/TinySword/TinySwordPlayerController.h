@@ -23,11 +23,13 @@ public:
 	UPROPERTY()
 	UPlayingWidget* playingWidget; 
 
-
 	int32 GetTagId() const {return TagId;}
 
 	void SetTagId(int32 newTagId);
 
+	virtual void OnPossess(APawn* aPawn) override;
+	virtual void OnUnPossess() override;
+	
 protected: 
 	virtual void BeginPlay() override; 
 
@@ -39,7 +41,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	int32 TagId;
+
+	
 	
 private:
+
+	ATinySwordGameMode* GameMode; 
 
 };
