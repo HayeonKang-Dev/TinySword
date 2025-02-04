@@ -9,6 +9,7 @@
 void ATinySwordGameMode::BeginPlay()
 {
     Super::BeginPlay();
+    FindCastlesLocation();
 }
 
 
