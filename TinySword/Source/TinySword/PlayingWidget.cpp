@@ -30,6 +30,7 @@ void UPlayingWidget::OnSpawnButtonClicked()
     UE_LOG(LogTemp, Warning, TEXT("SpawnButton Clicked!"));
     if (DecreasePlayerMoney())
     {
+        UE_LOG(LogTemp, Warning, TEXT("Decrease Plyer's Money Success"));
         SpawnBomb();
     }
 }
@@ -68,23 +69,28 @@ void UPlayingWidget::SpawnBomb()
                 break;
 
             default: 
+                UE_LOG(LogTemp, Warning, TEXT("Case Number is ..."));
                 break;
         }
 
         UBlueprint* GeneratedBP = Cast<UBlueprint>(spawnActor); 
         UWorld* World = GetWorld(); 
-        if (!spawnActor || !GeneratedBP || !GeneratedBP->GeneratedClass || !World) return; 
+
+        if (!spawnActor || !GeneratedBP || !GeneratedBP->GeneratedClass || !World) {
+            return; 
+        }
 
         FActorSpawnParameters SpawnParams; 
         SpawnParams.Owner = controlledChar; 
         SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
 
         FVector* FoundLocation = CastleMap.Find(controlledChar->GetTagId()); 
+       
         if(FoundLocation)
         {
             SpawnLocation = *FoundLocation; 
             SpawnLocation.Z = 73.0f; 
-            SpawnLocation.Y += 80.0f;
+            SpawnLocation.Y += 50.0f;
             
             AActor* OwnerActor = controlledChar; 
             AActor* SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnLocation, OwnerActor->GetActorRotation(), SpawnParams);
