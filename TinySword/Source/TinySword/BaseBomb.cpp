@@ -24,6 +24,11 @@ void ABaseBomb::BeginPlay()
 void ABaseBomb::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    FRotator CurrentRotation = GetActorRotation();
+    CurrentRotation.Pitch = 0.0f; 
+    CurrentRotation.Yaw = 0.0f; 
+    SetActorRotation(CurrentRotation);
 }
 
 
