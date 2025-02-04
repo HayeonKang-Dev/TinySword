@@ -1,0 +1,67 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/Button.h"
+#include "PlayingWidget.h"
+#include "SelectCharacterWidget.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class TINYSWORD_API USelectCharacterWidget : public UUserWidget
+{
+	GENERATED_BODY()
+
+public: 
+	virtual void NativeConstruct() override; 
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+	UPROPERTY()
+	UPlayingWidget* playingWidget; 
+
+	
+protected:
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<class UPlayingWidget> PlayingWidgetClass; 
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* RedButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* YellowButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* BlueButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* PurpleButton;
+
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* QuitButton;
+
+	UFUNCTION()
+	void OnRedButtonClicked();
+
+	UFUNCTION()
+	void OnYellowButtonClicked();
+
+	UFUNCTION()
+	void OnBlueButtonClicked();
+
+	UFUNCTION()
+	void OnPurpleButtonClicked();
+
+	UFUNCTION()
+	void OnQuitButtonClicked();
+
+private:
+	int32 ClickCnt = 0;
+
+	ATinySwordPlayerController* PC; 
+};
