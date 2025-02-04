@@ -11,6 +11,7 @@
 /**
  * 
  */
+class ATinySwordGameMode;
 UCLASS()
 class TINYSWORD_API USelectCharacterWidget : public UUserWidget
 {
@@ -64,4 +65,6 @@ private:
 	int32 ClickCnt = 0;
 
 	ATinySwordPlayerController* PC; 
+
+	ATinySwordGameMode* GameMode;
 };

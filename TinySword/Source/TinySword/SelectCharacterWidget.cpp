@@ -3,11 +3,15 @@
 
 #include "SelectCharacterWidget.h"
 #include "TinySwordPlayerController.h"
+#include "TinySwordGameMode.h"
+#include "Goblin.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 
 void USelectCharacterWidget::NativeConstruct()
 {
     Super::NativeConstruct(); 
+
+    GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
 
     RedButton = Cast<UButton>(GetWidgetFromName(TEXT("RedButton")));
     YellowButton = Cast<UButton>(GetWidgetFromName(TEXT("YellowButton")));
@@ -29,7 +33,7 @@ void USelectCharacterWidget::NativeTick(const FGeometry &MyGeometry, float InDel
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
 
-    if (ClickCnt == 4)
+    if (ClickCnt == 1) // 4
     {
         UE_LOG(LogTemp, Warning, TEXT("Click Cnt == 4!!"));
         if (PlayingWidgetClass)
@@ -51,10 +55,14 @@ void USelectCharacterWidget::OnRedButtonClicked()
     {
         PC->SetTagId(2);
         PC->playingWidget = playingWidget;
+
+        ClickCnt++;
+        UE_LOG(LogTemp, Warning, TEXT("RedButtonClicked: %d"), ClickCnt);
+        RedButton->SetIsEnabled(false);
+        AGoblin** Goblin = GameMode->GoblinMap.Find(2);
+        if (Goblin) PC->OnPossess(*Goblin);
     }
-    ClickCnt++;
-    UE_LOG(LogTemp, Warning, TEXT("RedButtonClicked: %d"), ClickCnt);
-    RedButton->SetIsEnabled(false);
+    
 }
 
 void USelectCharacterWidget::OnYellowButtonClicked()
@@ -69,6 +77,8 @@ void USelectCharacterWidget::OnYellowButtonClicked()
     ClickCnt++;
     UE_LOG(LogTemp, Warning, TEXT("YellowButtonClicked: %d"), ClickCnt);
     YellowButton->SetIsEnabled(false);
+    AGoblin** Goblin = GameMode->GoblinMap.Find(3);
+    if (Goblin) PC->OnPossess(*Goblin);
 }
 
 void USelectCharacterWidget::OnBlueButtonClicked()
@@ -82,6 +92,8 @@ void USelectCharacterWidget::OnBlueButtonClicked()
     ClickCnt++;
     UE_LOG(LogTemp, Warning, TEXT("BlueButtonClicked: %d"), ClickCnt);
     BlueButton->SetIsEnabled(false);
+    AGoblin** Goblin = GameMode->GoblinMap.Find(0);
+    if (Goblin) PC->OnPossess(*Goblin);
 }
 
 void USelectCharacterWidget::OnPurpleButtonClicked()
@@ -95,6 +107,8 @@ void USelectCharacterWidget::OnPurpleButtonClicked()
     ClickCnt++;
     UE_LOG(LogTemp, Warning, TEXT("PurpleButtonClicked: %d"), ClickCnt);
     PurpleButton->SetIsEnabled(false);
+    AGoblin** Goblin = GameMode->GoblinMap.Find(1);
+    if (Goblin) PC->OnPossess(*Goblin);
 }
 
 void USelectCharacterWidget::OnQuitButtonClicked()
