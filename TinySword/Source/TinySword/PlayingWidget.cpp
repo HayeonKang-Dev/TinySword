@@ -22,6 +22,13 @@ void UPlayingWidget::NativeConstruct()
 
     if (SpawnButton) SpawnButton->OnClicked.AddDynamic(this, &UPlayingWidget::OnSpawnButtonClicked);   
 
+    // 초기화
+    HPBar->SetPercent(100.0f);
+
+    FString moneyStr = FString::Printf(TEXT("%d"), 0);
+    moneyCount->SetText(FText::FromString(moneyStr));
+
+    playerController->playingWidget = this;
 }
 
 
