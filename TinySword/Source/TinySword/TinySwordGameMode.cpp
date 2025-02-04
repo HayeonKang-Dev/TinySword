@@ -5,11 +5,13 @@
 #include "BaseCastle.h"
 #include "Kismet/GameplayStatics.h"
 #include "BaseBomb.h"
+#include "Goblin.h"
 
 void ATinySwordGameMode::BeginPlay()
 {
     Super::BeginPlay();
     FindCastlesLocation();
+    FindAllGoblins();
 }
 
 
@@ -27,5 +29,20 @@ void ATinySwordGameMode::FindCastlesLocation()
     {
         ABaseCastle* castle = Cast<ABaseCastle>(Castle); 
         CastleMap.Add(castle->GetTagId(), castle->GetActorLocation());
+    }
+}
+
+void ATinySwordGameMode::FindAllGoblins()
+{
+    TArray<AActor*> AllGoblins; 
+    UWorld* World = GetWorld(); 
+    if (World)
+    {
+        UGameplayStatics::GetAllActorsOfClass(World, AGoblin::StaticClass(), AllGoblins);
+        for (AActor* Goblin : AllGoblins)
+        {
+            AGoblin* goblin = Cast<AGoblin>(Goblin); 
+            if (goblin) GoblinMap.Add(goblin->GetTagId(), goblin);
+        }
     }
 }

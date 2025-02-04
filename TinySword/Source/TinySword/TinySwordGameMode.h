@@ -15,6 +15,7 @@ class ABaseGoldBag;
 class ABaseAISheep; 
 class ABaseMeat; 
 class ABaseBomb;
+class AGoblin;
 
 UCLASS()
 class TINYSWORD_API ATinySwordGameMode : public AGameMode
@@ -41,10 +42,14 @@ public:
 	TMap<ABaseMeat*, int32> ActiveMeatId; 
     ABaseMeat* FindMeatById(const TMap<ABaseMeat*, int32>&Map, int32 TargetValue);
 
+	TMap<int32, AGoblin*> GoblinMap;
+
 protected:
 	virtual void BeginPlay() override; 
 
 private:
 	void FindCastlesLocation();
+
+	void FindAllGoblins();
 	
 };
