@@ -30,7 +30,7 @@ void UPlayingWidget::OnSpawnButtonClicked()
     UE_LOG(LogTemp, Warning, TEXT("SpawnButton Clicked!"));
     if (DecreasePlayerMoney())
     {
-        UE_LOG(LogTemp, Warning, TEXT("Decrease Plyer's Money Success"));
+        UE_LOG(LogTemp, Warning, TEXT("Decrease Player's Money Success"));
         SpawnBomb();
     }
 }
@@ -89,6 +89,7 @@ void UPlayingWidget::SpawnBomb()
         if(FoundLocation)
         {
             SpawnLocation = *FoundLocation; 
+            SpawnLocation.X += 40.0f;
             SpawnLocation.Z = 73.0f; 
             SpawnLocation.Y += 50.0f;
             
