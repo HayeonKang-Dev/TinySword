@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "PlayingWidget.h"
+#include "MainWidget.h"
 #include "TinySwordPlayerController.generated.h"
 
 /**
@@ -17,16 +18,27 @@ class TINYSWORD_API ATinySwordPlayerController : public APlayerController
 
 public: 
 	UPROPERTY()
+	UMainWidget* MainWidget; 
+
+	UPROPERTY()
 	UPlayingWidget* playingWidget; 
+
+
+	int32 GetTagId() const {return TagId;}
+
+	void SetTagId(int32 newTagId);
 
 protected: 
 	virtual void BeginPlay() override; 
 
 	UPROPERTY(EditAnywhere, Category="UI")
-	TSubclassOf<class UPlayingWidget> PlayingWidgetClass; 
+	TSubclassOf<class UMainWidget> MainWidgetClass; 
 
 	// UPROPERTY()
 	// class UPlayingWidget* PlayingWidgetInstance; 
+
+	UPROPERTY(VisibleAnywhere)
+	int32 TagId;
 	
 private:
 

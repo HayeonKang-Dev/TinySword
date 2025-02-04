@@ -11,9 +11,14 @@ void ATinySwordPlayerController::BeginPlay()
 
     bShowMouseCursor = true; 
     
-    if (PlayingWidgetClass)
+    if (MainWidgetClass)
     {
-        playingWidget = CreateWidget<UPlayingWidget>(this, PlayingWidgetClass);
-        if (playingWidget) playingWidget->AddToViewport(); // 위젯 화면 추가
+        MainWidget = CreateWidget<UMainWidget>(this, MainWidgetClass);
+        if (MainWidget) MainWidget->AddToViewport(); // 위젯 화면 추가
     }
+}
+
+void ATinySwordPlayerController::SetTagId(int32 newTagId)
+{
+    TagId = newTagId;
 }
