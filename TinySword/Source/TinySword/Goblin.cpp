@@ -12,6 +12,7 @@
 #include "BaseBomb.h"
 #include "BaseGoldBag.h"
 #include "PlayingWidget.h"
+#include "GameFramework/HUD.h"
 
 
 void AGoblin::BeginPlay()
@@ -29,11 +30,11 @@ void AGoblin::BeginPlay()
     //UPaperFlipbook* WalkAnim = LoadObject<UPaperFlipbook>(nullptr, TEXT("/Script/Paper2D.PaperFlipbook'/Game/Animations/Character/TNT_Blue_Walk.TNT_Blue_Walk'"));
 
     Timer = 0.0f; 
-    if (playerController && playerController->playingWidget)
-    {
-        playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
-        UpdateMoneyCount(Money);
-    }
+    // if (playerController && playerController->playingWidget)
+    // {
+    //     playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
+    //     UpdateMoneyCount(Money);
+    // }
     
 
 }
@@ -154,7 +155,7 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
     if (OtherActor->IsA(ABaseMeat::StaticClass())) 
     {
         IncreaseHealth(10);
-        playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
+        if (playerController && playerController->playingWidget) playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
         OtherActor->Destroy();
     }
     if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
@@ -281,7 +282,7 @@ int AGoblin::GetMoneyCount() const
 void AGoblin::UpdateMoneyCount(int money)
 {
     FString moneyStr = FString::Printf(TEXT("%d"), money);
-    playerController->playingWidget->moneyCount->SetText(FText::FromString(moneyStr));
+    if (playerController && playerController->playingWidget) playerController->playingWidget->moneyCount->SetText(FText::FromString(moneyStr));
 }
 
 void AGoblin::HandleDeath()
