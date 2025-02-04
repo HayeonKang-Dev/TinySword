@@ -9,6 +9,8 @@ void ATinySwordPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
+    bShowMouseCursor = true; 
+    
     if (PlayingWidgetClass)
     {
         playingWidget = CreateWidget<UPlayingWidget>(this, PlayingWidgetClass);
