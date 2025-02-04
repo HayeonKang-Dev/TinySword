@@ -20,17 +20,18 @@ void ABombAIController::BeginPlay()
 void ABombAIController::OnPossess(APawn *InPawn)
 {
     Super::OnPossess(InPawn); 
-
+    UE_LOG(LogTemp, Warning, TEXT("Start Possess Bomb"));
     controlledBomb = Cast<ABaseBomb>(GetPawn()); 
     bHasArrived = false; 
     bIsReadyToExplode = false; 
     ElapsedTime = 0.0f;
 
     FVector CurrentLocation; 
-    controlledBomb = Cast<ABaseBomb>(InPawn); 
+    //controlledBomb = Cast<ABaseBomb>(InPawn); 
 
     if (controlledBomb)
     {
+        UE_LOG(LogTemp, Warning, TEXT("Controlled Bomb is not null"));
         CurrentLocation = controlledBomb->GetActorLocation(); 
         EnemyCastleLocation = GetRandomCastleLocation(controlledBomb->GetTagId()); 
         FVector NewLocation(EnemyCastleLocation.X, EnemyCastleLocation.Y, CurrentLocation.Z);
@@ -51,6 +52,7 @@ void ABombAIController::Tick(float DeltaTime)
 
     if (!IsDead())
     {
+        UE_LOG(LogTemp, Warning, TEXT("Tick - bomb is not dead"));
         MoveToCastle(EnemyCastleLocation);
         const float DistanceSquared = FVector::DistSquared(controlledBomb->GetActorLocation(), EnemyCastleLocation); 
         if (DistanceSquared <= FMath::Square(30.0f))
@@ -126,6 +128,7 @@ FVector ABombAIController::GetRandomCastleLocation(int TagId)
 
 void ABombAIController::MoveToCastle(const FVector &CastleLocation)
 {
+    UE_LOG(LogTemp, Warning, TEXT("Entered in MoveToCastle"));
     FNavLocation ClosetPoint; 
     if(CastleLocation != FVector::ZeroVector)
     {
