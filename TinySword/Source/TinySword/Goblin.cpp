@@ -29,7 +29,7 @@ void AGoblin::BeginPlay()
     //UPaperFlipbook* WalkAnim = LoadObject<UPaperFlipbook>(nullptr, TEXT("/Script/Paper2D.PaperFlipbook'/Game/Animations/Character/TNT_Blue_Walk.TNT_Blue_Walk'"));
 
     Timer = 0.0f; 
-    if (playerController)
+    if (playerController && playerController->playingWidget)
     {
         playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
         UpdateMoneyCount(Money);
