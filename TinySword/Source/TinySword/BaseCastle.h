@@ -58,6 +58,7 @@ public:
 
 	
 private:
+	UPROPERTY(VisibleAnywhere)
 	float Durability; 
 
 	float MaxDurability = 100.0f; 
