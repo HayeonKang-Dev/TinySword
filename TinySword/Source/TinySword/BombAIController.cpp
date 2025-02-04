@@ -34,8 +34,11 @@ void ABombAIController::OnPossess(APawn *InPawn)
         UE_LOG(LogTemp, Warning, TEXT("Controlled Bomb is not null"));
         CurrentLocation = controlledBomb->GetActorLocation(); 
         EnemyCastleLocation = GetRandomCastleLocation(controlledBomb->GetTagId()); 
+        UE_LOG(LogTemp, Warning, TEXT("Destination_Origin : %s"), *EnemyCastleLocation.ToString());
+
         FVector NewLocation(EnemyCastleLocation.X, EnemyCastleLocation.Y, CurrentLocation.Z);
         EnemyCastleLocation = NewLocation;
+        UE_LOG(LogTemp, Warning, TEXT("Destination : %s"), *EnemyCastleLocation.ToString());
     }
     
 }
@@ -52,7 +55,7 @@ void ABombAIController::Tick(float DeltaTime)
 
     if (!IsDead())
     {
-        UE_LOG(LogTemp, Warning, TEXT("Tick - bomb is not dead"));
+       
         MoveToCastle(EnemyCastleLocation);
         const float DistanceSquared = FVector::DistSquared(controlledBomb->GetActorLocation(), EnemyCastleLocation); 
         if (DistanceSquared <= FMath::Square(30.0f))
@@ -100,35 +103,23 @@ void ABombAIController::AddToReuseId()
 
 FVector ABombAIController::GetRandomCastleLocation(int TagId)
 {
-    TArray<AActor*> AllCastles; 
-    TArray<AActor*> FoundCastles; 
+    TArray<FVector> ValidCastleLocations; 
 
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCastle::StaticClass(), AllCastles); 
-
-    for (AActor* Castle : AllCastles)
+    for (const TPair<int32, FVector>& CastlePair : GameMode->GetCastleMap())
     {
-        ABaseCastle* baseCastle = Cast<ABaseCastle>(Castle); 
-        if(baseCastle && baseCastle->GetTagId() != TagId && !baseCastle->IsCollapse())
-            FoundCastles.Add(Castle);
+        if (CastlePair.Key != TagId) ValidCastleLocations.Add(CastlePair.Value);
     }
 
-    if (FoundCastles.Num() > 0)
+    if (ValidCastleLocations.Num() > 0)
     {
-        int32 randIdx = FMath::RandRange(0, FoundCastles.Num() -1); 
-        AActor* randomCastle = FoundCastles[randIdx]; 
-        if (randomCastle)
-        {
-            FVector CastleLocation = randomCastle->GetActorLocation(); 
-            CastleLocation.Y += 100.0f; 
-            return CastleLocation; 
-        }
+        int32 RandomIndex = FMath::RandRange(0, ValidCastleLocations.Num() - 1); 
+        return ValidCastleLocations[RandomIndex];
     }
-    return FVector::ZeroVector;
+    else return FVector::ZeroVector;
 }
 
 void ABombAIController::MoveToCastle(const FVector &CastleLocation)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Entered in MoveToCastle"));
     FNavLocation ClosetPoint; 
     if(CastleLocation != FVector::ZeroVector)
     {
