@@ -63,4 +63,6 @@ private:
 	FVector SpawnLocation;
 
 	ABaseBomb* SpawnedBomb;
+
+	FVector GetBombSpawnPoint(UWorld* World, FVector& FoundLocation);
 };

@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "TinySwordPlayerController.h"
 #include "TinySwordGameMode.h"
+#include "NavigationSystem.h"
 #include "BaseBomb.h"
 
 void UPlayingWidget::NativeConstruct()
@@ -28,7 +29,7 @@ void UPlayingWidget::NativeConstruct()
     FString moneyStr = FString::Printf(TEXT("%d"), 0);
     moneyCount->SetText(FText::FromString(moneyStr));
 
-    playerController->playingWidget = this;
+    //playerController->playingWidget = this;
 }
 
 
@@ -95,13 +96,9 @@ void UPlayingWidget::SpawnBomb()
        
         if(FoundLocation)
         {
-            SpawnLocation = *FoundLocation; 
-            SpawnLocation.X += 40.0f;
-            SpawnLocation.Z = 73.0f; 
-            SpawnLocation.Y += 50.0f;
             
             AActor* OwnerActor = controlledChar; 
-            AActor* SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnLocation, OwnerActor->GetActorRotation(), SpawnParams);
+            AActor* SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GetBombSpawnPoint(World, *FoundLocation), OwnerActor->GetActorRotation(), SpawnParams);
             
             
             if (SpawnedActor)
@@ -126,6 +123,28 @@ float UPlayingWidget::GetHpBarPercent()
 {
     UE_LOG(LogTemp, Warning, TEXT("Health(%f) / MaxHealth(%f) = %f"), controlledChar->GetHealth(), 100.0f, controlledChar->GetHealth()/100.0f);
     return controlledChar->GetHealthPercent();
+}
+
+FVector UPlayingWidget::GetBombSpawnPoint(UWorld *World, FVector &FoundLocation)
+{
+    UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(World);
+    if (!NavSys) return FVector::ZeroVector;
+
+    SpawnLocation = FoundLocation; 
+    SpawnLocation.X += 100.0f;
+    SpawnLocation.Z = -275.647822f; 
+    SpawnLocation.Y += 80.0f;
+
+    FNavLocation DestinationLocation;
+    FVector QueryExtent(100.0f, 100.0f, 10.0f);
+    UE_LOG(LogTemp, Warning, TEXT("Entered in GetBombSpawnPoint..."));
+    // if (NavSys->ProjectPointToNavigation(SpawnLocation, DestinationLocation, QueryExtent)) return DestinationLocation.Location;
+    // {
+    //     UE_LOG(LogTemp, Warning, TEXT("Spawn Location Update to Nav : %s"), *DestinationLocation.Location.ToString());
+    //     return DestinationLocation.Location;
+    // }
+    // if (NavSys->GetRandomPointInNavigableRadius(SpawnLocation, 300.0f, DestinationLocation)) return DestinationLocation.Location;
+    return SpawnLocation;
 }
 
 void UPlayingWidget::UpdateHealthBar()
