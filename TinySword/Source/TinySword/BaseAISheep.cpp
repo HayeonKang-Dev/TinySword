@@ -133,8 +133,8 @@ void ABaseAISheep::FlipCharacter(float MoveDirec)
 
     if (SpriteComponent)
     {
-        if (MoveDirec > 0.0f) SpriteComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
-        else if (MoveDirec < 0.0f) SpriteComponent->SetRelativeScale3D(FVector(-1.0f, 1.0f, 1.0f));
+        if (MoveDirec > 0.0f) SpriteComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
+        else if (MoveDirec < 0.0f) SpriteComponent->SetRelativeScale3D(FVector(-1.5f, 1.5f, 1.5f));
     }
 }
 
