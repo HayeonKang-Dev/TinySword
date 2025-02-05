@@ -112,6 +112,7 @@ FVector ABombAIController::GetRandomCastleLocation(int TagId)
 
     if (ValidCastleLocations.Num() > 0)
     {
+        UE_LOG(LogTemp, Warning, TEXT("Valid Castle numebr: %d"), ValidCastleLocations.Num());
         int32 RandomIndex = FMath::RandRange(0, ValidCastleLocations.Num() - 1); 
         return ValidCastleLocations[RandomIndex];
     }
@@ -124,7 +125,7 @@ void ABombAIController::MoveToCastle(const FVector &CastleLocation)
     if(CastleLocation != FVector::ZeroVector)
     {
         UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()); 
-        if (NavSystem && NavSystem->ProjectPointToNavigation(CastleLocation, ClosetPoint, FVector(0.0f, 0.0f, 0.0f)))
+        if (NavSystem && NavSystem->ProjectPointToNavigation(CastleLocation, ClosetPoint, FVector(70.0f, 70.0f, 0.0f)))
         {
             UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ClosetPoint.Location); 
         }
