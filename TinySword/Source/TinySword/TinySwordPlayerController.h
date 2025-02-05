@@ -31,6 +31,7 @@ public:
 	virtual void OnUnPossess() override;
 	
 	void SetPlayingWidget(UPlayingWidget* playing);
+	
 protected: 
 	virtual void BeginPlay() override; 
 
