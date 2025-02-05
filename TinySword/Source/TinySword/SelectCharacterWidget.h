@@ -12,6 +12,7 @@
  * 
  */
 class ATinySwordGameMode;
+class UMainWidget;
 UCLASS()
 class TINYSWORD_API USelectCharacterWidget : public UUserWidget
 {
@@ -25,10 +26,16 @@ public:
 	UPROPERTY()
 	UPlayingWidget* playingWidget; 
 
+	UPROPERTY()
+	UMainWidget* mainWidget; 
+
 	
 protected:
 	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<class UPlayingWidget> PlayingWidgetClass; 
+
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<class UMainWidget> MainWidgetClass; 
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* RedButton;

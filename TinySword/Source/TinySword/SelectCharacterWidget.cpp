@@ -6,6 +6,7 @@
 #include "TinySwordGameMode.h"
 #include "Goblin.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "MainWidget.h"
 
 void USelectCharacterWidget::NativeConstruct()
 {
@@ -40,6 +41,7 @@ void USelectCharacterWidget::NativeTick(const FGeometry &MyGeometry, float InDel
         {
             playingWidget = CreateWidget<UPlayingWidget>(this, PlayingWidgetClass);
             UWidgetLayoutLibrary::RemoveAllWidgets(this);
+            PC->SetPlayingWidget(playingWidget);
             if (playingWidget) playingWidget->AddToViewport(); // 위젯 화면 추가
 
         }
@@ -113,4 +115,11 @@ void USelectCharacterWidget::OnPurpleButtonClicked()
 
 void USelectCharacterWidget::OnQuitButtonClicked()
 {
+    if (MainWidgetClass)
+    {
+        mainWidget = CreateWidget<UMainWidget>(this, MainWidgetClass);
+        UWidgetLayoutLibrary::RemoveAllWidgets(this);
+        if (mainWidget) mainWidget->AddToViewport(); // 위젯 화면 추가
+
+    }
 }
