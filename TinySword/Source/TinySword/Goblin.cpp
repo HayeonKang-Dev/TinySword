@@ -84,8 +84,8 @@ void AGoblin::FlipCharacter(int MoveDirec)
 
     if (SpriteComponent)
     {
-        if (MoveDirec == 1) SpriteComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
-        else if (MoveDirec == -1) SpriteComponent->SetRelativeScale3D(FVector(-1.0f, 1.0f, 1.0f));
+        if (MoveDirec == 1) SpriteComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
+        else if (MoveDirec == -1) SpriteComponent->SetRelativeScale3D(FVector(-1.5f, 1.5f, 1.5f));
     }
 }
 
@@ -281,8 +281,16 @@ int AGoblin::GetMoneyCount() const
 
 void AGoblin::UpdateMoneyCount(int money)
 {
+    UE_LOG(LogTemp, Warning, TEXT("Entered in UpdateMoneyCount"));
     FString moneyStr = FString::Printf(TEXT("%d"), money);
-    if (playerController && playerController->playingWidget) playerController->playingWidget->moneyCount->SetText(FText::FromString(moneyStr));
+    if (playerController && playerController->playingWidget) 
+    {
+        UE_LOG(LogTemp, Warning, TEXT("in Goblin class, UpdateMoneyCount -> NOT NULLPTR"));
+        playerController->playingWidget->moneyCount->SetText(FText::FromString(moneyStr));
+    }
+
+    // playerController가 널인지, playingWidget이 널인지 분리해서 판별해야 함. 
+
 }
 
 void AGoblin::HandleDeath()
