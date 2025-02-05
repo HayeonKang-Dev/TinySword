@@ -1,0 +1,246 @@
+#pragma once
+//#include "CoreMinimal.h"
+
+struct HEAD {
+	short Command;
+};
+
+struct CharacterSelect {
+	struct Request {
+		struct HEAD H;
+		char playerId[40];
+		int selectCharIndex; // 선택한 캐릭터에 미리 부여되어 있던 id 값 
+	};
+
+	struct Response {
+		struct HEAD H;
+		int playerIndex;
+	};
+
+	struct Notification {
+		struct HEAD H;
+		char playerId[40];
+		int playerIndex;
+	};
+};
+
+struct Move {
+	// 0x10, 0x11, 0x12
+	// key => 'W' : 0x01, 'A' : 0x02, 'S' : 0x04, 'D': 0x08
+	//   0x01 + 0x-8 = 0x09
+	// key = index 
+	struct Request {
+		struct HEAD H;
+		int ActorType; // player, sheep, bomb = 0, 1, 2
+		int ActorIndex; // 원래 playerIndex
+		char key; // 방향키 
+		//FVector Pos;
+		float X; 
+		float Y;
+	};
+
+	struct Response {
+		struct HEAD H;
+	};
+
+	struct Notification {
+		struct HEAD H;
+		int ActorType;
+		int ActorIndex;
+		char key;
+		//FVector Pos;
+		float X; 
+		float Y; 
+	};
+};
+
+struct Attack {
+	struct Request {
+		struct HEAD H;
+		int targetIndex;
+		int targetType;
+		int AttackerType;
+		int AttackerIndex;
+		int Damage; 
+		float X, Y;
+	};
+
+	struct Response {
+		struct HEAD H;
+		int hityn;
+	};
+
+	struct Notification {
+		struct HEAD H;
+		int AttackerType; // player, bomb = 0, 1
+		int AttackerIndex;
+		int targetType; // player, bomb, castle, sheep, goldmine = 0, 1, 2, 3, 4
+		int targetIndex;
+		//FVector Pos;
+		int Damage;
+		int targetHp;
+		float X, Y;
+	};
+};
+
+struct Spawn {
+	struct Request {
+		struct HEAD H;
+		int SpawnActorIndex; // Bomb, Player  = 0, 1
+		int SpawnType; 
+		//FVector Pos;
+		int playerIndex;
+		float X, Y;
+	};
+
+	struct Response {
+		struct HEAD H;
+		int successyn;
+	};
+
+	struct Notification {
+		struct HEAD H;
+		//FVector Pos;
+		int SpawnType;
+		int SpawnActorIndex;
+		float X, Y;
+	};
+};
+
+struct GetItem {
+	struct Request {
+		struct HEAD H;
+		int playerIndex;
+		int ItemType; // Meat, Coin = 0, 1
+		int itemIndex;
+		int playerHp; 
+		int playerCoin; 
+		float X, Y;
+	};
+
+	struct Response {
+		struct HEAD H;
+		int successyn;
+		int playerHp;
+		int playerCoin;
+	};
+
+	struct Notification {
+		struct HEAD H;
+		int playerIndex;
+		//FVector Pos;
+		int playerHp;
+		int playerCoin;
+		int ItemType;
+		float X, Y;
+	};
+};
+
+struct BombExplode {
+	struct Request {
+		struct HEAD H;
+		int BombIndex;
+		int Damage; 
+		int targetType; // player, castle, bomb, sheep, goldmine = 0, 1, 2, 3, 4 
+		//int targetIndex; 
+		int DamagedActorIndex;
+		float X, Y;
+	};
+
+	struct Response {
+		struct HEAD H;
+	};
+
+	struct Notification {
+		struct HEAD H;
+		//FVector Pos;
+		int DamagedActorIndex;
+		int Damage;
+		int targetType;
+		int targetHp; // target last hp
+		float X, Y;
+	};
+};
+
+struct PlayerDead {
+	struct Request {
+		struct HEAD H;
+		int playerIndex;
+		float X, Y;
+	};
+
+	struct Response {
+		struct HEAD H;
+	};
+
+	struct Notification {
+		struct HEAD H;
+		//FVector Pos;
+		int playerIndex;
+		float X, Y;
+	};
+};
+
+struct Destroy {
+	struct Request {
+		struct HEAD H;
+		int ActorType;
+		int ActorIndex;
+		float X, Y;
+	};
+
+	struct Response {
+		struct HEAD H;
+	};
+
+	struct Notification {
+		struct HEAD H;
+		int ActorType; // sheep, meat, bomb, goldbag = 0, 1, 2, 3
+		int ActorIndex;
+		//FVector Pos;
+		float X, Y;
+	};
+};
+
+struct EndGame {
+	struct Request {
+		struct HEAD H;
+
+	};
+
+	struct Response {
+		struct HEAD H;
+	};
+
+	struct Notification {
+		struct HEAD H;
+	};
+};
+
+struct StartGame {
+	struct Request {
+		struct HEAD H;
+	};
+
+	struct Response {
+		struct HEAD H;
+	};
+
+	struct Notification {
+		struct HEAD H;
+	};
+};
+
+struct PauseGame {
+	struct Request {
+		struct HEAD H;
+	};
+
+	struct Response {
+		struct HEAD H;
+	};
+
+	struct Notification {
+		struct HEAD H;
+	};
+};
