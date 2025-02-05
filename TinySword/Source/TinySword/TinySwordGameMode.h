@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
 #include <queue>
+#include "protocol.h"
 #include "TinySwordGameMode.generated.h"
 
 /**
@@ -17,6 +18,48 @@ class ABaseMeat;
 class ABaseBomb;
 class AGoblin;
 
+
+class MessageQueue
+{
+public: 
+	struct Node 
+	{
+		struct HEAD *data; 
+		struct Node *next; 
+	}; 
+
+	void push(struct HEAD *value)
+	{
+		struct Node *node = new Node(); 
+
+		node->data = value; 
+		node->next = nullptr;
+		if (head == nullptr) this->head = this->tail = node; 
+		else 
+		{
+			this->tail->next = node; 
+			this->tail = node; 
+		}
+	}
+
+	struct HEAD* pop()
+	{
+		if (this->head == nullptr) return nullptr;
+
+		struct HEAD *value = this->head->data; 
+		
+		delete this->head; 
+		this->head = this->head->next;
+		return value; 
+	}
+
+private:
+	struct Node *head, *tail;
+};
+
+
+
+
 UCLASS()
 class TINYSWORD_API ATinySwordGameMode : public AGameMode
 {
@@ -24,6 +67,8 @@ class TINYSWORD_API ATinySwordGameMode : public AGameMode
 	
 public:
 	virtual void Tick(float DeltaTime) override;
+
+	MessageQueue messageQueue; 
 
 	TMap<int32, FVector>& GetCastleMap() { return CastleMap;}
 	
@@ -51,5 +96,7 @@ private:
 	void FindCastlesLocation();
 
 	void FindAllGoblins();
+
+	void Moving(struct HEAD *data); 
 	
 };

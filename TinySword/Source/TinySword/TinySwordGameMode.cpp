@@ -18,6 +18,9 @@ void ATinySwordGameMode::BeginPlay()
 void ATinySwordGameMode::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    struct HEAD *data = messageQueue.pop(); 
+    if (data == nullptr) return;
 }
 
 
@@ -45,4 +48,13 @@ void ATinySwordGameMode::FindAllGoblins()
             if (goblin) GoblinMap.Add(goblin->GetTagId(), goblin);
         }
     }
+}
+
+
+
+// Packet Processing Function 
+
+void ATinySwordGameMode::Moving(HEAD *data)
+{
+    
 }
