@@ -8,6 +8,7 @@
 #include "TinySwordPlayerController.h"
 #include "TinySwordGameMode.h"
 #include "NavigationSystem.h"
+#include "SettingWidget.h"
 #include "BaseBomb.h"
 
 void UPlayingWidget::NativeConstruct()
@@ -20,8 +21,10 @@ void UPlayingWidget::NativeConstruct()
     SpawnButton = Cast<UButton>(GetWidgetFromName(TEXT("SpawnButton")));
     HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HPBar"))); 
     moneyCount = Cast<UTextBlock>(GetWidgetFromName(TEXT("MoneyCount")));
+    SettingButton = Cast<UButton>(GetWidgetFromName(TEXT("SettingButton")));
 
     if (SpawnButton) SpawnButton->OnClicked.AddDynamic(this, &UPlayingWidget::OnSpawnButtonClicked);   
+    if (SettingButton) SettingButton->OnClicked.AddDynamic(this, &UPlayingWidget::OnSettingButtonClicked);
 
     // 초기화
     HPBar->SetPercent(100.0f);
@@ -40,6 +43,21 @@ void UPlayingWidget::OnSpawnButtonClicked()
     {
         UE_LOG(LogTemp, Warning, TEXT("Decrease Player's Money Success"));
         SpawnBomb();
+    }
+}
+
+void UPlayingWidget::OnSettingButtonClicked()
+{
+    // Setting Button add to viewport
+    if (SettingWidgetClass)
+    {
+        UWorld* World = GetWorld(); 
+        if (World) UGameplayStatics::SetGamePaused(World, true);
+        EnableSpawnButton(false);
+
+        SettingWidget = CreateWidget<USettingWidget>(this, SettingWidgetClass);
+        if (SettingWidget) SettingWidget->AddToViewport(); // 위젯 화면 추가
+
     }
 }
 
@@ -152,3 +170,10 @@ void UPlayingWidget::UpdateHealthBar()
     if (HPBar) HPBar-> SetPercent(GetHpBarPercent());
 }
 
+void UPlayingWidget::EnableSpawnButton(bool bEnable)
+{
+    if (SpawnButton)
+    {
+        SpawnButton->SetIsEnabled(bEnable);
+    }
+}

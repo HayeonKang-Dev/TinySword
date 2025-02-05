@@ -18,6 +18,7 @@ class ATinySwordGameMode;
 class ATinySwordPlayerController; 
 class AGoblin;
 class ABaseBomb;
+class USettingWidget;
 
 UCLASS()
 class TINYSWORD_API UPlayingWidget : public UUserWidget
@@ -35,15 +36,27 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* moneyCount;
 
+	UPROPERTY()
+	USettingWidget* SettingWidget; 
+
+	void EnableSpawnButton(bool bEnable);
 
 protected: 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SpawnButton;
 
+	UPROPERTY(meta = (BindWidget))
+	class UButton* SettingButton; 
+
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<class USettingWidget> SettingWidgetClass; 
 
 
 	UFUNCTION()
 	void OnSpawnButtonClicked(); 
+
+	UFUNCTION()
+	void OnSettingButtonClicked();
 
 	bool DecreasePlayerMoney();
 
