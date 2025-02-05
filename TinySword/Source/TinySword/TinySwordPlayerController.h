@@ -30,6 +30,7 @@ public:
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void OnUnPossess() override;
 	
+	void SetPlayingWidget(UPlayingWidget* playing);
 protected: 
 	virtual void BeginPlay() override; 
 
@@ -45,6 +46,7 @@ protected:
 	
 	
 private:
+	
 
 	ATinySwordGameMode* GameMode; 
 

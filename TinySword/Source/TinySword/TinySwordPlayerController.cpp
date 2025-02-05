@@ -20,6 +20,10 @@ void ATinySwordPlayerController::BeginPlay()
     }
 }
 
+void ATinySwordPlayerController::SetPlayingWidget(UPlayingWidget* playing)
+{
+    playingWidget = playing;
+}
 
 void ATinySwordPlayerController::SetTagId(int32 newTagId)
 {
