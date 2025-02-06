@@ -89,6 +89,8 @@ public:
 
 	TMap<int32, AGoblin*> GoblinMap;
 
+	FVector FindCastleLocationByTagId(int32 TagId);
+	
 protected:
 	virtual void BeginPlay() override; 
 

@@ -7,11 +7,13 @@
 #include "BaseBomb.h"
 #include "Goblin.h"
 
+
+
 void ATinySwordGameMode::BeginPlay()
 {
     Super::BeginPlay();
     FindCastlesLocation();
-    FindAllGoblins();
+    //FindAllGoblins();
 }
 
 
@@ -50,7 +52,11 @@ void ATinySwordGameMode::FindAllGoblins()
     }
 }
 
-
+FVector ATinySwordGameMode::FindCastleLocationByTagId(int32 TagId)
+{
+    if (CastleMap.Contains(TagId)) return *CastleMap.Find(TagId);
+    else return FVector::ZeroVector;
+}
 
 // Packet Processing Function 
 
