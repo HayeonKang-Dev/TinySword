@@ -13,6 +13,7 @@ void ASheepAIController::BeginPlay()
     Super::BeginPlay();
 
     GameMode = (ATinySwordGameMode *)GetWorld()->GetAuthGameMode(); 
+    
     NaviSystem = UNavigationSystemV1::GetNavigationSystem(GetWorld());
 }
 
@@ -21,7 +22,11 @@ void ASheepAIController::BeginPlay()
 void ASheepAIController::OnPossess(APawn *InPawn)
 {
     Super::OnPossess(InPawn); 
-    GetWorldTimerManager().SetTimer(Timer, this, &ASheepAIController::MoveRandomPos, 3.f, true, 0.f);
+    ControlledCharacter = Cast<ABaseAISheep>(InPawn);
+
+    if (ControlledCharacter)    GetWorldTimerManager().SetTimer(Timer, this, &ASheepAIController::MoveRandomPos, 3.f, true, 0.f);
+    
+    
 }
 
 void ASheepAIController::OnUnPossess()
@@ -35,8 +40,6 @@ void ASheepAIController::OnUnPossess()
 
 bool ASheepAIController::IsDead() const
 {
-    ABaseAISheep* ControlledCharacter = Cast<ABaseAISheep>(GetPawn());
-
     if (ControlledCharacter != nullptr) return ControlledCharacter->IsDead(); 
 
     return true;
@@ -51,9 +54,10 @@ void ASheepAIController::MoveRandomPos()
 
     FNavLocation RandomPos;
     if (NaviSystem->GetRandomPointInNavigableRadius(GetPawn()->GetActorLocation(), 200.f, RandomPos))
-    {
+    {   
         FVector Velocity = GetPawn()->GetVelocity(); 
-        UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, RandomPos); 
+        // UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, RandomPos.Location); 
+        MoveToLocation(RandomPos.Location);
     }
 }
 
@@ -70,7 +74,7 @@ void ASheepAIController::FleeFrom(const FVector &AttackLocation)
     if (NaviSystem)
     {
         FNavLocation NavLocation; 
-        if (NaviSystem->GetRandomPointInNavigableRadius(fleeLocation, 50.0f, NavLocation))
+        if (NaviSystem->GetRandomPointInNavigableRadius(fleeLocation, 50.0f, NavLocation)) 
             UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, NavLocation.Location);
     }
 }
