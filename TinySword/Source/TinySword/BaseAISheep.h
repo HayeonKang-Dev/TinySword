@@ -47,7 +47,7 @@ private:
 	ATinySwordGameMode* GameMode;
 
 	UPROPERTY(EditAnywhere, Category="Speed")
-	float BoostedSpeed = 100.0f; 
+	float BoostedSpeed = 140.0f; 
 
 	UPROPERTY(EditAnywhere, Category="Speed")
 	float NormalSpeed = 30.0f; 
@@ -62,6 +62,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UPaperFlipbook* MoveAnim;
 
+	UPROPERTY(EditAnywhere, Category="State")
 	int32 TagId; 
 
 	UPROPERTY(VisibleAnywhere, Category="State")

@@ -91,7 +91,7 @@ void ABaseAISheep::SpawnMeat()
 
     // Adjust Spawn Location (Lower Z)
     FVector SpawnLocation = GetActorLocation(); 
-    SpawnLocation.Z = 45.f;
+    //SpawnLocation.Z = 45.f;
 
     // Spawn Meat & Set Meat TagId
     AActor* SpawnedActor; 
