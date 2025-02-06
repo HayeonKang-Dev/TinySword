@@ -33,7 +33,7 @@ void ABombAIController::OnPossess(APawn *InPawn)
     {
         UE_LOG(LogTemp, Warning, TEXT("Controlled Bomb is not null"));
         CurrentLocation = controlledBomb->GetActorLocation(); 
-        EnemyCastleLocation = GetRandomCastleLocation(controlledBomb->GetTagId()); 
+        EnemyCastleLocation = GetRandomCastleLocation(controlledBomb->GetOwnerTagId()); 
         UE_LOG(LogTemp, Warning, TEXT("Destination_Origin : %s"), *EnemyCastleLocation.ToString());
 
         FVector NewLocation(EnemyCastleLocation.X, EnemyCastleLocation.Y, CurrentLocation.Z);
@@ -58,15 +58,17 @@ void ABombAIController::Tick(float DeltaTime)
        
         MoveToCastle(EnemyCastleLocation);
         const float DistanceSquared = FVector::DistSquared(controlledBomb->GetActorLocation(), EnemyCastleLocation); 
-        if (DistanceSquared <= FMath::Square(30.0f))
+        if (DistanceSquared <= FMath::Square(100.0f))
         {
             if (!bHasArrived) bHasArrived = true;
             else if (bHasArrived && !bIsReadyToExplode)
             {
+                controlledBomb->PlayBrinkAnim();
                 ElapsedTime += DeltaTime; 
                 if (ElapsedTime >= 1.5f)
                 {
                     bIsReadyToExplode = true; 
+                    controlledBomb->PlayExplodeAnim();
                     ElapsedTime = 0.0f;
                 }
             }
@@ -125,9 +127,11 @@ void ABombAIController::MoveToCastle(const FVector &CastleLocation)
     if(CastleLocation != FVector::ZeroVector)
     {
         UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()); 
-        if (NavSystem && NavSystem->ProjectPointToNavigation(CastleLocation, ClosetPoint, FVector(70.0f, 70.0f, 0.0f)))
+        if (NavSystem && NavSystem->ProjectPointToNavigation(CastleLocation, ClosetPoint, FVector(150.0f, 150.0f, 70.0f)))
         {
-            UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ClosetPoint.Location); 
+            // UE_LOG(LogTemp, Warning, TEXT("Bomb AI Controller - Find Destination in NAV"));
+            UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ClosetPoint.Location);
+            // MoveToLocation(ClosetPoint.Location); 
         }
     }
 }

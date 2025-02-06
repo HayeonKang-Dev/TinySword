@@ -53,4 +53,6 @@ private:
 	FVector GetRandomCastleLocation(int TagId);	
 
 	void MoveToCastle(const FVector &CastleLocation);
+
+	int32 OwnerTagId; 
 };
