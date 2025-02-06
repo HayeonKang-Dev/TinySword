@@ -21,6 +21,7 @@ void UMainWidget::OnStartGameButtonClicked()
         if (selectWidget)
         {
             selectWidget->AddToViewport();
+            
         }
     }
 }
