@@ -50,7 +50,7 @@ float ABaseCastle::TakeDamage(float DamageAmount, FDamageEvent const &DamageEven
 void ABaseCastle::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Durability = MaxDurability;
 }
 
 
@@ -58,7 +58,7 @@ void ABaseCastle::BeginPlay()
 void ABaseCastle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 }
 
 
