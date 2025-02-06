@@ -3,6 +3,7 @@
 
 #include "TinySwordPlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Goblin.h"
 #include "TinySwordGameMode.h"
 
 void ATinySwordPlayerController::BeginPlay()
@@ -34,6 +35,9 @@ void ATinySwordPlayerController::SetTagId(int32 newTagId)
 void ATinySwordPlayerController::OnPossess(APawn *aPawn)
 {
     Super::OnPossess(aPawn);
+    controlledChar = Cast<AGoblin>(aPawn);
+    controlledChar->SetTagId(TagId);
+    controlledChar->SetPlayerController(this);
 }
 
 void ATinySwordPlayerController::OnUnPossess()
