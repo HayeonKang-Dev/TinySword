@@ -11,12 +11,15 @@
 /**
  * 
  */
+class AGoblin;
 UCLASS()
 class TINYSWORD_API ATinySwordPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
 public: 
+	AGoblin* controlledChar; 
+
 	UPROPERTY()
 	UMainWidget* MainWidget; 
 
@@ -31,6 +34,7 @@ public:
 	virtual void OnUnPossess() override;
 	
 	void SetPlayingWidget(UPlayingWidget* playing);
+	UPlayingWidget* GetPlayingWidget() const {return playingWidget;}
 	
 protected: 
 	virtual void BeginPlay() override; 
