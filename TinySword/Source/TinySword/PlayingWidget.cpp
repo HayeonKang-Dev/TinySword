@@ -28,11 +28,8 @@ void UPlayingWidget::NativeConstruct()
 
     // 초기화
     HPBar->SetPercent(100.0f);
+    moneyCount->SetText(FText::AsNumber(0));
 
-    FString moneyStr = FString::Printf(TEXT("%d"), 0);
-    moneyCount->SetText(FText::FromString(moneyStr));
-
-    //playerController->playingWidget = this;
 }
 
 
@@ -122,7 +119,10 @@ void UPlayingWidget::SpawnBomb()
             if (SpawnedActor)
             {
                 SpawnedBomb = Cast<ABaseBomb>(SpawnedActor); 
-                if (SpawnedBomb) SetBombIndex();
+                if (SpawnedBomb) {
+                    SetBombIndex();
+                    SpawnedBomb->SetOwnerTagId(controlledChar->GetTagId());
+                }
             }
         }
     }
@@ -137,11 +137,7 @@ void UPlayingWidget::SetBombIndex()
     GameMode->ActiveBombId.Add(SpawnedBomb, id);
 }
 
-float UPlayingWidget::GetHpBarPercent()
-{
-    UE_LOG(LogTemp, Warning, TEXT("Health(%f) / MaxHealth(%f) = %f"), controlledChar->GetHealth(), 100.0f, controlledChar->GetHealth()/100.0f);
-    return controlledChar->GetHealthPercent();
-}
+
 
 FVector UPlayingWidget::GetBombSpawnPoint(UWorld *World, FVector &FoundLocation)
 {
@@ -165,9 +161,21 @@ FVector UPlayingWidget::GetBombSpawnPoint(UWorld *World, FVector &FoundLocation)
     return SpawnLocation;
 }
 
-void UPlayingWidget::UpdateHealthBar()
+void UPlayingWidget::UpdateHealthBar(float HealthPercent)
 {
-    if (HPBar) HPBar-> SetPercent(GetHpBarPercent());
+    if (HPBar) HPBar-> SetPercent(HealthPercent);
+}
+
+float UPlayingWidget::GetHpBarPercent()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Health(%f) / MaxHealth(%f) = %f"), controlledChar->GetHealth(), 100.0f, controlledChar->GetHealth()/100.0f);
+    return controlledChar->GetHealthPercent();
+}
+
+void UPlayingWidget::UpdateMoneyCount(float Money)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Entered in UpdateMoneyCount"));
+    moneyCount->SetText(FText::AsNumber(controlledChar->GetMoneyCount()));
 }
 
 void UPlayingWidget::EnableSpawnButton(bool bEnable)
@@ -177,3 +185,4 @@ void UPlayingWidget::EnableSpawnButton(bool bEnable)
         SpawnButton->SetIsEnabled(bEnable);
     }
 }
+

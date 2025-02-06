@@ -28,7 +28,8 @@ class TINYSWORD_API UPlayingWidget : public UUserWidget
 public: 
 	virtual void NativeConstruct() override; 
 
-	void UpdateHealthBar();
+	void UpdateHealthBar(float HealthPercent);
+	void UpdateMoneyCount(float Money);
 
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HPBar;
