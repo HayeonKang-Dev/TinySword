@@ -17,6 +17,8 @@ void ABaseBomb::BeginPlay()
 
     bombController = Cast<ABombAIController>(GetController());
     GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
+
+    paperFlipbookComponent = FindComponentByClass<UPaperFlipbookComponent>();
 }
 
 
@@ -62,6 +64,8 @@ void ABaseBomb::DealRadialDamage()
     FVector Origin = GetActorLocation(); 
     float DamageRadius = 100.0f; 
     TArray<AActor*> IgnoreActors;
+    IgnoreActors.Add(this);
+
     AController* InstigatedByController = nullptr;
 
     TArray<AActor*> DamagedActors; 
@@ -77,6 +81,15 @@ void ABaseBomb::DealRadialDamage()
         GetInstigatorController(), 
         true
     );
+
+    // for (int32 i = DamagedActors.Num()-1; i>=0; --i)
+    // {
+    //     AActor* Actor = DamagedActors[i];
+    //     if (!Actor || Actor->IsPendingKill())
+    //     {
+    //         DamagedActors.RemoveAt(i);
+    //     }
+    // }
 }
 
 
@@ -90,4 +103,25 @@ bool ABaseBomb::IsDead() const
 void ABaseBomb::SetTagId(int32 newTagId)
 {
     TagId = newTagId;
+}
+
+void ABaseBomb::SetOwnerTagId(int32 newOwnerTagId)
+{
+    OwnerTagId = newOwnerTagId;
+}
+
+void ABaseBomb::PlayBrinkAnim()
+{
+    if (BrinkAnim && paperFlipbookComponent->GetFlipbook() != BrinkAnim)
+    {
+        paperFlipbookComponent->SetFlipbook(BrinkAnim);
+    }
+}
+
+void ABaseBomb::PlayExplodeAnim()
+{
+    if (ExplodeAnim && paperFlipbookComponent->GetFlipbook() != ExplodeAnim)
+    {
+        paperFlipbookComponent->SetFlipbook(ExplodeAnim);
+    }
 }

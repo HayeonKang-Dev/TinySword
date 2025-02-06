@@ -6,6 +6,7 @@
 #include "PaperCharacter.h"
 #include "BombAIController.h"
 #include "TinySwordGameMode.h"
+#include "PaperFlipbookComponent.h"
 #include "BaseBomb.generated.h"
 
 /**
@@ -35,12 +36,20 @@ public:
 
 	void SetTagId(int32 newTagId);
 
+	int32 GetOwnerTagId() const {return OwnerTagId;}
+	void SetOwnerTagId(int32 newOwnerTagId);
+
+	void PlayBrinkAnim();
+	void PlayExplodeAnim();
+
 protected:
 	virtual void BeginPlay() override; 
 
 	FTimerHandle BombExplosionTimerHandle; 
 
 	float ElapsedTime = 0.0f; 
+
+	UPaperFlipbookComponent* paperFlipbookComponent;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category="State")
@@ -49,7 +58,7 @@ private:
 	float MaxHealth = 70.0f;
 
 	UPROPERTY(VisibleAnywhere, Category="State")
-	float Speed = 50.0f; 
+	float Speed = 80.0f; 
 
 	UPROPERTY(VisibleAnywhere, Category="State")
 	float Damage; 
@@ -57,7 +66,15 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="State")
 	int32 TagId;
 
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* BrinkAnim; 
+	
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* ExplodeAnim;
+
 	ABombAIController* bombController; 
 
 	ATinySwordGameMode* GameMode;
+
+	int32 OwnerTagId; 
 };
