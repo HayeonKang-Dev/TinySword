@@ -37,12 +37,13 @@ void USettingWidget::OnMainMenuButtonClicked()
     {
         UWorld* World = GetWorld(); 
         if (World) UGameplayStatics::SetGamePaused(World, true);
-    
+
+        APawn* pawn = playerController->GetPawn(); 
+        playerController->OnUnPossess();
+        pawn->Destroy(); ////////////////////////////////////////////
+
         UWidgetLayoutLibrary::RemoveAllWidgets(this);
         MainWidget = CreateWidget<UMainWidget>(this, MainWidgetClass);
         if (MainWidget) MainWidget->AddToViewport(); // 위젯 화면 추가
-        playerController->OnUnPossess();
-        
-
     }
 }
