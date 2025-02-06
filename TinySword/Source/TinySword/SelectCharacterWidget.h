@@ -74,4 +74,8 @@ private:
 	ATinySwordPlayerController* PC; 
 
 	ATinySwordGameMode* GameMode;
+
+	void SpawnGoblin(ATinySwordPlayerController* PlayerController);
+
+	
 };

@@ -61,8 +61,10 @@ void USelectCharacterWidget::OnRedButtonClicked()
         ClickCnt++;
         UE_LOG(LogTemp, Warning, TEXT("RedButtonClicked: %d"), ClickCnt);
         RedButton->SetIsEnabled(false);
-        AGoblin** Goblin = GameMode->GoblinMap.Find(2);
-        if (Goblin) PC->OnPossess(*Goblin);
+        // AGoblin** Goblin = GameMode->GoblinMap.Find(2);
+        // if (Goblin) PC->OnPossess(*Goblin);
+
+        SpawnGoblin(PC);
     }
     
 }
@@ -79,8 +81,9 @@ void USelectCharacterWidget::OnYellowButtonClicked()
     ClickCnt++;
     UE_LOG(LogTemp, Warning, TEXT("YellowButtonClicked: %d"), ClickCnt);
     YellowButton->SetIsEnabled(false);
-    AGoblin** Goblin = GameMode->GoblinMap.Find(3);
-    if (Goblin) PC->OnPossess(*Goblin);
+    // AGoblin** Goblin = GameMode->GoblinMap.Find(3);
+    // if (Goblin) PC->OnPossess(*Goblin);
+    SpawnGoblin(PC);
 }
 
 void USelectCharacterWidget::OnBlueButtonClicked()
@@ -94,8 +97,9 @@ void USelectCharacterWidget::OnBlueButtonClicked()
     ClickCnt++;
     UE_LOG(LogTemp, Warning, TEXT("BlueButtonClicked: %d"), ClickCnt);
     BlueButton->SetIsEnabled(false);
-    AGoblin** Goblin = GameMode->GoblinMap.Find(0);
-    if (Goblin) PC->OnPossess(*Goblin);
+    // AGoblin** Goblin = GameMode->GoblinMap.Find(0);
+    // if (Goblin) PC->OnPossess(*Goblin);
+    SpawnGoblin(PC);
 }
 
 void USelectCharacterWidget::OnPurpleButtonClicked()
@@ -109,8 +113,9 @@ void USelectCharacterWidget::OnPurpleButtonClicked()
     ClickCnt++;
     UE_LOG(LogTemp, Warning, TEXT("PurpleButtonClicked: %d"), ClickCnt);
     PurpleButton->SetIsEnabled(false);
-    AGoblin** Goblin = GameMode->GoblinMap.Find(1);
-    if (Goblin) PC->OnPossess(*Goblin);
+    // AGoblin** Goblin = GameMode->GoblinMap.Find(1);
+    // if (Goblin) PC->OnPossess(*Goblin);
+    SpawnGoblin(PC);
 }
 
 void USelectCharacterWidget::OnQuitButtonClicked()
@@ -123,3 +128,57 @@ void USelectCharacterWidget::OnQuitButtonClicked()
 
     }
 }
+
+void USelectCharacterWidget::SpawnGoblin(ATinySwordPlayerController* PlayerController)
+{
+    if (GameMode)
+    {
+        TMap<int32, FVector>& CastleMap = GameMode->GetCastleMap();
+        UObject* spawnActor = nullptr; 
+
+        switch(PlayerController->GetTagId())
+        {
+            case 0: 
+                spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Blue.Goblin_Blue'")); 
+                break; 
+
+            case 1: 
+                spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Purple.Goblin_Purple'")); 
+                break; 
+
+            case 2: 
+                spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Red.Goblin_Red'")); 
+                break; 
+
+            case 3: 
+                spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Yellow.Goblin_Yellow'")); 
+                break; 
+
+            default: 
+                UE_LOG(LogTemp, Warning, TEXT("Spawn Actor is not valid"));
+                break;
+
+        }
+
+        UBlueprint* GeneratedBP = Cast<UBlueprint>(spawnActor); 
+        UWorld* World = GetWorld(); 
+
+        if (!spawnActor || !GeneratedBP || !GeneratedBP->GeneratedClass || !World) return; 
+        
+        FActorSpawnParameters SpawnParams; 
+        SpawnParams.Owner = PlayerController; 
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; 
+
+        FVector SpawnLocation = GameMode->FindCastleLocationByTagId(PlayerController->GetTagId());  
+        // SpawnLocation.X += 150.0f;
+        SpawnLocation.Y += 100.0f;
+        SpawnLocation.Z = -250.0f;
+        FRotator SpawnRotation(0.0f, 0.0f, 0.0f);
+
+        APaperZDCharacter* SpawnedChar = World->SpawnActor<APaperZDCharacter>(GeneratedBP->GeneratedClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+        if (SpawnedChar) PlayerController->OnPossess(SpawnedChar);
+    }
+}
+
+
