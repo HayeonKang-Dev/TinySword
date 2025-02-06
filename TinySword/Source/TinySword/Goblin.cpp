@@ -19,7 +19,7 @@ void AGoblin::BeginPlay()
 {
     Super::BeginPlay(); 
 
-    playerController = Cast<ATinySwordPlayerController>(GetController());
+    //playerController = Cast<ATinySwordPlayerController>(GetController());
 
     Health = MaxHealth; 
     Money = 0; 
@@ -46,6 +46,8 @@ void AGoblin::Tick(float DeltaTime)
     //UE_LOG(LogTemp, Warning, TEXT("bIsAttacking: %s, Velocity: %s"), bIsAttacking ? TEXT("true") : TEXT("false"), *GetVelocity().ToString());
 
     UpdateAnimation();
+
+
 
 }
 
@@ -144,7 +146,10 @@ void AGoblin::PlayAttackAnimation()
 
 
 //////////////
-
+void AGoblin::SetTagId(int32 newTagId)
+{
+    TagId = newTagId;
+}
 //////////////
 void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
 {
@@ -155,13 +160,13 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
     if (OtherActor->IsA(ABaseMeat::StaticClass())) 
     {
         IncreaseHealth(10);
-        if (playerController && playerController->playingWidget) playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
+        if (playerController && playerController->playingWidget) playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
         OtherActor->Destroy();
     }
     if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
     {
         IncreaseMoney(10);
-        UpdateMoneyCount(Money);
+        //UpdateMoneyCount_(Money);
         OtherActor->Destroy();
     }
 }
@@ -185,7 +190,7 @@ float AGoblin::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, A
     if (!IsDead())
     {
         Health -= DamageToApply; 
-        playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
+        playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
 
         if (IsDead())
         {
@@ -249,13 +254,14 @@ void AGoblin::Attack()
 void AGoblin::IncreaseMoney(float Amount)
 {
     Money += Amount; 
+    UpdateMoneyCount_(Money);
 }
 
 bool AGoblin::DecreaseMoney(float Amount)
 {
     if (Money < 10) return false;
     Money -= Amount;
-    UpdateMoneyCount(Money);
+    UpdateMoneyCount_(Money);
     return true;
 }
 
@@ -265,8 +271,6 @@ void AGoblin::IncreaseHealth(float Amount)
     else Health += Amount; 
 }
 /////////////
-
-
 
 // Connection with UI
 float AGoblin::GetHealthPercent() const
@@ -279,16 +283,21 @@ int AGoblin::GetMoneyCount() const
     return Money;
 }
 
-void AGoblin::UpdateMoneyCount(int money)
+void AGoblin::UpdateMoneyCount_(int money)
 {
     UE_LOG(LogTemp, Warning, TEXT("Entered in UpdateMoneyCount"));
-    FString moneyStr = FString::Printf(TEXT("%d"), money);
-    if (playerController && playerController->playingWidget) 
-    {
-        UE_LOG(LogTemp, Warning, TEXT("in Goblin class, UpdateMoneyCount -> NOT NULLPTR"));
-        playerController->playingWidget->moneyCount->SetText(FText::FromString(moneyStr));
-    }
 
+    if (playerController)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Goblin -> PlayerController is valid"));
+        UPlayingWidget* playing = playerController->GetPlayingWidget(); 
+        if (playing) 
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Goblin-> playingWidget is not null"));
+            playing->UpdateMoneyCount(money);
+        }
+    }
+    
     // playerController가 널인지, playingWidget이 널인지 분리해서 판별해야 함. 
 
 }
@@ -296,4 +305,9 @@ void AGoblin::UpdateMoneyCount(int money)
 void AGoblin::HandleDeath()
 {
 
+}
+
+void AGoblin::SetPlayerController(ATinySwordPlayerController *newPlayerController)
+{
+    playerController = newPlayerController;
 }

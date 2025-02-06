@@ -53,6 +53,7 @@ public:
 	int TagId = 0; 
 
 	int32 GetTagId() const {return TagId;}
+	void SetTagId(int32 newTagId);
 	
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* OverlapComponent;
@@ -67,7 +68,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	int GetMoneyCount() const; 
 
-	void UpdateMoneyCount(int money);
+	void UpdateMoneyCount_(int money);
 
 
 	// Actions
@@ -78,6 +79,8 @@ public:
 	void UpDown(float Value);
 
 	void HandleDeath();
+
+	void SetPlayerController(ATinySwordPlayerController* newPlayerController);
 
 protected:
 	virtual void BeginPlay() override;
