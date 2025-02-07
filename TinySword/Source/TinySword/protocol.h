@@ -9,7 +9,7 @@ struct CharacterSelect {
 	struct Request {
 		struct HEAD H;
 		char playerId[40];
-		int selectCharIndex; // 선택한 캐릭터에 미리 부여되어 있던 id 값 
+		int selectCharIndex; 
 	};
 
 	struct Response {
@@ -32,8 +32,8 @@ struct Move {
 	struct Request {
 		struct HEAD H;
 		int ActorType; // player, sheep, bomb = 0, 1, 2
-		int ActorIndex; // 원래 playerIndex
-		char key; // 방향키 
+		int ActorIndex; //  playerIndex
+		char key; //  
 		//FVector Pos;
 		float X; 
 		float Y;
@@ -54,7 +54,7 @@ struct Move {
 	};
 };
 
-struct Attack {
+struct Attack { // 0x2
 	struct Request {
 		struct HEAD H;
 		int targetIndex;
@@ -83,11 +83,11 @@ struct Attack {
 	};
 };
 
-struct Spawn {
+struct Spawn { // 0x3
 	struct Request {
 		struct HEAD H;
-		int SpawnActorIndex; // Bomb, Player  = 0, 1
-		int SpawnType; 
+		int SpawnActorIndex; 
+		int SpawnType; // player, bomb, meat, goldbag = 0, 1, 2, 3
 		//FVector Pos;
 		int playerIndex;
 		float X, Y;
@@ -132,6 +132,7 @@ struct GetItem {
 		int playerHp;
 		int playerCoin;
 		int ItemType;
+		int ItemIndex;
 		float X, Y;
 	};
 };
