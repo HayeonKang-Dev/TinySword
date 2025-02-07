@@ -42,6 +42,7 @@ public:
 	void PlayBrinkAnim();
 	void PlayExplodeAnim();
 
+
 protected:
 	virtual void BeginPlay() override; 
 
@@ -76,5 +77,5 @@ private:
 
 	ATinySwordGameMode* GameMode;
 
-	int32 OwnerTagId; 
+	int32 OwnerTagId; 	
 };
