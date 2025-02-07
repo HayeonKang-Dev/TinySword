@@ -13,6 +13,9 @@
 /**
  * 
  */
+class ATinySwordGameMode;
+
+
 UCLASS()
 class TINYSWORD_API AGoblin : public APaperZDCharacter
 {
@@ -100,8 +103,7 @@ private:
 
 	float Timer; 
 
-
-	// ATinySwordGameModeBase* GameMode; 
+	ATinySwordGameMode* GameMode; 
 
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UPaperFlipbook* IdleAnim; 
@@ -114,6 +116,7 @@ private:
 
 	FTimerHandle TimerHandleAttack;
 
+
 	bool bIsAttacking; 
 
 	void UpdateAnimation();
@@ -124,5 +127,8 @@ private:
 
 
 	ATinySwordPlayerController* playerController;
+
+	void SendMoveResponseMsg(); 
+	void SendMoveNotiMsg(int actorType, int actorIndex, char key, float X, float Y);
  
 };

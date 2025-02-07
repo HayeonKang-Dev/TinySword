@@ -13,6 +13,8 @@
 #include "BaseGoldBag.h"
 #include "PlayingWidget.h"
 #include "GameFramework/HUD.h"
+#include "TinySwordGameMode.h"
+#include "protocol.h"
 
 
 void AGoblin::BeginPlay()
@@ -20,6 +22,7 @@ void AGoblin::BeginPlay()
     Super::BeginPlay(); 
 
     //playerController = Cast<ATinySwordPlayerController>(GetController());
+    GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
 
     Health = MaxHealth; 
     Money = 0; 
@@ -66,6 +69,19 @@ void AGoblin::MoveRight(float Value)
 {
     if (Value != 0.0f)
     {
+        Timer += GetWorld()->DeltaTimeSeconds;
+        if (Timer >= 0.5f)
+        {
+            SendMoveResponseMsg(); 
+
+            char key; 
+            if (Value < 0.0f) key = 0x02; 
+            else key = 0x08;
+
+            SendMoveNotiMsg(0, TagId, key, GetActorLocation().X, GetActorLocation().Y);
+
+            Timer = 0.0f;
+        }
         AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
         FlipCharacter(Value);
     }
@@ -75,6 +91,19 @@ void AGoblin::UpDown(float Value)
 {
     if (Value != 0.0f)
     {
+        Timer += GetWorld()->DeltaTimeSeconds; 
+        if (Timer >= 0.5f)
+        {
+            SendMoveResponseMsg(); 
+            
+            char key; 
+            if (Value < 0.0f) key = 0x01; 
+            else key = 0x04;
+
+            SendMoveNotiMsg(0, TagId, key, GetActorLocation().X, GetActorLocation().Y);
+
+            Timer = 0.0f;
+        }
         AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
     }
 }
@@ -310,4 +339,27 @@ void AGoblin::HandleDeath()
 void AGoblin::SetPlayerController(ATinySwordPlayerController *newPlayerController)
 {
     playerController = newPlayerController;
+}
+
+
+
+
+/////////////////////////////////////////////////////
+void AGoblin::SendMoveResponseMsg()
+{
+    struct Move::Response *response = new Move::Response(); 
+    response->H.Command = 0x11; 
+    GameMode->messageQueue.push((struct HEAD *)response);
+}
+
+void AGoblin::SendMoveNotiMsg(int actorType, int actorIndex, char key, float X, float Y)
+{
+    struct Move::Notification *noti = new Move::Notification(); 
+    noti->H.Command = 0x12; 
+    noti->ActorType = actorType; 
+    noti->ActorIndex = actorIndex; 
+    noti->key = key; 
+    noti->X = X; 
+    noti->Y = Y; 
+    GameMode->messageQueue.push((struct HEAD *)noti);
 }
