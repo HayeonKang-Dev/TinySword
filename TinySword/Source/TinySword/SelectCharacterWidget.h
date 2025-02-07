@@ -77,5 +77,8 @@ private:
 
 	void SpawnGoblin(ATinySwordPlayerController* PlayerController);
 
+	void SendSelectCharResponseMsg(int playerIndex); 
+	void SendSelectCharNotiMsg(const char playerId[40], int playerIndex);
+
 	
 };

@@ -6,6 +6,7 @@
 #include "TinySwordGameMode.h"
 #include "Goblin.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "protocol.h"
 #include "MainWidget.h"
 
 void USelectCharacterWidget::NativeConstruct()
@@ -177,8 +178,32 @@ void USelectCharacterWidget::SpawnGoblin(ATinySwordPlayerController* PlayerContr
 
         APaperZDCharacter* SpawnedChar = World->SpawnActor<APaperZDCharacter>(GeneratedBP->GeneratedClass, SpawnLocation, SpawnRotation, SpawnParams);
 
-        if (SpawnedChar) PlayerController->OnPossess(SpawnedChar);
+        if (SpawnedChar) 
+        {
+            PlayerController->OnPossess(SpawnedChar);
+            // PlayerController->SetViewTargetWithBlend(SpawnedChar, 0.0f);
+
+            SendSelectCharResponseMsg(PlayerController->GetTagId());
+            char myPlayerId[40] = "test";
+            SendSelectCharNotiMsg(myPlayerId, PlayerController->GetTagId());
+        }
     }
 }
 
+void USelectCharacterWidget::SendSelectCharResponseMsg(int playerIndex)
+{
+    struct CharacterSelect::Response *response = new CharacterSelect::Response(); 
+    response->H.Command = 0x01; 
+    response->playerIndex = playerIndex; 
+    GameMode->messageQueue.push((struct HEAD*)response);
+}
 
+void USelectCharacterWidget::SendSelectCharNotiMsg(const char playerId[40], int playerIndex)
+{
+    struct CharacterSelect::Notification *noti = new CharacterSelect::Notification(); 
+    noti->H.Command = 0x02; 
+    strncpy(noti->playerId, playerId, sizeof(noti->playerId));
+    noti->playerId[sizeof(noti->playerId) - 1] = '\0';
+    noti->playerIndex = playerIndex;
+    GameMode->messageQueue.push((struct HEAD*)noti);
+}
