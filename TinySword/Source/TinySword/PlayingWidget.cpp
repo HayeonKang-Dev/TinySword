@@ -10,6 +10,7 @@
 #include "NavigationSystem.h"
 #include "SettingWidget.h"
 #include "BaseBomb.h"
+#include "protocol.h"
 
 void UPlayingWidget::NativeConstruct()
 {
@@ -121,7 +122,11 @@ void UPlayingWidget::SpawnBomb()
                 SpawnedBomb = Cast<ABaseBomb>(SpawnedActor); 
                 if (SpawnedBomb) {
                     SetBombIndex();
-                    SpawnedBomb->SetOwnerTagId(controlledChar->GetTagId());
+                    SpawnedBomb->SetOwnerTagId(playerController->GetTagId()); /////////////////////////////
+                    UE_LOG(LogTemp, Warning, TEXT("Owner Tag Id (PC) : %d -> %d"), playerController->GetTagId(), SpawnedBomb->GetOwnerTagId());
+
+                    SendSpawnResponseMsg(); 
+                    SendSpawnNotiMsg(1, SpawnedBomb->GetTagId(), SpawnedBomb->GetActorLocation().X, SpawnedBomb->GetActorLocation().Y);
                 }
             }
         }
@@ -161,6 +166,8 @@ FVector UPlayingWidget::GetBombSpawnPoint(UWorld *World, FVector &FoundLocation)
     return SpawnLocation;
 }
 
+
+
 void UPlayingWidget::UpdateHealthBar(float HealthPercent)
 {
     if (HPBar) HPBar-> SetPercent(HealthPercent);
@@ -186,3 +193,23 @@ void UPlayingWidget::EnableSpawnButton(bool bEnable)
     }
 }
 
+
+void UPlayingWidget::SendSpawnResponseMsg()
+{
+    struct Spawn::Response *response = new Spawn::Response(); 
+    response->H.Command = 0x31; 
+    response->successyn = 1; 
+    GameMode->messageQueue.push((struct HEAD *)response);
+    delete response;
+}
+
+void UPlayingWidget::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
+{
+    struct Spawn::Notification *noti = new Spawn::Notification(); 
+	noti->H.Command = 0x32; 
+	noti->SpawnType = spawnType; 
+	noti->SpawnActorIndex = spawnActorIndex; 
+	noti->X = X; 
+	noti->Y = Y; 
+	GameMode->messageQueue.push((struct HEAD *)noti);
+}

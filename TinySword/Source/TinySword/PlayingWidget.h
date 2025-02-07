@@ -79,4 +79,7 @@ private:
 	ABaseBomb* SpawnedBomb;
 
 	FVector GetBombSpawnPoint(UWorld* World, FVector& FoundLocation);
+
+	void SendSpawnResponseMsg(); 
+	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
 };
