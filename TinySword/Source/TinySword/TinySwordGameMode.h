@@ -77,7 +77,7 @@ public:
 
 	TMap<ABaseGoldBag*, int32> ActiveGoldBagId; 
 	TQueue<int32> ReuseGoldBagId;
-	ABaseGoldBag* FindGoldBagById(const TMap<ABaseGoldBag*, int32>&Map, int32 TargetId);
+	ABaseGoldBag* FindGoldBagById(const TMap<ABaseGoldBag*, int32>&Map, int32 TargetValue);
 
 	TMap<int32, FVector> CastleMap;
 
@@ -99,6 +99,38 @@ private:
 
 	void FindAllGoblins();
 
-	void Moving(struct HEAD *data); 
+	// packet processing functions
+	void CharacterSelectResponse(struct HEAD* data);
+	void CharacterSelectNotification(struct HEAD* data);
+
+	void MoveResponse(struct HEAD *data); 
+	void MoveNotification(struct HEAD* data); 
+
+	void AttackResponse(struct HEAD *data); 
+	void AttackNotification(struct HEAD* data);
+
+	void SpawnResponse(struct HEAD* data);
+	void SpawnNotification(struct HEAD* data);
+
+	void GetItemResponse(struct HEAD* data);
+	void GetItemNotification(struct HEAD* data);
+
+	void BombExplodeResponse(struct HEAD* data);
+	void BombExplodeNotification(struct HEAD* data);
+
+	void PlayerDeadResponse(struct HEAD* data);
+	void PlayerDeadNotification(struct HEAD* data); 
+
+	void DestroyResponse(struct HEAD* data); 
+	void DestroyNotification(struct HEAD* data);
+
+	void EndGameResponse(struct HEAD* data);
+	void EndGameNotification(struct HEAD* data); 
+
+	void StartGameResponse(struct HEAD* data); 
+	void StartGameNotification(struct HEAD* data);
+
+	void PauseGameResponse(struct HEAD* data); 
+	void PauseGameNotification(struct HEAD* data); 
 	
 };
