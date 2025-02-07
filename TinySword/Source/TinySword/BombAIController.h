@@ -55,4 +55,8 @@ private:
 	void MoveToCastle(const FVector &CastleLocation);
 
 	int32 OwnerTagId; 
+
+	FVector CurrentLocation; 
+
+	void CheckOwnerTagId();
 };

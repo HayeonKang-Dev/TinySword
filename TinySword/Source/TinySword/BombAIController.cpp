@@ -26,19 +26,12 @@ void ABombAIController::OnPossess(APawn *InPawn)
     bIsReadyToExplode = false; 
     ElapsedTime = 0.0f;
 
-    FVector CurrentLocation; 
+    
     //controlledBomb = Cast<ABaseBomb>(InPawn); 
 
     if (controlledBomb)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Controlled Bomb is not null"));
-        CurrentLocation = controlledBomb->GetActorLocation(); 
-        EnemyCastleLocation = GetRandomCastleLocation(controlledBomb->GetOwnerTagId()); 
-        UE_LOG(LogTemp, Warning, TEXT("Destination_Origin : %s"), *EnemyCastleLocation.ToString());
-
-        FVector NewLocation(EnemyCastleLocation.X, EnemyCastleLocation.Y, CurrentLocation.Z);
-        EnemyCastleLocation = NewLocation;
-        UE_LOG(LogTemp, Warning, TEXT("Destination : %s"), *EnemyCastleLocation.ToString());
+        GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ABombAIController::CheckOwnerTagId);
     }
     
 }
@@ -46,6 +39,19 @@ void ABombAIController::OnPossess(APawn *InPawn)
 void ABombAIController::OnUnPossess()
 {
     Super::OnUnPossess();
+}
+
+
+void ABombAIController::CheckOwnerTagId()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Controlled Bomb is not null"));
+    CurrentLocation = controlledBomb->GetActorLocation(); 
+    EnemyCastleLocation = GetRandomCastleLocation(controlledBomb->GetOwnerTagId()); 
+    UE_LOG(LogTemp, Warning, TEXT("OwnerTagId: %d / Destination_Origin : %s"), controlledBomb->GetOwnerTagId(), *EnemyCastleLocation.ToString());
+
+    FVector NewLocation(EnemyCastleLocation.X, EnemyCastleLocation.Y, CurrentLocation.Z);
+    EnemyCastleLocation = NewLocation;
+    UE_LOG(LogTemp, Warning, TEXT("Destination : %s"), *EnemyCastleLocation.ToString());
 }
 
 
@@ -116,6 +122,7 @@ FVector ABombAIController::GetRandomCastleLocation(int TagId)
     {
         UE_LOG(LogTemp, Warning, TEXT("Valid Castle numebr: %d"), ValidCastleLocations.Num());
         int32 RandomIndex = FMath::RandRange(0, ValidCastleLocations.Num() - 1); 
+        UE_LOG(LogTemp, Warning, TEXT("TagId: %d / Selected Castle Num: %d"), TagId, RandomIndex);
         return ValidCastleLocations[RandomIndex];
     }
     else return FVector::ZeroVector;
