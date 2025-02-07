@@ -73,4 +73,9 @@ private:
 	void FlipCharacter(float MoveDirec);
 
 	void UpdateAnimation();
+
+	float Timer = 0.0f; 
+
+	void SendMoveResponseMsg(); 
+	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
 };

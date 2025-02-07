@@ -6,6 +6,7 @@
 #include "TinySwordGameMode.h"
 #include "SheepAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "protocol.h"
 
 
 void ABaseAISheep::BeginPlay()
@@ -29,6 +30,14 @@ void ABaseAISheep::Tick(float DeltaTime)
     if (Velocity.SizeSquared() > 0.0f)
     {
         FlipCharacter(Velocity.X);
+    }
+
+    Timer += GetWorld()->DeltaTimeSeconds;
+    if (Timer >= 0.5f)
+    {
+        SendMoveResponseMsg();
+        SendMoveNotiMsg(1, TagId, GetActorLocation().X, GetActorLocation().Y);
+        Timer = 0.0f;
     }
 
     // Fix Rotation
@@ -160,4 +169,22 @@ void ABaseAISheep::UpdateAnimation()
         
         
     }
+}
+
+void ABaseAISheep::SendMoveResponseMsg()
+{
+    struct Move::Response *response = new Move::Response(); 
+    response->H.Command = 0x11; 
+    GameMode->messageQueue.push((struct HEAD *)response);
+}
+
+void ABaseAISheep::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
+{
+    struct Move::Notification *noti = new Move::Notification(); 
+    noti->H.Command = 0x12; 
+    noti->ActorType = actorType; 
+    noti->ActorIndex = actorIndex; 
+    noti->X = X; 
+    noti->Y = Y; 
+    GameMode->messageQueue.push((struct HEAD *)noti);
 }
