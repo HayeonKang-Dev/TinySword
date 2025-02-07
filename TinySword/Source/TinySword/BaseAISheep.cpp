@@ -111,6 +111,8 @@ void ABaseAISheep::SpawnMeat()
     {
         SpawnedMeat->SetTagId(GetTagId()); 
         GameMode->ActiveMeatId.Add(SpawnedMeat, GetTagId());
+        SendSpawnResponseMsg(); 
+        SendSpawnNotiMsg(2, SpawnedMeat->GetTagId(), SpawnedMeat->GetActorLocation().X, SpawnedMeat->GetActorLocation().Y);
     }
 
 }
@@ -176,6 +178,7 @@ void ABaseAISheep::SendMoveResponseMsg()
     struct Move::Response *response = new Move::Response(); 
     response->H.Command = 0x11; 
     GameMode->messageQueue.push((struct HEAD *)response);
+    delete response;
 }
 
 void ABaseAISheep::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
@@ -187,4 +190,25 @@ void ABaseAISheep::SendMoveNotiMsg(int actorType, int actorIndex, float X, float
     noti->X = X; 
     noti->Y = Y; 
     GameMode->messageQueue.push((struct HEAD *)noti);
+    delete noti;
+}
+
+void ABaseAISheep::SendSpawnResponseMsg()
+{
+    struct Spawn::Response *response = new Spawn::Response(); 
+    response->H.Command = 0x31; 
+    response->successyn = 1; 
+    GameMode->messageQueue.push((struct HEAD *)response);
+    delete response;
+}
+
+void ABaseAISheep::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
+{
+    struct Spawn::Notification *noti = new Spawn::Notification(); 
+	noti->H.Command = 0x32; 
+	noti->SpawnType = spawnType; 
+	noti->SpawnActorIndex = spawnActorIndex; 
+	noti->X = X; 
+	noti->Y = Y; 
+	GameMode->messageQueue.push((struct HEAD *)noti);
 }

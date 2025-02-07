@@ -80,5 +80,6 @@ private:
 	void SendSelectCharResponseMsg(int playerIndex); 
 	void SendSelectCharNotiMsg(const char playerId[40], int playerIndex);
 
-	
+	void SendSpawnResponseMsg(); 
+	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
 };

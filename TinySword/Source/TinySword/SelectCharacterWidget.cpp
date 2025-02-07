@@ -186,6 +186,9 @@ void USelectCharacterWidget::SpawnGoblin(ATinySwordPlayerController* PlayerContr
             SendSelectCharResponseMsg(PlayerController->GetTagId());
             char myPlayerId[40] = "test";
             SendSelectCharNotiMsg(myPlayerId, PlayerController->GetTagId());
+
+            SendSpawnResponseMsg();
+            SendSpawnNotiMsg(0, PlayerController->GetTagId(), SpawnLocation.X, SpawnLocation.Y);
         }
     }
 }
@@ -202,8 +205,31 @@ void USelectCharacterWidget::SendSelectCharNotiMsg(const char playerId[40], int 
 {
     struct CharacterSelect::Notification *noti = new CharacterSelect::Notification(); 
     noti->H.Command = 0x02; 
-    strncpy(noti->playerId, playerId, sizeof(noti->playerId));
+    // strncpy(noti->playerId, playerId, sizeof(noti->playerId));
+    strncpy_s(noti->playerId, sizeof(noti->playerId), playerId, _TRUNCATE);
+
+
     noti->playerId[sizeof(noti->playerId) - 1] = '\0';
     noti->playerIndex = playerIndex;
     GameMode->messageQueue.push((struct HEAD*)noti);
+}
+
+void USelectCharacterWidget::SendSpawnResponseMsg()
+{
+    struct Spawn::Response *response = new Spawn::Response(); 
+    response->H.Command = 0x31; 
+    response->successyn = 1; 
+    GameMode->messageQueue.push((struct HEAD *)response);
+    delete response;
+}
+
+void USelectCharacterWidget::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
+{
+    struct Spawn::Notification *noti = new Spawn::Notification(); 
+	noti->H.Command = 0x32; 
+	noti->SpawnType = spawnType; 
+	noti->SpawnActorIndex = spawnActorIndex; 
+	noti->X = X; 
+	noti->Y = Y; 
+	GameMode->messageQueue.push((struct HEAD *)noti);
 }

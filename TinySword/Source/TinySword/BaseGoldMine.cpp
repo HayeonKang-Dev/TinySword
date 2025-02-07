@@ -5,6 +5,8 @@
 #include "BaseGoldBag.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "protocol.h"
+#include "TinySwordGameMode.h"
 
 // Sets default values
 ABaseGoldMine::ABaseGoldMine()
@@ -82,6 +84,9 @@ void ABaseGoldMine::DropGoldBag()
 		SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnLocation, GetActorRotation(), SpawnParams);
 		ABaseGoldBag* SpawnedGoldBag = Cast<ABaseGoldBag>(SpawnedActor);
 
+		SendSpawnResponseMsg(); 
+		SendSpawnNotiMsg(3, SpawnedGoldBag->GetTagId(), SpawnLocation.X, SpawnLocation.Y);
+
 	}
 }
 
@@ -98,4 +103,24 @@ void ABaseGoldMine::UpdateSprite()
 {
 	if (IsCollapse() && collapseSprite != nullptr)
 		paperSprite->SetSprite(collapseSprite);
+}
+
+
+void ABaseGoldMine::SendSpawnResponseMsg()
+{
+	struct Spawn::Response *response = new Spawn::Response(); 
+	response->H.Command = 0x31; 
+	response->successyn = 1; 
+	GameMode->messageQueue.push((struct HEAD *)response);
+}
+
+void ABaseGoldMine::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
+{
+	struct Spawn::Notification *noti = new Spawn::Notification(); 
+	noti->H.Command = 0x32; 
+	noti->SpawnType = spawnType; 
+	noti->SpawnActorIndex = spawnActorIndex; 
+	noti->X = X; 
+	noti->Y = Y; 
+	GameMode->messageQueue.push((struct HEAD *)noti);
 }

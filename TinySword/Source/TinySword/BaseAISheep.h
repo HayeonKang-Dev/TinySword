@@ -32,6 +32,8 @@ public:
 
 	int32 GetTagId() const {return TagId;}
 
+	float GetHealth() const {return Health;}
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -78,4 +80,7 @@ private:
 
 	void SendMoveResponseMsg(); 
 	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
+
+	void SendSpawnResponseMsg(); 
+	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
 };

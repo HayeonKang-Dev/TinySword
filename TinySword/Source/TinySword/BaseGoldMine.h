@@ -11,7 +11,7 @@
 class UBoxComponent; 
 class UPaperFlipbookComponent; 
 class USceneComponent;
-
+class ATinySwordGameMode;
 
 UCLASS()
 class TINYSWORD_API ABaseGoldMine : public AActor
@@ -68,4 +68,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="TagId")
 	int32 TagId; 
 
+	ATinySwordGameMode* GameMode; 
+
+	void SendSpawnResponseMsg(); 
+	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
 };
