@@ -26,6 +26,7 @@ void ATinySwordGameMode::Tick(float DeltaTime)
 }
 
 
+
 void ATinySwordGameMode::FindCastlesLocation()
 {
     TArray<AActor*> AllCastles; 
@@ -56,6 +57,36 @@ FVector ATinySwordGameMode::FindCastleLocationByTagId(int32 TagId)
 {
     if (CastleMap.Contains(TagId)) return *CastleMap.Find(TagId);
     else return FVector::ZeroVector;
+}
+
+
+
+
+ABaseGoldBag *ATinySwordGameMode::FindGoldBagById(const TMap<ABaseGoldBag *, int32> &Map, int32 TargetId)
+{
+    for (const auto& Pair : Map)
+    {
+        if (Pair.Value == TargetValue) return Pair.Key; 
+    }
+    return nullptr;
+}
+
+ABaseAISheep *ATinySwordGameMode::FindSheepById(const TMap<ABaseAISheep *, int32> &Map, int32 TargetValue)
+{
+    for (const auto& Pair : Map)
+    {
+        if (Pair.Value == TargetValue) return Pair.Key; 
+    }
+    return nullptr;
+}
+
+ABaseMeat *ATinySwordGameMode::FindMeatById(const TMap<ABaseMeat *, int32> &Map, int32 TargetValue)
+{
+    for (const auto& Pair : Map)
+    {
+        if (Pair.Value == TargetValue) return Pair.Key; 
+    }
+    return nullptr;
 }
 
 // Packet Processing Function 
