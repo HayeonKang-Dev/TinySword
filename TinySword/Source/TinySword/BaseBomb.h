@@ -83,4 +83,7 @@ private:
 
 	void SendMoveResponseMsg(); 
 	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
+
+	void SendAttackResponseMsg(); 
+	void SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y);
 };

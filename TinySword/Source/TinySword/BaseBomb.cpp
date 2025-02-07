@@ -5,6 +5,11 @@
 #include "Goblin.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "BaseCastle.h"
+#include "BaseGoldMine.h"
+#include "BaseAISheep.h"
+
 #include "protocol.h"
 
 void ABaseBomb::BeginPlay()
@@ -69,6 +74,7 @@ float ABaseBomb::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent,
 
 void ABaseBomb::DealRadialDamage()
 {
+    SendAttackResponseMsg();
     FVector Origin = GetActorLocation(); 
     float DamageRadius = 100.0f; 
     TArray<AActor*> IgnoreActors;
@@ -89,6 +95,20 @@ void ABaseBomb::DealRadialDamage()
         GetInstigatorController(), 
         true
     );
+
+    for (AActor * hittedActor : DamagedActors)
+    {
+        if (AGoblin * goblin = Cast<AGoblin>(hittedActor)) 
+            SendAttackNotiMsg(1, TagId, 0, goblin->GetTagId(), Damage, goblin->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
+        else if (ABaseBomb* bomb = Cast<ABaseBomb>(hittedActor))
+            SendAttackNotiMsg(1, TagId, 1, bomb->GetTagId(), Damage, bomb->GetHealth(), GetActorLocation().X, GetActorLocation().Y); 
+        else if (ABaseCastle* castle = Cast<ABaseCastle>(hittedActor))
+            SendAttackNotiMsg(1, TagId, 2, castle->GetTagId(), Damage, castle->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
+        else if (ABaseAISheep* sheep = Cast<ABaseAISheep>(hittedActor))
+            SendAttackNotiMsg(1, TagId, 3, sheep->GetTagId(), Damage, sheep->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
+        else if (ABaseGoldMine* goldMine = Cast<ABaseGoldMine>(hittedActor))
+            SendAttackNotiMsg(1, TagId, 4, goldMine->GetTagId(), Damage, goldMine->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
+    }
 }
 
 
@@ -135,6 +155,7 @@ void ABaseBomb::SendMoveResponseMsg()
     struct Move::Response *response = new Move::Response(); 
     response->H.Command = 0x11; 
     GameMode->messageQueue.push((struct HEAD *)response);
+    delete response;
 }
 
 void ABaseBomb::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
@@ -146,4 +167,30 @@ void ABaseBomb::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
     noti->X = X; 
     noti->Y = Y; 
     GameMode->messageQueue.push((struct HEAD *)noti);
+    delete noti;
+}
+
+void ABaseBomb::SendAttackResponseMsg()
+{
+    struct Attack::Response *response = new Attack::Response(); 
+    response->H.Command = 0x21; 
+    response->hityn = 1; 
+    GameMode->messageQueue.push((struct HEAD *)response);
+    delete response;
+}
+
+void ABaseBomb::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y)
+{
+    struct Attack::Notification *noti = new Attack::Notification(); 
+    noti->H.Command = 0x22; 
+    noti->AttackerType = attackerType; 
+    noti->AttackerIndex = attackerIndex; 
+    noti->AttackerType = attackerType; 
+    noti->targetIndex = targetIndex; 
+    noti->Damage = damage; 
+    noti->targetHp = targetHp; 
+    noti->X = X; 
+    noti->Y = Y; 
+    GameMode->messageQueue.push((struct HEAD *)noti);
+    delete noti; 
 }
