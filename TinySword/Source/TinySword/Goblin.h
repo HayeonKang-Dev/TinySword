@@ -129,6 +129,6 @@ private:
 	ATinySwordPlayerController* playerController;
 
 	void SendMoveResponseMsg(); 
-	void SendMoveNotiMsg(int actorType, int actorIndex, char key, float X, float Y);
+	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
  
 };
