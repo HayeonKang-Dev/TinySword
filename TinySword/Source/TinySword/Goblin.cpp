@@ -8,9 +8,14 @@
 #include "GameFramework/Character.h"
 #include "PaperFlipbookComponent.h"
 #include "PaperFlipbook.h" 
+
 #include "BaseMeat.h"
 #include "BaseBomb.h"
+#include "BaseCastle.h"
+#include "BaseAISheep.h"
+#include "BaseGoldMine.h"
 #include "BaseGoldBag.h"
+
 #include "PlayingWidget.h"
 #include "GameFramework/HUD.h"
 #include "TinySwordGameMode.h"
@@ -178,12 +183,19 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
 
     if (OtherActor->IsA(ABaseMeat::StaticClass())) 
     {
+        ABaseMeat* meat = Cast<ABaseMeat>(OtherActor); 
+        SendGetItemResponseMsg(); 
+        SendGetItemNotiMsg(0, meat->GetTagId(), GetActorLocation().X, GetActorLocation().Y);
         IncreaseHealth(10);
         if (playerController && playerController->playingWidget) playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
         OtherActor->Destroy();
+
     }
     if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
     {
+        ABaseGoldBag* gold = Cast<ABaseGoldBag>(OtherActor); 
+        SendGetItemResponseMsg(); 
+        SendGetItemNotiMsg(1, gold->GetTagId(), GetActorLocation().X, GetActorLocation().Y);
         IncreaseMoney(10);
         //UpdateMoneyCount_(Money);
         OtherActor->Destroy();
@@ -231,6 +243,7 @@ void AGoblin::Attack()
     PlayAttackAnimation();
     IsAttack = true; 
     FVector Start, End;
+    SendAttackResponseMsg();
 
     // Get Dynamite's collision
     USphereComponent* SphereCollision = FindComponentByClass<USphereComponent>();
@@ -258,10 +271,25 @@ void AGoblin::Attack()
 
             if (AGoblin* targetPlayer = Cast<AGoblin>(HitActor))
             {
-
+                SendAttackNotiMsg(0, TagId, 0, targetPlayer->GetTagId(), Damage, targetPlayer->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
+            }
+            else if (ABaseBomb* targetBomb = Cast<ABaseBomb>(HitActor))
+            {
+                SendAttackNotiMsg(0, TagId, 1, targetBomb->GetTagId(), Damage, targetBomb->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
+            }
+            else if (ABaseCastle* targetCastle = Cast<ABaseCastle>(HitActor))
+            {
+                SendAttackNotiMsg(0, TagId, 2, targetCastle->GetTagId(), Damage, targetCastle->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
+            }
+            else if (ABaseAISheep* targetSheep = Cast<ABaseAISheep>(HitActor))
+            {
+                SendAttackNotiMsg(0, TagId, 3, targetSheep->GetTagId(), Damage, targetSheep->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
+            }
+            else if (ABaseGoldMine* targetGoldMine = Cast<ABaseGoldMine>(HitActor))
+            {
+                SendAttackNotiMsg(0, TagId, 4, targetGoldMine->GetTagId(), Damage, targetGoldMine->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
             }
 
-            // else if .. != my castle, my bomb 
         }
     }
 
@@ -351,4 +379,54 @@ void AGoblin::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
     noti->X = X; 
     noti->Y = Y; 
     GameMode->messageQueue.push((struct HEAD *)noti);
+}
+
+void AGoblin::SendAttackResponseMsg()
+{
+    struct Attack::Response *response = new Attack::Response(); 
+    response->H.Command = 0x21; 
+    response->hityn = 1;
+    GameMode->messageQueue.push((struct HEAD *)response);
+} 
+
+void AGoblin::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y)
+{
+    struct Attack::Notification *noti = new Attack::Notification(); 
+    noti->H.Command = 0x22; 
+    noti->AttackerType = attackerType; 
+    noti->AttackerIndex = attackerIndex; 
+    noti->targetType = targetType; 
+    noti->targetIndex = targetIndex; 
+    noti->Damage = damage; 
+    noti->targetHp = targetHp; 
+    noti->X = X; 
+    noti->Y = Y; 
+    GameMode->messageQueue.push((struct HEAD *)noti);
+    delete noti;
+}
+
+void AGoblin::SendGetItemResponseMsg()
+{
+    struct GetItem::Response *response = new GetItem::Response(); 
+    response->H.Command = 0x41; 
+    response->successyn = 1; 
+    response->playerHp = GetHealth(); 
+    response->playerCoin = GetMoneyCount(); 
+    GameMode->messageQueue.push((struct HEAD *)response);
+    delete response;
+}
+
+void AGoblin::SendGetItemNotiMsg(int itemType, int itemIndex, float X, float Y)
+{
+    struct GetItem::Notification *noti = new GetItem::Notification(); 
+    noti->H.Command =0x42; 
+    noti->playerIndex = GetTagId(); 
+    noti->playerHp = GetHealth(); 
+    noti->playerCoin = GetMoneyCount(); 
+    noti->ItemType = itemType; 
+    noti->ItemIndex = itemIndex; 
+    noti->X = X; 
+    noti->Y = Y; 
+    GameMode->messageQueue.push((struct HEAD *)noti);
+    delete noti;
 }
