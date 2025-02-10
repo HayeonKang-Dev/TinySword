@@ -5,20 +5,19 @@
 #include "Blueprint/UserWidget.h"
 #include "Goblin.h"
 #include "TinySwordGameMode.h"
+#include "TinySwordGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 void ATinySwordPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
     GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
+    GI = Cast<UTinySwordGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
     bShowMouseCursor = true; 
     
-    if (MainWidgetClass)
-    {
-        MainWidget = CreateWidget<UMainWidget>(this, MainWidgetClass);
-        if (MainWidget) MainWidget->AddToViewport(); // 위젯 화면 추가
-    }
+
 }
 
 void ATinySwordPlayerController::SetPlayingWidget(UPlayingWidget* playing)
@@ -36,8 +35,14 @@ void ATinySwordPlayerController::OnPossess(APawn *aPawn)
 {
     Super::OnPossess(aPawn);
     controlledChar = Cast<AGoblin>(aPawn);
-    controlledChar->SetTagId(TagId);
-    controlledChar->SetPlayerController(this);
+    if (controlledChar && GI)
+    {
+        controlledChar->SetTagId(GI->GetTagId());
+        controlledChar->SetPlayerController(this);
+        TagId = GI->GetTagId(); 
+        UE_LOG(LogTemp, Warning, TEXT("Possessed Char: %s"), *aPawn->GetName());
+    }
+    
 }
 
 void ATinySwordPlayerController::OnUnPossess()

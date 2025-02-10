@@ -12,6 +12,8 @@
  * 
  */
 class AGoblin;
+class UTinySwordGameInstance;
+
 UCLASS()
 class TINYSWORD_API ATinySwordPlayerController : public APlayerController
 {
@@ -42,16 +44,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<class UMainWidget> MainWidgetClass; 
 
-	// UPROPERTY()
-	// class UPlayingWidget* PlayingWidgetInstance; 
-
 	UPROPERTY(VisibleAnywhere)
 	int32 TagId;
 
 	
 	
 private:
-	
+	UTinySwordGameInstance* GI;
 
 	ATinySwordGameMode* GameMode; 
 
