@@ -7,6 +7,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "protocol.h"
 #include "TinySwordGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABaseGoldMine::ABaseGoldMine()
@@ -36,7 +37,7 @@ void ABaseGoldMine::BeginPlay()
 	Super::BeginPlay();
 
 	Durability = MaxDurability;
-	
+	GameMode = Cast<ATinySwordGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 }
 
 
@@ -84,8 +85,13 @@ void ABaseGoldMine::DropGoldBag()
 		SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnLocation, GetActorRotation(), SpawnParams);
 		ABaseGoldBag* SpawnedGoldBag = Cast<ABaseGoldBag>(SpawnedActor);
 
-		SendSpawnResponseMsg(); 
-		SendSpawnNotiMsg(3, SpawnedGoldBag->GetTagId(), SpawnLocation.X, SpawnLocation.Y);
+		if (GameMode)
+		{
+			SendSpawnResponseMsg(); 
+			SendSpawnNotiMsg(3, SpawnedGoldBag->GetTagId(), SpawnLocation.X, SpawnLocation.Y);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("Game Mode is null (in goldmine.cpp)"));
+		
 
 	}
 }
@@ -108,10 +114,12 @@ void ABaseGoldMine::UpdateSprite()
 
 void ABaseGoldMine::SendSpawnResponseMsg()
 {
+
 	struct Spawn::Response *response = new Spawn::Response(); 
 	response->H.Command = 0x31; 
 	response->successyn = 1; 
 	GameMode->messageQueue.push((struct HEAD *)response);
+
 }
 
 void ABaseGoldMine::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
