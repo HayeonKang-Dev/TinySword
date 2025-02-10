@@ -16,9 +16,11 @@
  */
 class ATinySwordGameMode;
 class ATinySwordPlayerController; 
+class ATinySwordPlayerState;
 class AGoblin;
 class ABaseBomb;
 class USettingWidget;
+class UTinySwordGameInstance;
 
 UCLASS()
 class TINYSWORD_API UPlayingWidget : public UUserWidget
@@ -26,6 +28,8 @@ class TINYSWORD_API UPlayingWidget : public UUserWidget
 	GENERATED_BODY()
 
 public: 
+	virtual void NativeOnInitialized() override;
+
 	virtual void NativeConstruct() override; 
 
 	void UpdateHealthBar(float HealthPercent);
@@ -65,10 +69,12 @@ protected:
 
 	void SetBombIndex(); 
 
-	UFUNCTION()
-	float GetHpBarPercent();
+
+
 private:
 	ATinySwordGameMode* GameMode; 
+
+	UTinySwordGameInstance* GI;
 
 	ATinySwordPlayerController* playerController; 
 
@@ -80,6 +86,12 @@ private:
 
 	FVector GetBombSpawnPoint(UWorld* World, FVector& FoundLocation);
 
+	void SpawnGoblin(ATinySwordPlayerController* PlayerController);
+
 	void SendSpawnResponseMsg(); 
 	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
+
+	void SendSelectCharResponseMsg(int playerIndex); 
+	void SendSelectCharNotiMsg(const char playerId[40], int playerIndex);
+
 };

@@ -11,14 +11,37 @@
 #include "SettingWidget.h"
 #include "BaseBomb.h"
 #include "protocol.h"
+// #include "TinySwordPlayerState.h"
+#include "TinySwordGameInstance.h"
+
+void UPlayingWidget::NativeOnInitialized()
+{
+    Super::NativeOnInitialized();
+
+    GI = Cast<UTinySwordGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+    playerController = Cast<ATinySwordPlayerController>(GetOwningPlayer()); 
+    GameMode = Cast<ATinySwordGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+    GameMode->FindCastlesLocation();
+    
+    FTimerHandle tmpTimer;
+    GetWorld()->GetTimerManager().SetTimer(tmpTimer, FTimerDelegate::CreateUObject(this, &UPlayingWidget::SpawnGoblin, playerController), 0.2f, false); 
+    
+}
 
 void UPlayingWidget::NativeConstruct()
 {
     Super::NativeConstruct(); 
 
-    playerController = Cast<ATinySwordPlayerController>(GetOwningPlayer()); 
-    GameMode = Cast<ATinySwordGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-    controlledChar = Cast<AGoblin>(playerController->GetPawn());
+    if (playerController)
+    {
+        playerController->SetPlayingWidget(this); 
+    }
+    else if (!playerController)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("PlayerController is not valid"));
+    }
+ 
+
     SpawnButton = Cast<UButton>(GetWidgetFromName(TEXT("SpawnButton")));
     HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HPBar"))); 
     moneyCount = Cast<UTextBlock>(GetWidgetFromName(TEXT("MoneyCount")));
@@ -30,6 +53,7 @@ void UPlayingWidget::NativeConstruct()
     // 초기화
     HPBar->SetPercent(100.0f);
     moneyCount->SetText(FText::AsNumber(0));
+    controlledChar = GI->GetChar();
 
 }
 
@@ -61,6 +85,7 @@ void UPlayingWidget::OnSettingButtonClicked()
 
 bool UPlayingWidget::DecreasePlayerMoney()
 {
+    controlledChar = Cast<AGoblin>(playerController->GetPawn());
     if (playerController && controlledChar) 
     {
         return controlledChar->DecreaseMoney(10);
@@ -157,12 +182,6 @@ FVector UPlayingWidget::GetBombSpawnPoint(UWorld *World, FVector &FoundLocation)
     FNavLocation DestinationLocation;
     FVector QueryExtent(100.0f, 100.0f, 10.0f);
     UE_LOG(LogTemp, Warning, TEXT("Entered in GetBombSpawnPoint..."));
-    // if (NavSys->ProjectPointToNavigation(SpawnLocation, DestinationLocation, QueryExtent)) return DestinationLocation.Location;
-    // {
-    //     UE_LOG(LogTemp, Warning, TEXT("Spawn Location Update to Nav : %s"), *DestinationLocation.Location.ToString());
-    //     return DestinationLocation.Location;
-    // }
-    // if (NavSys->GetRandomPointInNavigableRadius(SpawnLocation, 300.0f, DestinationLocation)) return DestinationLocation.Location;
     return SpawnLocation;
 }
 
@@ -173,16 +192,10 @@ void UPlayingWidget::UpdateHealthBar(float HealthPercent)
     if (HPBar) HPBar-> SetPercent(HealthPercent);
 }
 
-float UPlayingWidget::GetHpBarPercent()
-{
-    UE_LOG(LogTemp, Warning, TEXT("Health(%f) / MaxHealth(%f) = %f"), controlledChar->GetHealth(), 100.0f, controlledChar->GetHealth()/100.0f);
-    return controlledChar->GetHealthPercent();
-}
 
 void UPlayingWidget::UpdateMoneyCount(float Money)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Entered in UpdateMoneyCount"));
-    moneyCount->SetText(FText::AsNumber(controlledChar->GetMoneyCount()));
+    moneyCount->SetText(FText::AsNumber(Money));
 }
 
 void UPlayingWidget::EnableSpawnButton(bool bEnable)
@@ -212,4 +225,106 @@ void UPlayingWidget::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float 
 	noti->X = X; 
 	noti->Y = Y; 
 	GameMode->messageQueue.push((struct HEAD *)noti);
+}
+
+
+
+void UPlayingWidget::SendSelectCharResponseMsg(int playerIndex)
+{
+    struct CharacterSelect::Response *response = new CharacterSelect::Response(); 
+    response->H.Command = 0x01; 
+    response->playerIndex = playerIndex; 
+    GameMode->messageQueue.push((struct HEAD*)response);
+}
+
+void UPlayingWidget::SendSelectCharNotiMsg(const char playerId[40], int playerIndex)
+{
+    struct CharacterSelect::Notification *noti = new CharacterSelect::Notification(); 
+    noti->H.Command = 0x02; 
+    // strncpy(noti->playerId, playerId, sizeof(noti->playerId));
+    strncpy_s(noti->playerId, sizeof(noti->playerId), playerId, _TRUNCATE);
+
+
+    noti->playerId[sizeof(noti->playerId) - 1] = '\0';
+    noti->playerIndex = playerIndex;
+    GameMode->messageQueue.push((struct HEAD*)noti);
+}
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+
+void UPlayingWidget::SpawnGoblin(ATinySwordPlayerController* PlayerController)
+{
+    if (GameMode)
+    {
+        TMap<int32, FVector>& CastleMap = GameMode->GetCastleMap();
+        UObject* spawnActor = nullptr; 
+
+     
+        if (GI)
+        {
+            switch(GI->GetTagId())
+            {
+                case 0: 
+                    spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Blue.Goblin_Blue'")); 
+                    break; 
+
+                case 1: 
+                    spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Purple.Goblin_Purple'")); 
+                    break; 
+
+                case 2: 
+                    spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Red.Goblin_Red'")); 
+                    break; 
+
+                case 3: 
+                    spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Yellow.Goblin_Yellow'")); 
+                    break; 
+
+                default: 
+                    UE_LOG(LogTemp, Warning, TEXT("Spawn Actor is not valid"));
+                    break;
+
+            }
+
+        }
+
+        
+        UBlueprint* GeneratedBP = Cast<UBlueprint>(spawnActor); 
+        UWorld* World = GetWorld(); 
+
+        if (!spawnActor || !GeneratedBP || !GeneratedBP->GeneratedClass || !World) return; 
+        
+        FActorSpawnParameters SpawnParams; 
+        SpawnParams.Owner = PlayerController; 
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; 
+
+        FVector SpawnCharLocation = GameMode->FindCastleLocationByTagId(GI->GetTagId()); ////////////////////////////////// 
+        // SpawnCharLocation.X += 150.0f;
+        SpawnCharLocation.Y += 100.0f;
+        SpawnCharLocation.Z = -250.0f;
+        FRotator SpawnRotation(0.0f, 0.0f, 0.0f);
+
+        AGoblin* SpawnedChar = World->SpawnActor<AGoblin>(GeneratedBP->GeneratedClass, SpawnCharLocation, SpawnRotation, SpawnParams);
+
+        if (SpawnedChar) 
+        {
+            UE_LOG(LogTemp, Warning, TEXT("SpawnedChar : %s"), *SpawnedChar->GetName());
+            PlayerController->OnPossess(SpawnedChar);
+            // PlayerController->SetViewTargetWithBlend(SpawnedChar, 0.0f);
+
+            SendSelectCharResponseMsg(PlayerController->GetTagId());
+            char myPlayerId[40] = "test";
+            SendSelectCharNotiMsg(myPlayerId, PlayerController->GetTagId());
+
+            SendSpawnResponseMsg();
+            SendSpawnNotiMsg(0, PlayerController->GetTagId(), SpawnCharLocation.X, SpawnCharLocation.Y);
+            GI->SetChar(SpawnedChar);
+        }
+    }
 }
