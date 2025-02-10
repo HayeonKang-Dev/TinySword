@@ -13,6 +13,9 @@
  */
 class ATinySwordGameMode;
 class UMainWidget;
+class UTinySwordGameInstance;
+
+
 UCLASS()
 class TINYSWORD_API USelectCharacterWidget : public UUserWidget
 {
@@ -74,8 +77,6 @@ private:
 	ATinySwordPlayerController* PC; 
 
 	ATinySwordGameMode* GameMode;
-
-	void SpawnGoblin(ATinySwordPlayerController* PlayerController);
 
 	void SendSelectCharResponseMsg(int playerIndex); 
 	void SendSelectCharNotiMsg(const char playerId[40], int playerIndex);
