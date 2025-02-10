@@ -47,7 +47,7 @@ public:
 	bool IsDead() const;
 
 	UPROPERTY(VisibleAnywhere, Category="State")
-	float Money; 
+	float Money = 0; 
 
 	UPROPERTY(EditAnywhere, Category="Combat")
 	bool IsAttack = false; 
