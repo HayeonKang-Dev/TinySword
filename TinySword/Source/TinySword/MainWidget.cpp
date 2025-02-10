@@ -2,7 +2,7 @@
 
 
 #include "MainWidget.h"
-
+#include "Kismet/GameplayStatics.h"
 
 void UMainWidget::NativeConstruct()
 {
@@ -14,14 +14,16 @@ void UMainWidget::NativeConstruct()
 
 void UMainWidget::OnStartGameButtonClicked()
 {
-    if (selectWidgetClass)
-    {
-        selectWidget = CreateWidget<USelectCharacterWidget>(GetWorld(), selectWidgetClass); 
+    UGameplayStatics::OpenLevel(GetWorld(), FName("SelectCharLevel"));
 
-        if (selectWidget)
-        {
-            selectWidget->AddToViewport();
+    // if (selectWidgetClass)
+    // {
+    //     selectWidget = CreateWidget<USelectCharacterWidget>(GetWorld(), selectWidgetClass); 
+
+    //     if (selectWidget)
+    //     {
+    //         selectWidget->AddToViewport();
             
-        }
-    }
+    //     }
+    // }
 }
