@@ -13,7 +13,10 @@
 void ATinySwordGameMode::BeginPlay()
 {
     Super::BeginPlay();
-    FindCastlesLocation();
+
+    // UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenuLevel"));
+
+    // FindCastlesLocation();
     //FindAllGoblins();
 }
 
@@ -24,6 +27,13 @@ void ATinySwordGameMode::Tick(float DeltaTime)
 
     struct HEAD *data = messageQueue.pop(); 
     if (data == nullptr) return;
+
+    // switch case 
+
+
+
+
+
 }
 
 
@@ -37,6 +47,7 @@ void ATinySwordGameMode::FindCastlesLocation()
         ABaseCastle* castle = Cast<ABaseCastle>(Castle); 
         CastleMap.Add(castle->GetTagId(), castle->GetActorLocation());
     }
+    UE_LOG(LogTemp, Warning, TEXT("Find Castle Num : %d"), AllCastles.Num());
 }
 
 void ATinySwordGameMode::FindAllGoblins()
@@ -91,6 +102,11 @@ ABaseMeat *ATinySwordGameMode::FindMeatById(const TMap<ABaseMeat *, int32> &Map,
     }
     return nullptr;
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 // Packet Processing Function 
 
