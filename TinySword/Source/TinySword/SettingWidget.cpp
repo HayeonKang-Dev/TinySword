@@ -40,10 +40,10 @@ void USettingWidget::OnMainMenuButtonClicked()
 
         APawn* pawn = playerController->GetPawn(); 
         playerController->OnUnPossess();
-        pawn->Destroy(); ////////////////////////////////////////////
+        pawn->Destroy();
 
         UWidgetLayoutLibrary::RemoveAllWidgets(this);
-        MainWidget = CreateWidget<UMainWidget>(this, MainWidgetClass);
-        if (MainWidget) MainWidget->AddToViewport(); // 위젯 화면 추가
+
+        UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenuLevel"));
     }
 }
