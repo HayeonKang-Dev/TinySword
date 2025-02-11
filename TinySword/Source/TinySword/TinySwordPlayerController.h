@@ -20,6 +20,8 @@ class TINYSWORD_API ATinySwordPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public: 
+	virtual void Tick(float DeltaTime) override;
+
 	AGoblin* controlledChar; 
 
 	UPROPERTY()
@@ -53,5 +55,7 @@ private:
 	UTinySwordGameInstance* GI;
 
 	ATinySwordGameMode* GameMode; 
+
+	float SendTimer = 0.0f;
 
 };

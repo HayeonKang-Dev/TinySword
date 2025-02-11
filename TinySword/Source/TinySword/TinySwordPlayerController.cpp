@@ -20,10 +20,42 @@ void ATinySwordPlayerController::BeginPlay()
 
 }
 
+void ATinySwordPlayerController::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime); 
+
+    // SendTimer += GetWorld()->DeltaTimeSeconds; 
+    // if (SendTimer >= 0.2f)
+    // {
+    //     bool bMoveUp = IsInputKeyDown(EKeys::W); 
+    //     bool bMoveDown = IsInputKeyDown(EKeys::S); 
+    //     bool bMoveRight = IsInputKeyDown(EKeys::D); 
+    //     bool bMoveLeft = IsInputKeyDown(EKeys::A); 
+    //     if (bMoveUp || bMoveDown || bMoveLeft || bMoveRight)
+    //     {
+    //         controlledChar->SendMoveResponseMsg(0, controlledChar->GetTagId(), bMoveUp, bMoveDown, bMoveRight, bMoveLeft);
+    //     }
+    //     SendTimer = 0.0f;
+    // }
+
+    bool bMoveUp = IsInputKeyDown(EKeys::W); 
+    bool bMoveDown = IsInputKeyDown(EKeys::S); 
+    bool bMoveRight = IsInputKeyDown(EKeys::D); 
+    bool bMoveLeft = IsInputKeyDown(EKeys::A); 
+    if (bMoveUp || bMoveDown || bMoveLeft || bMoveRight)
+    {
+        controlledChar->SendMoveResponseMsg(0, controlledChar->GetTagId(), bMoveUp, bMoveDown, bMoveRight, bMoveLeft);
+    }
+
+
+}
+
 void ATinySwordPlayerController::SetPlayingWidget(UPlayingWidget* playing)
 {
     playingWidget = playing;
 }
+
+
 
 void ATinySwordPlayerController::SetTagId(int32 newTagId)
 {
