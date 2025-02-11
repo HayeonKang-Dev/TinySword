@@ -1,5 +1,5 @@
 #pragma once
-//#include "CoreMinimal.h"
+#include "CoreMinimal.h"
 
 struct HEAD {
 	short Command;
@@ -41,6 +41,12 @@ struct Move {
 
 	struct Response {
 		struct HEAD H;
+		int ActorType; 
+		int ActorIndex; 
+		bool bMoveUp, bMoveDown, bMoveRight, bMoveLeft; 
+		float Speed; 
+		float X, Y;
+		FVector Destination;
 	};
 
 	struct Notification {
@@ -48,7 +54,7 @@ struct Move {
 		int ActorType;
 		int ActorIndex;
 		char key;
-		//FVector Pos;
+		FVector Location;
 		float X; 
 		float Y; 
 	};
@@ -107,7 +113,7 @@ struct Spawn { // 0x3
 	};
 };
 
-struct GetItem {
+struct GetItem { // 0x4
 	struct Request {
 		struct HEAD H;
 		int playerIndex;
@@ -137,7 +143,7 @@ struct GetItem {
 	};
 };
 
-struct BombExplode {
+struct BombExplode { // 0x5
 	struct Request {
 		struct HEAD H;
 		int BombIndex;
@@ -155,15 +161,15 @@ struct BombExplode {
 	struct Notification {
 		struct HEAD H;
 		//FVector Pos;
-		int DamagedActorIndex;
-		int Damage;
-		int targetType;
-		int targetHp; // target last hp
+		//int DamagedActorIndex;
+		//int Damage;
+		// int targetType;
+		// int targetHp; // target last hp
 		float X, Y;
 	};
 };
 
-struct PlayerDead {
+struct PlayerDead { // 0x6
 	struct Request {
 		struct HEAD H;
 		int playerIndex;
@@ -182,7 +188,7 @@ struct PlayerDead {
 	};
 };
 
-struct Destroy {
+struct Destroy { // 0x7
 	struct Request {
 		struct HEAD H;
 		int ActorType;
@@ -192,11 +198,14 @@ struct Destroy {
 
 	struct Response {
 		struct HEAD H;
+		int ActorType; 
+		int ActorIndex; 
+		float X, Y;
 	};
 
 	struct Notification {
 		struct HEAD H;
-		int ActorType; // sheep, meat, bomb, goldbag = 0, 1, 2, 3
+		int ActorType; // bomb, goldbag, sheep, meat = 0, 1, 2, 3
 		int ActorIndex;
 		//FVector Pos;
 		float X, Y;
