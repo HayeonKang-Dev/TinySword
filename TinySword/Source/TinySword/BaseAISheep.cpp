@@ -35,7 +35,7 @@ void ABaseAISheep::Tick(float DeltaTime)
     Timer += GetWorld()->DeltaTimeSeconds;
     if (Timer >= 0.5f)
     {
-        SendMoveResponseMsg();
+        // SendMoveResponseMsg(1, TagId, Velocity.Size()); ///////////////////////////////////////////////
         SendMoveNotiMsg(1, TagId, GetActorLocation().X, GetActorLocation().Y);
         Timer = 0.0f;
     }
@@ -59,25 +59,14 @@ float ABaseAISheep::TakeDamage(float DamageAmount, FDamageEvent const &DamageEve
         TakeDamageFrom(DamageCauser); 
         if (IsDead())
         {
-            Destroy();
+            // Destroy(); ////////////////////////////////////
+            SendDestroyResponseMsg(2, TagId, GetActorLocation().X, GetActorLocation().Y);
+            SendDestroyNotiMsg(2, TagId, GetActorLocation().X, GetActorLocation().Y);
+
             SpawnMeat();
         }
     }
     return ActualDamage;
-}
-
-// Move 
-void ABaseAISheep::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
-{
-    Super::SetupPlayerInputComponent(PlayerInputComponent);
-    PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ABaseAISheep::MoveRight);
-}
-
-
-
-void ABaseAISheep::MoveRight(float AxisValue)
-{
-    AddMovementInput(GetActorRightVector() * AxisValue);
 }
 
 
@@ -173,12 +162,14 @@ void ABaseAISheep::UpdateAnimation()
     }
 }
 
-void ABaseAISheep::SendMoveResponseMsg()
+void ABaseAISheep::SendMoveResponseMsg(int ActorType, int ActorIndex, float Speed)
 {
     struct Move::Response *response = new Move::Response(); 
     response->H.Command = 0x11; 
+    response->ActorType = ActorType; 
+    response->ActorIndex = ActorIndex; 
+    response->Speed = Speed;
     GameMode->messageQueue.push((struct HEAD *)response);
-    delete response;
 }
 
 void ABaseAISheep::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
@@ -190,7 +181,6 @@ void ABaseAISheep::SendMoveNotiMsg(int actorType, int actorIndex, float X, float
     noti->X = X; 
     noti->Y = Y; 
     GameMode->messageQueue.push((struct HEAD *)noti);
-    delete noti;
 }
 
 void ABaseAISheep::SendSpawnResponseMsg()
@@ -199,7 +189,6 @@ void ABaseAISheep::SendSpawnResponseMsg()
     response->H.Command = 0x31; 
     response->successyn = 1; 
     GameMode->messageQueue.push((struct HEAD *)response);
-    delete response;
 }
 
 void ABaseAISheep::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
@@ -212,3 +201,26 @@ void ABaseAISheep::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X,
 	noti->Y = Y; 
 	GameMode->messageQueue.push((struct HEAD *)noti);
 }
+
+void ABaseAISheep::SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y)
+{
+    struct Destroy::Response *response = new Destroy::Response(); 
+    response->H.Command = 0x71; 
+    response->ActorType = actorType; 
+    response->ActorIndex = actorIndex; 
+    response->X = X; 
+    response->Y = Y; 
+    GameMode->messageQueue.push((struct HEAD *)response);
+}
+
+void ABaseAISheep::SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y)
+{
+    struct Destroy::Notification *noti = new Destroy::Notification(); 
+    noti->H.Command = 0x72; 
+    noti->ActorType = actorType;  
+    noti->ActorIndex = actorIndex; 
+    noti->X = X; 
+    noti->Y = Y; 
+    GameMode->messageQueue.push((struct HEAD *)noti);
+}
+

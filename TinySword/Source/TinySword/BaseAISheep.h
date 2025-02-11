@@ -34,6 +34,8 @@ public:
 
 	float GetHealth() const {return Health;}
 
+	
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -78,9 +80,12 @@ private:
 
 	float Timer = 0.0f; 
 
-	void SendMoveResponseMsg(); 
+	void SendMoveResponseMsg(int ActorType, int ActorIndex, float Speed); 
 	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
 
 	void SendSpawnResponseMsg(); 
 	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
+
+	void SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y); 
+	void SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y);
 };
