@@ -170,7 +170,7 @@ void USelectCharacterWidget::SendSpawnResponseMsg()
     response->H.Command = 0x31; 
     response->successyn = 1; 
     GameMode->messageQueue.push((struct HEAD *)response);
-    delete response;
+
 }
 
 void USelectCharacterWidget::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
