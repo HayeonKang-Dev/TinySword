@@ -213,7 +213,6 @@ void UPlayingWidget::SendSpawnResponseMsg()
     response->H.Command = 0x31; 
     response->successyn = 1; 
     GameMode->messageQueue.push((struct HEAD *)response);
-    delete response;
 }
 
 void UPlayingWidget::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
@@ -325,6 +324,7 @@ void UPlayingWidget::SpawnGoblin(ATinySwordPlayerController* PlayerController)
             SendSpawnResponseMsg();
             SendSpawnNotiMsg(0, PlayerController->GetTagId(), SpawnCharLocation.X, SpawnCharLocation.Y);
             GI->SetChar(SpawnedChar);
+            GameMode->GoblinMap.Add(SpawnedChar, GI->GetTagId());
         }
     }
 }
