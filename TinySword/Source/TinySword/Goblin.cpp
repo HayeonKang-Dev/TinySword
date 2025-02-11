@@ -20,6 +20,7 @@
 #include "GameFramework/HUD.h"
 #include "TinySwordGameMode.h"
 #include "protocol.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 void AGoblin::BeginPlay()
@@ -31,6 +32,7 @@ void AGoblin::BeginPlay()
 
     Health = MaxHealth; 
     Money = 0; 
+    GetCharacterMovement()->MaxWalkSpeed = Speed; 
 
     OverlapComponent = FindComponentByClass<UCapsuleComponent>(); 
     paperFlipbookComponent = FindComponentByClass<UPaperFlipbookComponent>();
@@ -77,12 +79,12 @@ void AGoblin::MoveRight(float Value)
         Timer += GetWorld()->DeltaTimeSeconds;
         if (Timer >= 0.5f)
         {
-            SendMoveResponseMsg(); 
+            // SendMoveResponseMsg(0, TagId, ); 
             SendMoveNotiMsg(0, TagId, GetActorLocation().X, GetActorLocation().Y);
 
             Timer = 0.0f;
         }
-        AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
+        // AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
         FlipCharacter(Value);
     }
 }
@@ -94,12 +96,12 @@ void AGoblin::UpDown(float Value)
         Timer += GetWorld()->DeltaTimeSeconds; 
         if (Timer >= 0.5f)
         {
-            SendMoveResponseMsg(); 
+            // SendMoveResponseMsg(); 
             SendMoveNotiMsg(0, TagId, GetActorLocation().X, GetActorLocation().Y);
 
             Timer = 0.0f;
         }
-        AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
+        // AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
     }
 }
 
@@ -183,22 +185,32 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
 
     if (OtherActor->IsA(ABaseMeat::StaticClass())) 
     {
+        UE_LOG(LogTemp, Warning, TEXT("Overlap with Meat"));
         ABaseMeat* meat = Cast<ABaseMeat>(OtherActor); 
         SendGetItemResponseMsg(); 
         SendGetItemNotiMsg(0, meat->GetTagId(), GetActorLocation().X, GetActorLocation().Y);
+
+        SendDestroyResponseMsg(3, meat->GetTagId(), meat->GetActorLocation().X, meat->GetActorLocation().Y); 
+        SendDestroyNotiMsg(3, meat->GetTagId(), meat->GetActorLocation().X, meat->GetActorLocation().Y);
+
         IncreaseHealth(10);
         if (playerController && playerController->playingWidget) playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
-        OtherActor->Destroy();
-
+        // OtherActor->Destroy(); ///////////////////////////////////////////////////////////
+        
     }
     if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
     {
+        UE_LOG(LogTemp, Warning, TEXT("Overlap with GoldBag"));
         ABaseGoldBag* gold = Cast<ABaseGoldBag>(OtherActor); 
         SendGetItemResponseMsg(); 
         SendGetItemNotiMsg(1, gold->GetTagId(), GetActorLocation().X, GetActorLocation().Y);
         IncreaseMoney(10);
         //UpdateMoneyCount_(Money);
-        OtherActor->Destroy();
+
+        SendDestroyResponseMsg(1, gold->GetTagId(), gold->GetActorLocation().X, gold->GetActorLocation().Y);
+        SendDestroyNotiMsg(1, gold->GetTagId(), gold->GetActorLocation().X, gold->GetActorLocation().Y);
+
+        // OtherActor->Destroy(); /////////////////////////////////////////////////////////
     }
 }
 
@@ -363,10 +375,17 @@ void AGoblin::SetPlayerController(ATinySwordPlayerController *newPlayerControlle
 
 
 /////////////////////////////////////////////////////
-void AGoblin::SendMoveResponseMsg()
+void AGoblin::SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft)
 {
     struct Move::Response *response = new Move::Response(); 
     response->H.Command = 0x11; 
+    response->ActorType = ActorType;
+    response->ActorIndex = ActorIndex; 
+    response->bMoveUp = bMoveUp; 
+    response->bMoveDown = bMoveDown; 
+    response->bMoveRight = bMoveRight; 
+    response->bMoveLeft = bMoveLeft; 
+    response->Speed = Speed;
     GameMode->messageQueue.push((struct HEAD *)response);
 }
 
@@ -402,7 +421,6 @@ void AGoblin::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetT
     noti->X = X; 
     noti->Y = Y; 
     GameMode->messageQueue.push((struct HEAD *)noti);
-    delete noti;
 }
 
 void AGoblin::SendGetItemResponseMsg()
@@ -413,7 +431,6 @@ void AGoblin::SendGetItemResponseMsg()
     response->playerHp = GetHealth(); 
     response->playerCoin = GetMoneyCount(); 
     GameMode->messageQueue.push((struct HEAD *)response);
-    delete response;
 }
 
 void AGoblin::SendGetItemNotiMsg(int itemType, int itemIndex, float X, float Y)
@@ -428,5 +445,30 @@ void AGoblin::SendGetItemNotiMsg(int itemType, int itemIndex, float X, float Y)
     noti->X = X; 
     noti->Y = Y; 
     GameMode->messageQueue.push((struct HEAD *)noti);
-    delete noti;
 }
+
+void AGoblin::SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y)
+{
+    struct Destroy::Response *response = new Destroy::Response(); 
+    response->H.Command = 0x71; 
+    response->ActorType = actorType; 
+    response->ActorIndex = actorIndex; 
+    response->X = X; 
+    response->Y = Y; 
+    GameMode->messageQueue.push((struct HEAD *)response);
+    UE_LOG(LogTemp, Warning, TEXT("Send Destroy Response Message..."));
+
+}
+
+void AGoblin::SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y)
+{
+    struct Destroy::Notification *noti = new Destroy::Notification(); 
+    noti->H.Command = 0x72;
+    noti->ActorType = actorType; 
+    noti->ActorIndex = actorIndex; 
+    noti->X = X; 
+    noti->Y = Y; 
+    GameMode->messageQueue.push((struct HEAD *)noti);
+
+}
+

@@ -73,7 +73,9 @@ public:
 
 	void UpdateMoneyCount_(int money);
 
+	void UpdateAnimation();
 
+	
 	// Actions
 	UFUNCTION()
 	void Attack();
@@ -84,6 +86,9 @@ public:
 	void HandleDeath();
 
 	void SetPlayerController(ATinySwordPlayerController* newPlayerController);
+
+	void SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft); 
+	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
 
 protected:
 	virtual void BeginPlay() override;
@@ -99,6 +104,9 @@ protected:
 	
 
 private:
+	UPROPERTY(EditAnywhere)
+	float Speed = 50.0f; 
+
 	void FlipCharacter(int MoveDirec);
 
 	float Timer; 
@@ -119,7 +127,7 @@ private:
 
 	bool bIsAttacking; 
 
-	void UpdateAnimation();
+	
 
 	void ResetToIdle();
 
@@ -128,13 +136,15 @@ private:
 
 	ATinySwordPlayerController* playerController;
 
-	void SendMoveResponseMsg(); 
-	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
+	
 
 	void SendAttackResponseMsg(); 
 	void SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y);
 
 	void SendGetItemResponseMsg(); 
 	void SendGetItemNotiMsg(int itemType, int itemIndex, float X, float Y);
+
+	void SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y); 
+	void SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y);
  
 };
