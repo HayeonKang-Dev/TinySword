@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-// #include "BaseBomb.h"
 #include "BombAIController.generated.h"
 
 /**
@@ -25,7 +24,7 @@ public:
 
 	bool IsDead() const; 
 
-	void AddToReuseId();
+	// void AddToReuseId();
 
 protected:
 	virtual void BeginPlay() override; 
@@ -35,7 +34,7 @@ protected:
 	virtual void OnUnPossess() override;
 
 
-
+	
 
 private:
 	FVector EnemyCastleLocation; 
@@ -59,4 +58,15 @@ private:
 	FVector CurrentLocation; 
 
 	void CheckOwnerTagId();
+
+	void SendBombExpResponseMsg(); 
+	void SendBombExpNotiMsg(float X, float Y);
+
+	void SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y); 
+	void SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y);
+
+	void SendMoveResponseMsg(int ActorType, int ActorIndex, FVector Destination, float speed); 
+	void SendMoveNotiMsg(int actorType, int actorIndex, FVector location);
+
+
 };
