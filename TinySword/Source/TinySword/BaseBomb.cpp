@@ -37,13 +37,6 @@ void ABaseBomb::Tick(float DeltaTime)
     CurrentRotation.Yaw = 0.0f; 
     SetActorRotation(CurrentRotation);
 
-    Timer += GetWorld()->DeltaTimeSeconds; 
-    if (Timer >= 0.5f)
-    {
-        SendMoveResponseMsg(); 
-        SendMoveNotiMsg(2, TagId, GetActorLocation().X, GetActorLocation().Y);
-        Timer = 0.0f;
-    }
 }
 
 
@@ -147,28 +140,12 @@ void ABaseBomb::PlayExplodeAnim()
 
 
 
-
-//////////////////////////////////////////////////////////
-
-void ABaseBomb::SendMoveResponseMsg()
+void ABaseBomb::AddToReuseId(int32 tagId)
 {
-    struct Move::Response *response = new Move::Response(); 
-    response->H.Command = 0x11; 
-    GameMode->messageQueue.push((struct HEAD *)response);
-    delete response;
+    // 폭발된 폭탄의 Id 재사용하기 위해 모아둠 
+    GameMode->ReuseBombId.Enqueue(tagId);
 }
 
-void ABaseBomb::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
-{
-    struct Move::Notification *noti = new Move::Notification(); 
-    noti->H.Command = 0x12; 
-    noti->ActorType = actorType; 
-    noti->ActorIndex = actorIndex; 
-    noti->X = X; 
-    noti->Y = Y; 
-    GameMode->messageQueue.push((struct HEAD *)noti);
-    delete noti;
-}
 
 void ABaseBomb::SendAttackResponseMsg()
 {
@@ -176,7 +153,6 @@ void ABaseBomb::SendAttackResponseMsg()
     response->H.Command = 0x21; 
     response->hityn = 1; 
     GameMode->messageQueue.push((struct HEAD *)response);
-    delete response;
 }
 
 void ABaseBomb::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y)
@@ -192,5 +168,4 @@ void ABaseBomb::SendAttackNotiMsg(int attackerType, int attackerIndex, int targe
     noti->X = X; 
     noti->Y = Y; 
     GameMode->messageQueue.push((struct HEAD *)noti);
-    delete noti; 
 }

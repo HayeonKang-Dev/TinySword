@@ -34,6 +34,8 @@ public:
 
 	int32 GetTagId() const {return TagId;}
 
+	float GetSpeed() const {return Speed;}
+
 	void SetTagId(int32 newTagId);
 
 	int32 GetOwnerTagId() const {return OwnerTagId;}
@@ -41,6 +43,8 @@ public:
 
 	void PlayBrinkAnim();
 	void PlayExplodeAnim();
+
+	void AddToReuseId(int32 tagId);
 
 
 protected:
@@ -78,11 +82,6 @@ private:
 	ATinySwordGameMode* GameMode;
 
 	int32 OwnerTagId; 	
-
-	float Timer = 0.0f; 
-
-	void SendMoveResponseMsg(); 
-	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
 
 	void SendAttackResponseMsg(); 
 	void SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y);
