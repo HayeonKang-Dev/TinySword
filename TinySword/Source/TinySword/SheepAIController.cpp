@@ -6,6 +6,7 @@
 #include "TinySwordGameMode.h"
 #include "BaseAISheep.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "protocol.h"
 
 
 void ASheepAIController::BeginPlay()
@@ -56,10 +57,12 @@ void ASheepAIController::MoveRandomPos()
     if (NaviSystem->GetRandomPointInNavigableRadius(GetPawn()->GetActorLocation(), 200.f, RandomPos))
     {   
         FVector Velocity = GetPawn()->GetVelocity(); 
-        // UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, RandomPos.Location); 
-        MoveToLocation(RandomPos.Location);
+
+        SendMoveResponseMsg(1, ControlledCharacter->GetTagId(), RandomPos.Location, ControlledCharacter->GetVelocity().Size());
     }
 }
+
+
 
 void ASheepAIController::FleeFrom(const FVector &AttackLocation)
 {
@@ -75,7 +78,34 @@ void ASheepAIController::FleeFrom(const FVector &AttackLocation)
     {
         FNavLocation NavLocation; 
         if (NaviSystem->GetRandomPointInNavigableRadius(fleeLocation, 50.0f, NavLocation)) 
-            UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, NavLocation.Location);
+        {
+            SendMoveResponseMsg(1, ControlledCharacter->GetTagId(), NavLocation.Location, ControlledCharacter->GetVelocity().Size());
+        }
+            
+
+        
     }
 }
 ////////////////////////////
+
+void ASheepAIController::SendMoveResponseMsg(int ActorType, int ActorIndex, FVector destination, float Speed)
+{
+    struct Move::Response *response = new Move::Response(); 
+    response->H.Command = 0x11; 
+    response->ActorType = ActorType; 
+    response->ActorIndex = ActorIndex; 
+    response->Destination = destination;
+    response->Speed = Speed; 
+    GameMode->messageQueue.push((struct HEAD *)response);
+}
+
+void ASheepAIController::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
+{
+    struct Move::Notification *noti = new Move::Notification(); 
+    noti->H.Command = 0x12;
+    noti->ActorType = actorType; 
+    noti->ActorIndex = actorIndex; 
+    noti->X = X; 
+    noti->Y = Y;
+    GameMode->messageQueue.push((struct HEAD *)noti);
+}
