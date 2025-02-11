@@ -7,7 +7,12 @@
 #include "BaseBomb.h"
 #include "Goblin.h"
 #include "protocol.h"
-
+#include "BaseGoldBag.h"
+#include "BaseAISheep.h"
+#include "BaseMeat.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "SheepAIController.h"
 
 
 void ATinySwordGameMode::BeginPlay()
@@ -18,18 +23,34 @@ void ATinySwordGameMode::BeginPlay()
 
     // FindCastlesLocation();
     //FindAllGoblins();
+    UE_LOG(LogTemp, Warning, TEXT("Starting GameMode"));
 }
 
 
 void ATinySwordGameMode::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
+    // UE_LOG(LogTemp, Warning, TEXT("Game Mode is running..."));
     struct HEAD *data = messageQueue.pop(); 
     if (data == nullptr) return;
 
     // switch case 
 
+    switch (data->Command)
+    {   
+        case 0x11: // Move Response
+        {
+            MoveResponse(data);
+            break;
+        }
+        case 0x71: // Destroy Response
+            UE_LOG(LogTemp, Warning, TEXT("Case 0x71 : Destroy Response"));
+            DestroyResponse(data);
+            break;
+        
+        default:
+            break;
+    }
 
 
 
@@ -50,22 +71,15 @@ void ATinySwordGameMode::FindCastlesLocation()
     UE_LOG(LogTemp, Warning, TEXT("Find Castle Num : %d"), AllCastles.Num());
 }
 
-void ATinySwordGameMode::FindAllGoblins()
+
+AGoblin *ATinySwordGameMode::FindGoblinById(const TMap<AGoblin*, int32> &Map, int32 TargetValue)
 {
-    TArray<AActor*> AllGoblins; 
-    UWorld* World = GetWorld(); 
-    if (World)
+    for (const auto& Pair : Map)
     {
-        UGameplayStatics::GetAllActorsOfClass(World, AGoblin::StaticClass(), AllGoblins);
-        for (AActor* Goblin : AllGoblins)
-        {
-            AGoblin* goblin = Cast<AGoblin>(Goblin); 
-            if (goblin) GoblinMap.Add(goblin->GetTagId(), goblin);
-        }
+        if (Pair.Value == TargetValue) return Pair.Key;
     }
+    return nullptr;
 }
-
-
 
 FVector ATinySwordGameMode::FindCastleLocationByTagId(int32 TagId)
 {
@@ -73,8 +87,14 @@ FVector ATinySwordGameMode::FindCastleLocationByTagId(int32 TagId)
     else return FVector::ZeroVector;
 }
 
-
-
+ABaseBomb *ATinySwordGameMode::FindBombById(const TMap<ABaseBomb *, int32> &Map, int32 TargetValue)
+{
+    for (const auto& Pair : Map)
+    {
+        if (Pair.Value == TargetValue) return Pair.Key;
+    }
+    return nullptr;
+}
 
 ABaseGoldBag *ATinySwordGameMode::FindGoldBagById(const TMap<ABaseGoldBag *, int32> &Map, int32 TargetValue)
 {
@@ -128,6 +148,73 @@ void ATinySwordGameMode::MoveResponse(HEAD *data)
 {
     struct Move::Response *response = (struct Move::Response *)data;
     UE_LOG(LogTemp, Warning, TEXT("[Move Response]"));
+
+    switch (response->ActorType)
+    {
+    case 0:
+    {
+        AGoblin* goblin = FindGoblinById(GoblinMap, response->ActorIndex); 
+        if (goblin)
+        {
+            // FVector newLoc = goblin->GetActorLocation(); 
+            FVector movement(0.0f, 0.0f, 0.0f); 
+
+            float speed = response->Speed; 
+            float deltaTime = 5.2f; //GetWorld()->DeltaTimeSeconds;
+            // UE_LOG(LogTemp, Warning, TEXT("    DeltaTime: %f, Speed: %.2f | %d %d %d %d"), deltaTime, speed, response->bMoveUp, response->bMoveDown, response->bMoveRight, response->bMoveLeft);
+            if (response->bMoveUp) movement.Y -= speed * deltaTime; 
+            if (response->bMoveDown) movement.Y += speed  * deltaTime; 
+            if (response->bMoveRight) movement.X += speed * deltaTime; 
+            if (response->bMoveLeft) movement.X -= speed * deltaTime; 
+
+            goblin->GetCharacterMovement()->AddInputVector(movement);
+        }
+        break;
+    }
+
+    case 1: 
+    {
+        ABaseAISheep* sheep = FindSheepById(ActiveSheepId, response->ActorIndex); 
+        if (sheep)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Sheep Is Moving!!"));
+            float speed = response->Speed; 
+            ASheepAIController* sheepController = Cast<ASheepAIController>(sheep->GetController()); 
+            if (sheepController)
+            {
+                UAIBlueprintHelperLibrary::SimpleMoveToLocation(sheepController, response->Destination);
+            }
+            
+        }
+    }
+
+    case 2: 
+    {
+        ABaseBomb* bomb = FindBombById(ActiveBombId, response->ActorIndex); 
+        if (bomb)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Bomb is Moving!!!"));
+            float speed = response->Speed; 
+            ABombAIController* bombController = Cast<ABombAIController>(bomb->GetController()); 
+            if (bombController)
+            {
+                UAIBlueprintHelperLibrary::SimpleMoveToLocation(bombController, response->Destination);
+            }
+        }
+    }
+        
+    
+    default:
+        break;
+    }
+
+
+
+
+
+
+
+
     delete response;
 }
 
@@ -192,8 +279,7 @@ void ATinySwordGameMode::BombExplodeResponse(HEAD *data)
 void ATinySwordGameMode::BombExplodeNotification(HEAD *data)
 {
     struct BombExplode::Notification *noti = (struct BombExplode::Notification *)data; 
-    UE_LOG(LogTemp, Warning, TEXT("[BombExplode Notification] Damaged Actor index: %d, target HP : %d / X: %f Y: %f"), 
-        noti->DamagedActorIndex, noti->targetHp, noti->X, noti->Y);
+    
     delete noti; 
 }
 
@@ -215,6 +301,63 @@ void ATinySwordGameMode::DestroyResponse(HEAD *data)
 {
     struct Destroy::Response *response = (struct Destroy::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[Destroy Response]"));
+
+    // bomb, goldbag, sheep, meat = 0, 1, 2, 3
+    switch (response->ActorType)    
+    {
+        case 0: // bomb
+        {
+            ABaseBomb* bomb = FindBombById(ActiveBombId, response->ActorIndex); 
+            if (bomb)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Destroy Bomb"));
+                bomb->AddToReuseId(response->ActorIndex);
+                bomb->Destroy();
+                ActiveBombId.Remove(bomb);
+            }
+            break;
+        }
+
+        case 1: // goldbag 
+        {
+            ABaseGoldBag* goldbag = FindGoldBagById(ActiveGoldBagId, response->ActorIndex); 
+            if (goldbag)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Destroy GoldBag: %d"), response->ActorIndex);
+                goldbag->Destroy(); 
+                ActiveGoldBagId.Remove(goldbag); 
+                ReuseGoldBagId.Enqueue(response->ActorIndex);
+            } 
+            break; 
+        }
+
+        case 2: // sheep 
+        {
+            ABaseAISheep* sheep = FindSheepById(ActiveSheepId, response->ActorIndex); 
+            if (sheep)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Destroy Sheep"));
+                sheep->Destroy(); 
+                ActiveSheepId.Remove(sheep);
+            }
+            break;
+        }
+
+        case 3: // meat
+        {
+            ABaseMeat* meat = FindMeatById(ActiveMeatId, response->ActorIndex);
+            if (meat)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Destroy Meat"));
+                meat->Destroy();
+                ActiveMeatId.Remove(meat);
+            }
+            break;
+        }
+
+        default:
+            break;
+    }
     delete response; 
 }
 

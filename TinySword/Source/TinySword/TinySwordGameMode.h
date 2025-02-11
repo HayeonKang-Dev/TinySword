@@ -74,6 +74,7 @@ public:
 	
 	TMap<ABaseBomb*, int32> ActiveBombId;
     TQueue<int32> ReuseBombId;
+	ABaseBomb* FindBombById(const TMap<ABaseBomb*, int32>& Map, int32 TargetValue);
 
 	TMap<ABaseGoldBag*, int32> ActiveGoldBagId; 
 	TQueue<int32> ReuseGoldBagId;
@@ -87,7 +88,8 @@ public:
 	TMap<ABaseMeat*, int32> ActiveMeatId; 
     ABaseMeat* FindMeatById(const TMap<ABaseMeat*, int32>&Map, int32 TargetValue);
 
-	TMap<int32, AGoblin*> GoblinMap;
+	TMap<AGoblin*, int32> GoblinMap;
+	AGoblin* FindGoblinById(const TMap<AGoblin*, int32>& Map, int32 TargetValue);
 
 	FVector FindCastleLocationByTagId(int32 TagId);
 
@@ -102,7 +104,7 @@ protected:
 private:
 	
 
-	void FindAllGoblins();
+	// void FindAllGoblins();
 
 	// packet processing functions
 	void CharacterSelectResponse(struct HEAD* data);
