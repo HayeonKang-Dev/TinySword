@@ -26,6 +26,20 @@ void ABaseAISheep::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
     UpdateAnimation();
 
+    if (IsDead())
+    {
+        
+        SendSpawnResponseMsg(GetActorLocation(), TagId, 2);
+
+        
+        // Destroy(); ////////////////////////////////////
+        SendDestroyResponseMsg(2, TagId, GetActorLocation().X, GetActorLocation().Y);
+        SendDestroyNotiMsg(2, TagId, GetActorLocation().X, GetActorLocation().Y);
+
+        
+        // SpawnMeat();
+    }
+
     FVector Velocity = GetVelocity();
     if (Velocity.SizeSquared() > 0.0f)
     {
@@ -50,22 +64,22 @@ void ABaseAISheep::Tick(float DeltaTime)
 float ABaseAISheep::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
     float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-    ActualDamage = FMath::Min(Health, ActualDamage);
-    FVector ActorLocation = GetActorLocation(); 
-    TSubclassOf<ABaseMeat> Meat = ABaseMeat::StaticClass(); 
-    if (!IsDead())
-    {
-        Health -= ActualDamage;
-        TakeDamageFrom(DamageCauser); 
-        if (IsDead())
-        {
-            // Destroy(); ////////////////////////////////////
-            SendDestroyResponseMsg(2, TagId, GetActorLocation().X, GetActorLocation().Y);
-            SendDestroyNotiMsg(2, TagId, GetActorLocation().X, GetActorLocation().Y);
+    // ActualDamage = FMath::Min(Health, ActualDamage);
+    // FVector ActorLocation = GetActorLocation(); 
+    // TSubclassOf<ABaseMeat> Meat = ABaseMeat::StaticClass(); 
+    // if (!IsDead())
+    // {
+    //     Health -= ActualDamage;
+    //     TakeDamageFrom(DamageCauser); 
+    //     if (IsDead())
+    //     {
+    //         // Destroy(); ////////////////////////////////////
+    //         SendDestroyResponseMsg(2, TagId, GetActorLocation().X, GetActorLocation().Y);
+    //         SendDestroyNotiMsg(2, TagId, GetActorLocation().X, GetActorLocation().Y);
 
-            SpawnMeat();
-        }
-    }
+    //         SpawnMeat();
+    //     }
+    // }
     return ActualDamage;
 }
 
@@ -100,7 +114,7 @@ void ABaseAISheep::SpawnMeat()
     {
         SpawnedMeat->SetTagId(GetTagId()); 
         GameMode->ActiveMeatId.Add(SpawnedMeat, GetTagId());
-        SendSpawnResponseMsg(); 
+        // SendSpawnResponseMsg(); 
         SendSpawnNotiMsg(2, SpawnedMeat->GetTagId(), SpawnedMeat->GetActorLocation().X, SpawnedMeat->GetActorLocation().Y);
     }
 
@@ -125,6 +139,7 @@ void ABaseAISheep::ResetSpeed()
 {
     GetCharacterMovement()->MaxWalkSpeed = NormalSpeed; 
 }
+
 
 
 void ABaseAISheep::FlipCharacter(float MoveDirec)
@@ -183,10 +198,13 @@ void ABaseAISheep::SendMoveNotiMsg(int actorType, int actorIndex, float X, float
     GameMode->messageQueue.push((struct HEAD *)noti);
 }
 
-void ABaseAISheep::SendSpawnResponseMsg()
+void ABaseAISheep::SendSpawnResponseMsg(FVector spawnLocation, int spawnActorIndex, int spawnType)
 {
     struct Spawn::Response *response = new Spawn::Response(); 
     response->H.Command = 0x31; 
+    response->Location = spawnLocation; 
+    response->SpawnType = spawnType; 
+    response->SpawnActorIndex = spawnActorIndex; 
     response->successyn = 1; 
     GameMode->messageQueue.push((struct HEAD *)response);
 }

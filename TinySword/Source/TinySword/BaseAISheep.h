@@ -22,8 +22,6 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	void TakeDamageFrom(AActor* Attacker);
 
 	bool IsDead() const;
@@ -33,6 +31,7 @@ public:
 	int32 GetTagId() const {return TagId;}
 
 	float GetHealth() const {return Health;}
+	void SetHealth(float newHealth) {Health = newHealth;}
 
 	
 
@@ -47,6 +46,7 @@ protected:
 
 private:
 	void MoveRight(float AxisValue); 
+
 
 	ATinySwordGameMode* GameMode;
 
@@ -69,7 +69,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="State")
 	int32 TagId; 
 
-	UPROPERTY(VisibleAnywhere, Category="State")
+	UPROPERTY(EditAnyWhere, Category="State")
 	float Health; 
 
 	float MaxHealth = 100; 
@@ -83,7 +83,7 @@ private:
 	void SendMoveResponseMsg(int ActorType, int ActorIndex, float Speed); 
 	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
 
-	void SendSpawnResponseMsg(); 
+	void SendSpawnResponseMsg(FVector spawnLocation, int spawnActorIndex, int spawnType); 
 	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
 
 	void SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y); 
