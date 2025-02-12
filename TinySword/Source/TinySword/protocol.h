@@ -73,7 +73,13 @@ struct Attack { // 0x2
 
 	struct Response {
 		struct HEAD H;
+		int AttackerType; 
+		int AttackerIndex; 
+		int TargetType; // goblin, bomb, castle, sheep, goldmine = 0, 1, 2, 3, 4
+		int TargetIndex; 
+		int Damage; 
 		int hityn;
+		FVector Location;
 	};
 
 	struct Notification {
@@ -101,6 +107,9 @@ struct Spawn { // 0x3
 
 	struct Response {
 		struct HEAD H;
+		int SpawnType; // goblin, bomb, meat, goldbag = 0, 1, 2, 3
+		int SpawnActorIndex; 
+		FVector Location; 
 		int successyn;
 	};
 
@@ -109,6 +118,7 @@ struct Spawn { // 0x3
 		//FVector Pos;
 		int SpawnType;
 		int SpawnActorIndex;
+		FVector Location;
 		float X, Y;
 	};
 };
@@ -127,8 +137,9 @@ struct GetItem { // 0x4
 	struct Response {
 		struct HEAD H;
 		int successyn;
-		int playerHp;
-		int playerCoin;
+		int playerIndex; 
+		int ItemType; // Meat, Coin = 0, 1
+
 	};
 
 	struct Notification {
