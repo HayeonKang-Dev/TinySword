@@ -64,12 +64,14 @@ public:
 	// for UI 
 	UFUNCTION(BlueprintCallable)
 	float GetHealth() const {return Health;}
+	void SetHealth(float newHealth) { Health = newHealth;}
 
 	UFUNCTION(BlueprintPure)
 	float GetHealthPercent() const; 
 
 	UFUNCTION(BlueprintPure)
 	int GetMoneyCount() const; 
+	void SetMoney(int newMoney) {Money = newMoney;}
 
 	void UpdateMoneyCount_(int money);
 
@@ -138,10 +140,10 @@ private:
 
 	
 
-	void SendAttackResponseMsg(); 
+	void SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage); 
 	void SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y);
 
-	void SendGetItemResponseMsg(); 
+	void SendGetItemResponseMsg(int itemType); 
 	void SendGetItemNotiMsg(int itemType, int itemIndex, float X, float Y);
 
 	void SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y); 

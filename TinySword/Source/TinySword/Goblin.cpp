@@ -57,6 +57,18 @@ void AGoblin::Tick(float DeltaTime)
 
     UpdateAnimation();
 
+    if (!IsDead())
+    {
+        playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
+
+        if (IsDead())
+        {
+            HandleDeath(); 
+            GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        }
+    }
+
+
 
 
 }
@@ -187,30 +199,28 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
     {
         UE_LOG(LogTemp, Warning, TEXT("Overlap with Meat"));
         ABaseMeat* meat = Cast<ABaseMeat>(OtherActor); 
-        SendGetItemResponseMsg(); 
+        SendGetItemResponseMsg(0); 
         SendGetItemNotiMsg(0, meat->GetTagId(), GetActorLocation().X, GetActorLocation().Y);
 
         SendDestroyResponseMsg(3, meat->GetTagId(), meat->GetActorLocation().X, meat->GetActorLocation().Y); 
         SendDestroyNotiMsg(3, meat->GetTagId(), meat->GetActorLocation().X, meat->GetActorLocation().Y);
 
-        IncreaseHealth(10);
+        // IncreaseHealth(10); ////////////////////////
         if (playerController && playerController->playingWidget) playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
-        // OtherActor->Destroy(); ///////////////////////////////////////////////////////////
         
     }
     if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
     {
         UE_LOG(LogTemp, Warning, TEXT("Overlap with GoldBag"));
         ABaseGoldBag* gold = Cast<ABaseGoldBag>(OtherActor); 
-        SendGetItemResponseMsg(); 
+        SendGetItemResponseMsg(1); 
         SendGetItemNotiMsg(1, gold->GetTagId(), GetActorLocation().X, GetActorLocation().Y);
-        IncreaseMoney(10);
+        // IncreaseMoney(10); ///////////////////////////////
         //UpdateMoneyCount_(Money);
 
         SendDestroyResponseMsg(1, gold->GetTagId(), gold->GetActorLocation().X, gold->GetActorLocation().Y);
         SendDestroyNotiMsg(1, gold->GetTagId(), gold->GetActorLocation().X, gold->GetActorLocation().Y);
 
-        // OtherActor->Destroy(); /////////////////////////////////////////////////////////
     }
 }
 
@@ -255,7 +265,6 @@ void AGoblin::Attack()
     PlayAttackAnimation();
     IsAttack = true; 
     FVector Start, End;
-    SendAttackResponseMsg();
 
     // Get Dynamite's collision
     USphereComponent* SphereCollision = FindComponentByClass<USphereComponent>();
@@ -283,22 +292,27 @@ void AGoblin::Attack()
 
             if (AGoblin* targetPlayer = Cast<AGoblin>(HitActor))
             {
+                SendAttackResponseMsg(0, TagId, 0, targetPlayer->GetTagId(), Damage); 
                 SendAttackNotiMsg(0, TagId, 0, targetPlayer->GetTagId(), Damage, targetPlayer->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
             }
             else if (ABaseBomb* targetBomb = Cast<ABaseBomb>(HitActor))
             {
+                SendAttackResponseMsg(0, TagId, 1, targetBomb->GetTagId(), Damage); 
                 SendAttackNotiMsg(0, TagId, 1, targetBomb->GetTagId(), Damage, targetBomb->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
             }
             else if (ABaseCastle* targetCastle = Cast<ABaseCastle>(HitActor))
             {
+                SendAttackResponseMsg(0, TagId, 2, targetCastle->GetTagId(), Damage); 
                 SendAttackNotiMsg(0, TagId, 2, targetCastle->GetTagId(), Damage, targetCastle->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
             }
             else if (ABaseAISheep* targetSheep = Cast<ABaseAISheep>(HitActor))
             {
+                SendAttackResponseMsg(0, TagId, 3, targetSheep->GetTagId(), Damage); 
                 SendAttackNotiMsg(0, TagId, 3, targetSheep->GetTagId(), Damage, targetSheep->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
             }
             else if (ABaseGoldMine* targetGoldMine = Cast<ABaseGoldMine>(HitActor))
             {
+                SendAttackResponseMsg(0, TagId, 4, targetGoldMine->GetTagId(), Damage); 
                 SendAttackNotiMsg(0, TagId, 4, targetGoldMine->GetTagId(), Damage, targetGoldMine->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
             }
 
@@ -400,10 +414,15 @@ void AGoblin::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
     GameMode->messageQueue.push((struct HEAD *)noti);
 }
 
-void AGoblin::SendAttackResponseMsg()
+void AGoblin::SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage)
 {
     struct Attack::Response *response = new Attack::Response(); 
     response->H.Command = 0x21; 
+    response->AttackerType = attackerType; 
+    response->AttackerIndex = attackerIndex; 
+    response->TargetType = targetType;
+    response->TargetIndex = targetIndex; 
+    response->Damage = damage; 
     response->hityn = 1;
     GameMode->messageQueue.push((struct HEAD *)response);
 } 
@@ -423,13 +442,13 @@ void AGoblin::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetT
     GameMode->messageQueue.push((struct HEAD *)noti);
 }
 
-void AGoblin::SendGetItemResponseMsg()
+void AGoblin::SendGetItemResponseMsg(int itemType)
 {
     struct GetItem::Response *response = new GetItem::Response(); 
     response->H.Command = 0x41; 
     response->successyn = 1; 
-    response->playerHp = GetHealth(); 
-    response->playerCoin = GetMoneyCount(); 
+    response->playerIndex = GetTagId();
+    response->ItemType = itemType; 
     GameMode->messageQueue.push((struct HEAD *)response);
 }
 
