@@ -13,6 +13,7 @@
  */
 class AGoblin;
 class UTinySwordGameInstance;
+class ABaseBomb;
 
 UCLASS()
 class TINYSWORD_API ATinySwordPlayerController : public APlayerController
@@ -39,6 +40,14 @@ public:
 	
 	void SetPlayingWidget(UPlayingWidget* playing);
 	UPlayingWidget* GetPlayingWidget() const {return playingWidget;}
+
+	void SpawnBomb(FVector spawnLocation, int tagId);
+
+	void SetBombIndex();
+
+	FVector GetBombSpawnPoint(FVector &FoundLocation);
+
+	void SpawnGoblin(FVector spawnLocation, int tagId);
 	
 protected: 
 	virtual void BeginPlay() override; 
@@ -55,6 +64,8 @@ private:
 	UTinySwordGameInstance* GI;
 
 	ATinySwordGameMode* GameMode; 
+
+	ABaseBomb* SpawnedBomb;
 
 	float SendTimer = 0.0f;
 
