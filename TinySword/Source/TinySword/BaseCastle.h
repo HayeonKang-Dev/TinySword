@@ -53,6 +53,7 @@ public:
 	int32 GetTagId() const {return TagId;}
 
 	float GetDurability() const {return Durability;}
+	void SetDurability(float newDurability) {Durability = newDurability;}
 
 	bool IsCollapse();
 
