@@ -27,16 +27,18 @@ public:
 	int32 GetTagId() const {return TagId;}
 
 	float GetDurability() const {return Durability;}
+	void SetDurability(float newDurability) {Durability = newDurability;}
 
 	UPROPERTY(EditAnywhere, Category="Sprite")
 	UPaperSprite* collapseSprite; 
 
+	void DropGoldBag(FVector spawnLocation);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void DropGoldBag();
+	
 
 	UPROPERTY(EditAnywhere, Category="Components")
 	USceneComponent* RootSceneComponent; 
@@ -70,6 +72,8 @@ private:
 
 	ATinySwordGameMode* GameMode; 
 
-	void SendSpawnResponseMsg(); 
+	void SendSpawnResponseMsg(int spawnActorIndex, int SpawnType, FVector location); 
 	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
+
+	FVector GoldBagSpawnLocation();
 };

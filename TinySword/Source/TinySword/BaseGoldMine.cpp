@@ -46,19 +46,29 @@ void ABaseGoldMine::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsCollapse()) 
+	{
+		UpdateSprite();
+	}
+	
+
 }
 
 float ABaseGoldMine::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
 	DamageAmount = FMath::Min(Durability, DamageAmount);
-	Durability -= DamageAmount;
-	if (Durability > 0) DropGoldBag();
+	// Durability -= DamageAmount;
+	if (Durability > 0) 
+	{
+		SendSpawnResponseMsg(TagId, 3, GoldBagSpawnLocation());
+		// DropGoldBag(GoldBagSpawnLocation());
+	}
 
     return DamageAmount;
 }
 
 
-void ABaseGoldMine::DropGoldBag()
+void ABaseGoldMine::DropGoldBag(FVector spawnLocation)
 {
 	int RandomValue = FMath::RandRange(0, 1);
 	if (RandomValue == 0)
@@ -73,22 +83,18 @@ void ABaseGoldMine::DropGoldBag()
 		SpawnParams.Owner = this; 
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; 
 
-		// fix z
-		FVector SpawnLocation = GetActorLocation(); 
-		SpawnLocation.Y += 60.0f; 
-		float RandomOffsetX = UKismetMathLibrary::RandomFloatInRange(-30.0f, 30.0f);
-		float RandomOffsetY = UKismetMathLibrary::RandomFloatInRange(-10.0f, 10.0f);
-		SpawnLocation.X += RandomOffsetX;
-		SpawnLocation.Y += RandomOffsetY;
+		
+
+		
 
 		AActor* SpawnedActor; 
-		SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnLocation, GetActorRotation(), SpawnParams);
+		SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, spawnLocation, GetActorRotation(), SpawnParams);
 		ABaseGoldBag* SpawnedGoldBag = Cast<ABaseGoldBag>(SpawnedActor);
 
 		if (GameMode)
 		{
-			SendSpawnResponseMsg(); 
-			SendSpawnNotiMsg(3, SpawnedGoldBag->GetTagId(), SpawnLocation.X, SpawnLocation.Y);
+			// SendSpawnResponseMsg(2, SpawnLocation); 
+			SendSpawnNotiMsg(3, SpawnedGoldBag->GetTagId(), spawnLocation.X, spawnLocation.Y);
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("Game Mode is null (in goldmine.cpp)"));
 		
@@ -96,6 +102,19 @@ void ABaseGoldMine::DropGoldBag()
 	}
 }
 
+FVector ABaseGoldMine::GoldBagSpawnLocation()
+{
+	// fix z
+	FVector SpawnLocation = GetActorLocation(); 
+	SpawnLocation.Y += 60.0f; 
+	SpawnLocation.Z = -291.0f;
+	float RandomOffsetX = UKismetMathLibrary::RandomFloatInRange(-30.0f, 30.0f);
+	float RandomOffsetY = UKismetMathLibrary::RandomFloatInRange(-10.0f, 10.0f);
+	SpawnLocation.X += RandomOffsetX;
+	SpawnLocation.Y += RandomOffsetY;
+
+    return SpawnLocation;
+}
 
 
 bool ABaseGoldMine::IsCollapse()
@@ -112,12 +131,15 @@ void ABaseGoldMine::UpdateSprite()
 }
 
 
-void ABaseGoldMine::SendSpawnResponseMsg()
+void ABaseGoldMine::SendSpawnResponseMsg(int spawnActorIndex, int SpawnType, FVector location)
 {
 
 	struct Spawn::Response *response = new Spawn::Response(); 
 	response->H.Command = 0x31; 
 	response->successyn = 1; 
+	response->SpawnActorIndex = spawnActorIndex; 
+	response->SpawnType = SpawnType;
+	response->Location = location;
 	GameMode->messageQueue.push((struct HEAD *)response);
 
 }
@@ -132,3 +154,5 @@ void ABaseGoldMine::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X
 	noti->Y = Y; 
 	GameMode->messageQueue.push((struct HEAD *)noti);
 }
+
+
