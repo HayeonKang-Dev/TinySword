@@ -65,9 +65,9 @@ protected:
 
 	bool DecreasePlayerMoney();
 
-	void SpawnBomb(); 
+	// void SpawnBomb(FVector spawnLocation); 
 
-	void SetBombIndex(); 
+	// void SetBombIndex(); 
 
 
 
@@ -84,14 +84,16 @@ private:
 
 	ABaseBomb* SpawnedBomb;
 
-	FVector GetBombSpawnPoint(UWorld* World, FVector& FoundLocation);
+	FVector GetBombSpawnPoint(FVector& FoundLocation);
 
 	void SpawnGoblin(ATinySwordPlayerController* PlayerController);
 
-	void SendSpawnResponseMsg(); 
+	void SendSpawnResponseMsg(FVector spawnLocation, int SpawnType, int SpawnActorIndex); 
 	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
 
 	void SendSelectCharResponseMsg(int playerIndex); 
 	void SendSelectCharNotiMsg(const char playerId[40], int playerIndex);
+
+	FVector GetSpawnGoblinLocation(int tagId);
 
 };
