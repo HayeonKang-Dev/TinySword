@@ -43,31 +43,31 @@ void ABaseBomb::Tick(float DeltaTime)
 
 float ABaseBomb::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
-    if (DamageCauser && DamageCauser->IsA(ABaseBomb::StaticClass())) return 0.0f; 
+    // if (DamageCauser && DamageCauser->IsA(ABaseBomb::StaticClass())) return 0.0f; 
     
-    if (AGoblin* Causer = Cast<AGoblin>(DamageCauser))
-    {
-        if (Causer && Causer->GetTagId() == TagId) return 0.0f; 
-    }
+    // if (AGoblin* Causer = Cast<AGoblin>(DamageCauser))
+    // {
+    //     if (Causer && Causer->GetTagId() == TagId) return 0.0f; 
+    // }
 
-    float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); 
-    if(!IsDead())
-    {
-        ActualDamage = FMath::Min(Health, ActualDamage); 
-        Health -= ActualDamage; 
+    // float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); 
+    // if(!IsDead())
+    // {
+    //     ActualDamage = FMath::Min(Health, ActualDamage); 
+    //     Health -= ActualDamage; 
 
-        if (IsDead())
-        {
+    //     if (IsDead())
+    //     {
             
-        }
-    }
-    return ActualDamage;
+    //     }
+    // }
+    return 0.0f;
 }
 
 
 void ABaseBomb::DealRadialDamage()
 {
-    SendAttackResponseMsg();
+
     FVector Origin = GetActorLocation(); 
     float DamageRadius = 100.0f; 
     TArray<AActor*> IgnoreActors;
@@ -92,15 +92,35 @@ void ABaseBomb::DealRadialDamage()
     for (AActor * hittedActor : DamagedActors)
     {
         if (AGoblin * goblin = Cast<AGoblin>(hittedActor)) 
+        {
+            SendAttackResponseMsg(1, TagId, 0, goblin->GetTagId(), Damage);
             SendAttackNotiMsg(1, TagId, 0, goblin->GetTagId(), Damage, goblin->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
+        }
+            
         else if (ABaseBomb* bomb = Cast<ABaseBomb>(hittedActor))
+        {
+            SendAttackResponseMsg(1, TagId, 1, bomb->GetTagId(), Damage);
             SendAttackNotiMsg(1, TagId, 1, bomb->GetTagId(), Damage, bomb->GetHealth(), GetActorLocation().X, GetActorLocation().Y); 
+        }
+            
         else if (ABaseCastle* castle = Cast<ABaseCastle>(hittedActor))
+        {
+            SendAttackResponseMsg(1, TagId, 2, castle->GetTagId(), Damage);
             SendAttackNotiMsg(1, TagId, 2, castle->GetTagId(), Damage, castle->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
+        }
+            
         else if (ABaseAISheep* sheep = Cast<ABaseAISheep>(hittedActor))
+        {
+            SendAttackResponseMsg(1, TagId, 3, sheep->GetTagId(), Damage);
             SendAttackNotiMsg(1, TagId, 3, sheep->GetTagId(), Damage, sheep->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
+        }
+            
         else if (ABaseGoldMine* goldMine = Cast<ABaseGoldMine>(hittedActor))
+        {
+            SendAttackResponseMsg(1, TagId, 4, goldMine->GetTagId(), Damage);
             SendAttackNotiMsg(1, TagId, 4, goldMine->GetTagId(), Damage, goldMine->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
+        }
+            
     }
 }
 
@@ -147,10 +167,15 @@ void ABaseBomb::AddToReuseId(int32 tagId)
 }
 
 
-void ABaseBomb::SendAttackResponseMsg()
+void ABaseBomb::SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage)
 {
     struct Attack::Response *response = new Attack::Response(); 
     response->H.Command = 0x21; 
+    response->AttackerType = attackerType;
+    response->AttackerIndex = attackerIndex;
+    response->TargetType = targetType; 
+    response->TargetIndex = targetIndex; 
+    response->Damage = damage; 
     response->hityn = 1; 
     GameMode->messageQueue.push((struct HEAD *)response);
 }

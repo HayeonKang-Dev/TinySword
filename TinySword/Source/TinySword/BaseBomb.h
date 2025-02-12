@@ -31,6 +31,7 @@ public:
 	void DealRadialDamage();
 
 	float GetHealth() const {return Health;}
+	void SetHealth(float newHealth) {Health = newHealth;} 
 
 	int32 GetTagId() const {return TagId;}
 
@@ -83,6 +84,6 @@ private:
 
 	int32 OwnerTagId; 	
 
-	void SendAttackResponseMsg(); 
+	void SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage); 
 	void SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y);
 };
