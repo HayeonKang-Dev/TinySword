@@ -15,7 +15,15 @@
 			"*.rh": "cpp",
 			"*.ipp": "cpp",
 			"queue": "cpp",
-			"stack": "cpp"
+			"stack": "cpp",
+			"__locale": "cpp",
+			"locale": "cpp",
+			"thread": "cpp",
+			"xlocale": "cpp",
+			"xlocmes": "cpp",
+			"xlocmon": "cpp",
+			"xlocnum": "cpp",
+			"xloctime": "cpp"
 		}
 	},
 	"extensions": {
