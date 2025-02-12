@@ -17,7 +17,9 @@ class ABaseAISheep;
 class ABaseMeat; 
 class ABaseBomb;
 class AGoblin;
-
+class ABaseGoldMine;
+class ABaseCastle;
+class ATinySwordPlayerController; 
 
 class MessageQueue
 {
@@ -70,6 +72,9 @@ public:
 
 	MessageQueue messageQueue; 
 
+	TMap<ATinySwordPlayerController*, int32> PlayerControllerMap; 
+	ATinySwordPlayerController* FindControllerById(const TMap<ATinySwordPlayerController*, int32>&Map, int32 TargetValue);
+
 	TMap<int32, FVector>& GetCastleMap() { return CastleMap;}
 	
 	TMap<ABaseBomb*, int32> ActiveBombId;
@@ -80,7 +85,10 @@ public:
 	TQueue<int32> ReuseGoldBagId;
 	ABaseGoldBag* FindGoldBagById(const TMap<ABaseGoldBag*, int32>&Map, int32 TargetValue);
 
-	TMap<int32, FVector> CastleMap;
+	TMap<ABaseGoldMine*, int32> ActiveGoldMineMap; 
+	void CollectGoldMine();
+	ABaseGoldMine* FindGoldMineById(const TMap<ABaseGoldMine*, int32>&Map, int32 TargetValue);
+	
 
 	TMap<ABaseAISheep*, int32> ActiveSheepId;
     ABaseAISheep* FindSheepById(const TMap<ABaseAISheep*, int32>& Map, int32 TargetValue);
@@ -91,12 +99,14 @@ public:
 	TMap<AGoblin*, int32> GoblinMap;
 	AGoblin* FindGoblinById(const TMap<AGoblin*, int32>& Map, int32 TargetValue);
 
+	TMap<int32, FVector> CastleMap;
 	FVector FindCastleLocationByTagId(int32 TagId);
-
-
+	
 	void FindCastlesLocation();
 
-
+	TMap<ABaseCastle*, int32> ActiveCastleMap; 
+	void CollectAllCastles(); 
+	ABaseCastle* FindCastleById(const TMap<ABaseCastle*, int32>&Map, int32 TargetValue);
 	
 protected:
 	virtual void BeginPlay() override; 

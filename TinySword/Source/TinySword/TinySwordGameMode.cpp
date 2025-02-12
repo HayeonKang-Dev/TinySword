@@ -8,6 +8,7 @@
 #include "Goblin.h"
 #include "protocol.h"
 #include "BaseGoldBag.h"
+#include "BaseGoldMine.h"
 #include "BaseAISheep.h"
 #include "BaseMeat.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -43,6 +44,21 @@ void ATinySwordGameMode::Tick(float DeltaTime)
             MoveResponse(data);
             break;
         }
+        case 0x21: // Attack Response
+        {
+            AttackResponse(data);
+            break;
+        }
+        case 0x31: // Spawn Response 
+        {
+            SpawnResponse(data); 
+            break;
+        }
+        case 0x41: // GetItem Response
+        {
+            GetItemResponse(data); 
+            break;
+        }
         case 0x71: // Destroy Response
             UE_LOG(LogTemp, Warning, TEXT("Case 0x71 : Destroy Response"));
             DestroyResponse(data);
@@ -71,6 +87,54 @@ void ATinySwordGameMode::FindCastlesLocation()
     UE_LOG(LogTemp, Warning, TEXT("Find Castle Num : %d"), AllCastles.Num());
 }
 
+void ATinySwordGameMode::CollectAllCastles()
+{
+    TArray<AActor*> AllCastles; 
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCastle::StaticClass(), AllCastles); 
+    for(AActor* Castle : AllCastles)
+    {
+        ABaseCastle* castle = Cast<ABaseCastle>(Castle); 
+        ActiveCastleMap.Add(castle, castle->GetTagId());
+    }
+}
+
+void ATinySwordGameMode::CollectGoldMine()
+{
+    TArray<AActor*> AllGoldMine; 
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseGoldMine::StaticClass(), AllGoldMine); 
+    for(AActor* goldmine : AllGoldMine)
+    {
+        ABaseGoldMine* GoldMine = Cast<ABaseGoldMine>(goldmine);
+        ActiveGoldMineMap.Add(GoldMine, GoldMine->GetTagId());
+    }
+}
+
+ATinySwordPlayerController *ATinySwordGameMode::FindControllerById(const TMap<ATinySwordPlayerController *, int32> &Map, int32 TargetValue)
+{
+    for (const auto& Pair : Map)
+    {
+        if (Pair.Value == TargetValue) return Pair.Key;
+    }
+    return nullptr;
+}
+
+ABaseGoldMine *ATinySwordGameMode::FindGoldMineById(const TMap<ABaseGoldMine *, int32> &Map, int32 TargetValue)
+{
+    for (const auto& Pair : Map)
+    {
+        if (Pair.Value == TargetValue) return Pair.Key;
+    }
+    return nullptr;
+}
+
+ABaseCastle *ATinySwordGameMode::FindCastleById(const TMap<ABaseCastle *, int32>&Map, int32 TargetValue)
+{
+    for (const auto& Pair : Map)
+    {
+        if (Pair.Value == TargetValue) return Pair.Key;
+    }
+    return nullptr;
+}
 
 AGoblin *ATinySwordGameMode::FindGoblinById(const TMap<AGoblin*, int32> &Map, int32 TargetValue)
 {
@@ -104,6 +168,7 @@ ABaseGoldBag *ATinySwordGameMode::FindGoldBagById(const TMap<ABaseGoldBag *, int
     }
     return nullptr;
 }
+
 
 ABaseAISheep *ATinySwordGameMode::FindSheepById(const TMap<ABaseAISheep *, int32> &Map, int32 TargetValue)
 {
@@ -228,7 +293,98 @@ void ATinySwordGameMode::MoveNotification(HEAD *data)
 void ATinySwordGameMode::AttackResponse(HEAD *data)
 {
     struct Attack::Response *response = (struct Attack::Response *)data; 
-    UE_LOG(LogTemp, Warning, TEXT("[Attack Response] hit? : %d"), response->hityn);
+    UE_LOG(LogTemp, Warning, TEXT("[Attack Response] hit? : %d"), response->hityn); 
+    // 공격 받은 액터에게 noti 전송하고, 액터가 데미지 받음 처리하기 
+
+    switch (response->TargetType)
+    {
+    case 0: // goblin
+    {
+        AGoblin* goblin = FindGoblinById(GoblinMap, response->TargetIndex); 
+        if (goblin)
+        {
+            goblin->SetHealth(goblin->GetHealth()-response->Damage);
+            // noti 전송 
+        }
+        break;
+    }
+
+    case 1: // bomb
+    {
+        ABaseBomb* bomb = FindBombById(ActiveBombId, response->TargetIndex); 
+        if (bomb)
+        {
+            if (response->AttackerType == 0)
+            {
+                AGoblin* attacker = Cast<AGoblin>(FindGoblinById(GoblinMap, response->AttackerIndex)); 
+                if (attacker && attacker->GetTagId() != bomb->GetTagId())
+                {
+                    bomb->SetHealth(bomb->GetHealth()-response->Damage);
+                }
+            }
+            
+            // noti 
+        }
+        break;
+    }
+
+    case 2: // castle 
+    {
+        ABaseCastle* castle = FindCastleById(ActiveCastleMap, response->TargetIndex);
+        if (castle)
+        {
+            if (response->AttackerType == 0)
+            {
+                AGoblin* attacker = Cast<AGoblin>(FindGoblinById(GoblinMap, response->AttackerIndex)); 
+                if (attacker && attacker->GetTagId() != castle->GetTagId()) 
+                {
+                    castle->SetDurability(castle->GetDurability()-response->Damage);
+                }
+            }
+            if (response->AttackerType == 1)
+            {
+                ABaseBomb* attacker = Cast<ABaseBomb>(FindBombById(ActiveBombId, response->AttackerIndex)); 
+                if (attacker && attacker->GetTagId() != castle->GetTagId())
+                {
+                    castle->SetDurability(castle->GetDurability()-response->Damage);
+                }
+            }
+            
+            // noti
+        }
+        break;
+    }
+    case 3: // sheep
+    {
+        ABaseAISheep* sheep = FindSheepById(ActiveSheepId, response->TargetIndex); 
+        if (sheep)
+        {
+            sheep->SetHealth(sheep->GetHealth()-response->Damage);
+            // noti
+        }
+        break;
+    }
+
+    case 4: // goldmine
+    {
+        ABaseGoldMine* goldmine = FindGoldMineById(ActiveGoldMineMap, response->TargetIndex); 
+        if (goldmine)
+        {
+            
+            goldmine->SetDurability(goldmine->GetDurability()-response->Damage);
+            UE_LOG(LogTemp, Warning, TEXT("Attacking GOLDMINE! : %d"), goldmine->GetDurability());
+            // goldmine->DropGoldBag();
+            // noti
+        }
+        break;
+    }
+
+    
+    
+    default:
+        break;
+    }
+
     delete response; 
 }
 
@@ -244,6 +400,62 @@ void ATinySwordGameMode::SpawnResponse(HEAD *data)
 {
     struct Spawn::Response *response = (struct Spawn::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[Spawn Response] success? %d"), response->successyn);
+
+
+    // goblin, goldbag, meat
+
+    switch (response->SpawnType)
+    {
+    case 0: // goblin
+    {
+
+        ATinySwordPlayerController* controller = Cast<ATinySwordPlayerController>(FindControllerById(PlayerControllerMap, response->SpawnActorIndex)); 
+        if (controller)
+        {
+            controller->SpawnGoblin(response->Location, response->SpawnActorIndex); 
+        }
+        break;
+    
+    }
+
+    case 1: // bomb
+    {
+        AGoblin* goblin = Cast<AGoblin>(FindGoblinById(GoblinMap, response->SpawnActorIndex)); 
+        if (goblin)
+        {
+            ATinySwordPlayerController* controller = Cast<ATinySwordPlayerController>(goblin->GetController()); 
+            if (controller)
+            {
+                controller->SpawnBomb(response->Location, response->SpawnActorIndex);
+                // SpawnBomb(GetBombSpawnPoint(*CastleMap.Find(controlledChar->GetTagId()))); ///////////////////////////////////////////////////
+   
+            }
+        }
+        break;
+    }
+
+    case 2: // meat
+    {
+        ABaseAISheep* sheep = Cast<ABaseAISheep>(FindSheepById(ActiveSheepId, response->SpawnActorIndex)); 
+        if (sheep)
+        {
+            sheep->SpawnMeat();
+        }
+        break;
+    }
+
+    case 3: // goldbag
+    {
+        ABaseGoldMine* goldmine = Cast<ABaseGoldMine>(FindGoldMineById(ActiveGoldMineMap, response->SpawnActorIndex));
+        if (goldmine) goldmine->DropGoldBag(response->Location);
+        break;
+    }
+    default:
+        break;
+    }
+
+
+
     delete response; 
 }
 
@@ -257,7 +469,21 @@ void ATinySwordGameMode::SpawnNotification(HEAD *data)
 void ATinySwordGameMode::GetItemResponse(HEAD *data)
 {
     struct GetItem::Response *response = (struct GetItem::Response *)data; 
-    UE_LOG(LogTemp, Warning, TEXT("[GetItem Response] success? %d / player HP: %d / player Coin: %d"), response->successyn, response->playerHp, response->playerCoin);
+
+    AGoblin* player = Cast<AGoblin>(FindGoblinById(GoblinMap, response->playerIndex)); 
+    if (player)
+    {
+        if (response->ItemType == 0) // meat 
+        {
+            player->IncreaseHealth(10);
+        }
+        if (response->ItemType == 1)
+        {
+            player->IncreaseMoney(10);
+            player->UpdateMoneyCount_(player->GetMoneyCount());
+        }
+    }
+
     delete response;
 }
 
@@ -272,6 +498,9 @@ void ATinySwordGameMode::GetItemNotification(HEAD *data)
 void ATinySwordGameMode::BombExplodeResponse(HEAD *data)
 {
     struct BombExplode::Response *response = (struct BombExplode::Response *)data; 
+
+    // play animation
+
     UE_LOG(LogTemp, Warning, TEXT("[BombExplode Response]"));
     delete response; 
 }
