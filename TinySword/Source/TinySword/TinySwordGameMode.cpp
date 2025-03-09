@@ -33,47 +33,41 @@ void ATinySwordGameMode::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
     // UE_LOG(LogTemp, Warning, TEXT("Game Mode is running..."));
     struct HEAD *data = messageQueue.pop(); 
-    if (data == nullptr) return;
-
-    // switch case 
-
-    switch (data->Command)
-    {   
-        case 0x11: // Move Response
-        {
-            MoveResponse(data);
-            break;
-        }
-        case 0x21: // Attack Response
-        {
-            AttackResponse(data);
-            break;
-        }
-        case 0x31: // Spawn Response 
-        {
-            SpawnResponse(data); 
-            break;
-        }
-        case 0x41: // GetItem Response
-        {
-            GetItemResponse(data); 
-            break;
-        }
-        case 0x71: // Destroy Response
-            UE_LOG(LogTemp, Warning, TEXT("Case 0x71 : Destroy Response"));
-            DestroyResponse(data);
-            break;
-        
-        default:
-            break;
-    }
-
-
-
+    if (data == nullptr || data->Command > 22 || data->Command == 0) return;
+    if (PROTOCOLS[data->Command] != nullptr) (this->*PROTOCOLS[data->Command])(data);
 
 }
 
+TArray<FVector> ATinySwordGameMode::GetAllPathPoints(FVector &StartLocation, FVector &EndLocation)
+{
+   
+    TArray<FVector> AllPathPoints; 
 
+    UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+    if (!NavSystem)
+    {
+        return AllPathPoints;
+    }
+    
+    // 경로 찾기
+    UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(GetWorld(), StartLocation, EndLocation);
+
+    
+    if (NavPath && NavPath->IsValid())
+    {
+       
+        const TArray<FVector>& PathPoints = NavPath->PathPoints; 
+        //UE_LOG(LogTemp, Log, TEXT("경로 포인트 개수: %d"), PathPoints.Num());
+    
+        for (int i = 0; i < PathPoints.Num(); i++)
+        {
+            FVector Point = PathPoints[i];
+            AllPathPoints[i] = Point;
+            //UE_LOG(LogTemp, Log, TEXT("경유지 %d: X=%f, Y=%f, Z=%f"), i, Point.X, Point.Y, Point.Z);
+        }
+    }
+    return AllPathPoints;
+}
 
 void ATinySwordGameMode::FindCastlesLocation()
 {
@@ -195,21 +189,21 @@ ABaseMeat *ATinySwordGameMode::FindMeatById(const TMap<ABaseMeat *, int32> &Map,
 
 // Packet Processing Function 
 
-void ATinySwordGameMode::CharacterSelectResponse(HEAD *data)
+void ATinySwordGameMode::OnCharacterSelectResponse(HEAD *data)
 {
     struct CharacterSelect::Response *response = (struct CharacterSelect::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[CharacterSelect Response] player index: %d"), response->playerIndex);
     delete response; 
 }
 
-void ATinySwordGameMode::CharacterSelectNotification(HEAD *data)
+void ATinySwordGameMode::OnCharacterSelectNotification(HEAD *data)
 {
     struct CharacterSelect::Notification *noti = (struct CharacterSelect::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[CharacterSelect Notification] player index: %d"), noti->playerIndex);
     delete noti;
 }
 
-void ATinySwordGameMode::MoveResponse(HEAD *data)
+void ATinySwordGameMode::OnMoveResponse(HEAD *data)
 {
     struct Move::Response *response = (struct Move::Response *)data;
     UE_LOG(LogTemp, Warning, TEXT("[Move Response]"));
@@ -275,22 +269,17 @@ void ATinySwordGameMode::MoveResponse(HEAD *data)
 
 
 
-
-
-
-
-
     delete response;
 }
 
-void ATinySwordGameMode::MoveNotification(HEAD *data)
+void ATinySwordGameMode::OnMoveNotification(HEAD *data)
 {
     struct Move::Notification *noti = (struct Move::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[Move Notification] Actor Index: %d / X: %f Y: %f"), noti->ActorIndex, noti->X, noti->Y);
     delete noti; 
 }
 
-void ATinySwordGameMode::AttackResponse(HEAD *data)
+void ATinySwordGameMode::OnAttackResponse(HEAD *data)
 {
     struct Attack::Response *response = (struct Attack::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[Attack Response] hit? : %d"), response->hityn); 
@@ -388,7 +377,7 @@ void ATinySwordGameMode::AttackResponse(HEAD *data)
     delete response; 
 }
 
-void ATinySwordGameMode::AttackNotification(HEAD *data)
+void ATinySwordGameMode::OnAttackNotification(HEAD *data)
 {
     struct Attack::Notification *noti = (struct Attack::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[Attack Notification] Attacker Type: %d / Attacker Index: %d / target Type: %d / target Index: %d"), 
@@ -396,7 +385,7 @@ void ATinySwordGameMode::AttackNotification(HEAD *data)
     delete noti; 
 }
 
-void ATinySwordGameMode::SpawnResponse(HEAD *data)
+void ATinySwordGameMode::OnSpawnResponse(HEAD *data)
 {
     struct Spawn::Response *response = (struct Spawn::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[Spawn Response] success? %d"), response->successyn);
@@ -459,14 +448,14 @@ void ATinySwordGameMode::SpawnResponse(HEAD *data)
     delete response; 
 }
 
-void ATinySwordGameMode::SpawnNotification(HEAD *data)
+void ATinySwordGameMode::OnSpawnNotification(HEAD *data)
 {
     struct Spawn::Notification *noti = (struct Spawn::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[Spawn Notification] Spawn Actor Type : %d / Spawn Actor Index: %d"), noti->SpawnType, noti->SpawnActorIndex);
     delete noti; 
 }
 
-void ATinySwordGameMode::GetItemResponse(HEAD *data)
+void ATinySwordGameMode::OnGetItemResponse(HEAD *data)
 {
     struct GetItem::Response *response = (struct GetItem::Response *)data; 
 
@@ -487,7 +476,7 @@ void ATinySwordGameMode::GetItemResponse(HEAD *data)
     delete response;
 }
 
-void ATinySwordGameMode::GetItemNotification(HEAD *data)
+void ATinySwordGameMode::OnGetItemNotification(HEAD *data)
 {
     struct GetItem::Notification *noti = (struct GetItem::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[GetItem Notification] player Index: %d / HP: %d / COIN : %d / X: %f Y: %f"), 
@@ -495,7 +484,7 @@ void ATinySwordGameMode::GetItemNotification(HEAD *data)
     delete noti; 
 }
 
-void ATinySwordGameMode::BombExplodeResponse(HEAD *data)
+void ATinySwordGameMode::OnBombExplodeResponse(HEAD *data)
 {
     struct BombExplode::Response *response = (struct BombExplode::Response *)data; 
 
@@ -505,28 +494,28 @@ void ATinySwordGameMode::BombExplodeResponse(HEAD *data)
     delete response; 
 }
 
-void ATinySwordGameMode::BombExplodeNotification(HEAD *data)
+void ATinySwordGameMode::OnBombExplodeNotification(HEAD *data)
 {
     struct BombExplode::Notification *noti = (struct BombExplode::Notification *)data; 
     
     delete noti; 
 }
 
-void ATinySwordGameMode::PlayerDeadResponse(HEAD *data)
+void ATinySwordGameMode::OnPlayerDeadResponse(HEAD *data)
 {
     struct PlayerDead::Response *response = (struct PlayerDead::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[PlayerDead Response] "));
     delete response;
 }
 
-void ATinySwordGameMode::PlayerDeadNotification(HEAD *data)
+void ATinySwordGameMode::OnPlayerDeadNotification(HEAD *data)
 {
     struct PlayerDead::Notification *noti = (struct PlayerDead::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[PlayerDead Notification] player index: %d / X: %f  Y: %f"), noti->playerIndex, noti->X, noti->Y);
     delete noti; 
 }
 
-void ATinySwordGameMode::DestroyResponse(HEAD *data)
+void ATinySwordGameMode::OnDestroyResponse(HEAD *data)
 {
     struct Destroy::Response *response = (struct Destroy::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[Destroy Response]"));
@@ -590,7 +579,7 @@ void ATinySwordGameMode::DestroyResponse(HEAD *data)
     delete response; 
 }
 
-void ATinySwordGameMode::DestroyNotification(HEAD *data)
+void ATinySwordGameMode::OnDestroyNotification(HEAD *data)
 {
     struct Destroy::Notification *noti = (struct Destroy::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[Destroy Notification] Actor Type: %d / Actor Index: %d / X: %f Y: %f"), 
@@ -598,42 +587,42 @@ void ATinySwordGameMode::DestroyNotification(HEAD *data)
     delete noti; 
 }
 
-void ATinySwordGameMode::EndGameResponse(HEAD *data)
+void ATinySwordGameMode::OnEndGameResponse(HEAD *data)
 { 
     struct EndGame::Response *response = (struct EndGame::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[EndGame Response] "));
     delete response; 
 }
 
-void ATinySwordGameMode::EndGameNotification(HEAD *data)
+void ATinySwordGameMode::OnEndGameNotification(HEAD *data)
 {
     struct EndGame::Notification *noti = (struct EndGame::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[EndGame Notification] "));
     delete noti;
 }
 
-void ATinySwordGameMode::StartGameResponse(HEAD *data)
+void ATinySwordGameMode::OnStartGameResponse(HEAD *data)
 {
     struct StartGame::Response *response = (struct StartGame::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[StartGame Response]"));
     delete response; 
 }
 
-void ATinySwordGameMode::StartGameNotification(HEAD *data)
+void ATinySwordGameMode::OnStartGameNotification(HEAD *data)
 {
     struct StartGame::Notification *noti = (struct StartGame::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[StartGame Notification]"));
     delete noti; 
 }
 
-void ATinySwordGameMode::PauseGameResponse(HEAD *data)
+void ATinySwordGameMode::OnPauseGameResponse(HEAD *data)
 {
     struct PauseGame::Response *response = (struct PauseGame::Response *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[PauseGame Response]"));
     delete response;
 }
 
-void ATinySwordGameMode::PauseGameNotification(HEAD *data)
+void ATinySwordGameMode::OnPauseGameNotification(HEAD *data)
 {
     struct PauseGame::Notification *noti = (struct PauseGame::Notification *)data; 
     UE_LOG(LogTemp, Warning, TEXT("[PauseGame Notification]"));

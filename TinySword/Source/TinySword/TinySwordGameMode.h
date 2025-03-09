@@ -6,6 +6,8 @@
 #include "GameFramework/GameMode.h"
 #include <queue>
 #include "protocol.h"
+#include "NavigationPath.h"
+#include "NavigationData.h"
 #include "TinySwordGameMode.generated.h"
 
 /**
@@ -72,6 +74,39 @@ public:
 
 	MessageQueue messageQueue; 
 
+	typedef void(ATinySwordGameMode::*FN_fnCallback)(struct HEAD* data);
+	FN_fnCallback PROTOCOLS[25];
+
+	ATinySwordGameMode()
+	{
+		PROTOCOLS[1] = &ATinySwordGameMode::OnCharacterSelectResponse; 
+		PROTOCOLS[2] = &ATinySwordGameMode::OnCharacterSelectNotification;
+		PROTOCOLS[3] = &ATinySwordGameMode::OnMoveResponse;
+		PROTOCOLS[4] = &ATinySwordGameMode::OnMoveNotification;
+		PROTOCOLS[5] = &ATinySwordGameMode::OnAttackResponse;
+		PROTOCOLS[6] = &ATinySwordGameMode::OnAttackNotification;
+		PROTOCOLS[7] = &ATinySwordGameMode::OnSpawnResponse;
+		PROTOCOLS[8] = &ATinySwordGameMode::OnSpawnNotification;
+		PROTOCOLS[9] = &ATinySwordGameMode::OnGetItemResponse;
+		PROTOCOLS[10] = &ATinySwordGameMode::OnGetItemNotification;
+		PROTOCOLS[11] = &ATinySwordGameMode::OnBombExplodeResponse;
+		PROTOCOLS[12] = &ATinySwordGameMode::OnBombExplodeNotification;
+		PROTOCOLS[13] = &ATinySwordGameMode::OnPlayerDeadResponse;
+		PROTOCOLS[14] = &ATinySwordGameMode::OnPlayerDeadNotification;
+		PROTOCOLS[15] = &ATinySwordGameMode::OnDestroyResponse;
+		PROTOCOLS[16] = &ATinySwordGameMode::OnDestroyNotification;
+		PROTOCOLS[17] = &ATinySwordGameMode::OnEndGameResponse;
+		PROTOCOLS[18] = &ATinySwordGameMode::OnEndGameNotification;
+		PROTOCOLS[19] = &ATinySwordGameMode::OnStartGameResponse;
+		PROTOCOLS[20] = &ATinySwordGameMode::OnStartGameNotification;
+		PROTOCOLS[21] = &ATinySwordGameMode::OnPauseGameResponse;
+		PROTOCOLS[22] = &ATinySwordGameMode::OnPauseGameNotification;
+
+	}
+
+
+	TArray<FVector> GetAllPathPoints(FVector &StartLocation, FVector &EndLocation);
+
 	TMap<ATinySwordPlayerController*, int32> PlayerControllerMap; 
 	ATinySwordPlayerController* FindControllerById(const TMap<ATinySwordPlayerController*, int32>&Map, int32 TargetValue);
 
@@ -117,37 +152,37 @@ private:
 	// void FindAllGoblins();
 
 	// packet processing functions
-	void CharacterSelectResponse(struct HEAD* data);
-	void CharacterSelectNotification(struct HEAD* data);
+	void OnCharacterSelectResponse(struct HEAD* data);
+	void OnCharacterSelectNotification(struct HEAD* data);
 
-	void MoveResponse(struct HEAD *data); 
-	void MoveNotification(struct HEAD* data); 
+	void OnMoveResponse(struct HEAD *data); 
+	void OnMoveNotification(struct HEAD* data); 
 
-	void AttackResponse(struct HEAD *data); 
-	void AttackNotification(struct HEAD* data);
+	void OnAttackResponse(struct HEAD *data); 
+	void OnAttackNotification(struct HEAD* data);
 
-	void SpawnResponse(struct HEAD* data);
-	void SpawnNotification(struct HEAD* data);
+	void OnSpawnResponse(struct HEAD* data);
+	void OnSpawnNotification(struct HEAD* data);
 
-	void GetItemResponse(struct HEAD* data);
-	void GetItemNotification(struct HEAD* data);
+	void OnGetItemResponse(struct HEAD* data);
+	void OnGetItemNotification(struct HEAD* data);
 
-	void BombExplodeResponse(struct HEAD* data);
-	void BombExplodeNotification(struct HEAD* data);
+	void OnBombExplodeResponse(struct HEAD* data);
+	void OnBombExplodeNotification(struct HEAD* data);
 
-	void PlayerDeadResponse(struct HEAD* data);
-	void PlayerDeadNotification(struct HEAD* data); 
+	void OnPlayerDeadResponse(struct HEAD* data);
+	void OnPlayerDeadNotification(struct HEAD* data); 
 
-	void DestroyResponse(struct HEAD* data); 
-	void DestroyNotification(struct HEAD* data);
+	void OnDestroyResponse(struct HEAD* data); 
+	void OnDestroyNotification(struct HEAD* data);
 
-	void EndGameResponse(struct HEAD* data);
-	void EndGameNotification(struct HEAD* data); 
+	void OnEndGameResponse(struct HEAD* data);
+	void OnEndGameNotification(struct HEAD* data); 
 
-	void StartGameResponse(struct HEAD* data); 
-	void StartGameNotification(struct HEAD* data);
+	void OnStartGameResponse(struct HEAD* data); 
+	void OnStartGameNotification(struct HEAD* data);
 
-	void PauseGameResponse(struct HEAD* data); 
-	void PauseGameNotification(struct HEAD* data); 
+	void OnPauseGameResponse(struct HEAD* data); 
+	void OnPauseGameNotification(struct HEAD* data); 
 	
 };
