@@ -8,7 +8,7 @@ public class TinySword : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D", "NavigationSystem", "UMG"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D", "NavigationSystem", "UMG", "Sockets", "Networking"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
