@@ -146,7 +146,7 @@ void USelectCharacterWidget::OnQuitButtonClicked()
 void USelectCharacterWidget::SendSelectCharResponseMsg(int playerIndex)
 {
     struct CharacterSelect::Response *response = new CharacterSelect::Response(); 
-    response->H.Command = 0x01; 
+    response->H.Command = 1;//0x01; 
     response->playerIndex = playerIndex; 
     GameMode->messageQueue.push((struct HEAD*)response);
 }
@@ -154,7 +154,7 @@ void USelectCharacterWidget::SendSelectCharResponseMsg(int playerIndex)
 void USelectCharacterWidget::SendSelectCharNotiMsg(const char playerId[40], int playerIndex)
 {
     struct CharacterSelect::Notification *noti = new CharacterSelect::Notification(); 
-    noti->H.Command = 0x02; 
+    noti->H.Command = 2;//0x02; 
     // strncpy(noti->playerId, playerId, sizeof(noti->playerId));
     strncpy_s(noti->playerId, sizeof(noti->playerId), playerId, _TRUNCATE);
 
@@ -167,7 +167,7 @@ void USelectCharacterWidget::SendSelectCharNotiMsg(const char playerId[40], int 
 void USelectCharacterWidget::SendSpawnResponseMsg()
 {
     struct Spawn::Response *response = new Spawn::Response(); 
-    response->H.Command = 0x31; 
+    response->H.Command = 7;//0x31; 
     response->successyn = 1; 
     GameMode->messageQueue.push((struct HEAD *)response);
 
@@ -176,7 +176,7 @@ void USelectCharacterWidget::SendSpawnResponseMsg()
 void USelectCharacterWidget::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
 {
     struct Spawn::Notification *noti = new Spawn::Notification(); 
-	noti->H.Command = 0x32; 
+	noti->H.Command = 8;//0x32; 
 	noti->SpawnType = spawnType; 
 	noti->SpawnActorIndex = spawnActorIndex; 
 	noti->X = X; 

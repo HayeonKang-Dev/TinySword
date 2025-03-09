@@ -15,15 +15,4 @@ void UMainWidget::NativeConstruct()
 void UMainWidget::OnStartGameButtonClicked()
 {
     UGameplayStatics::OpenLevel(GetWorld(), FName("SelectCharLevel"));
-
-    // if (selectWidgetClass)
-    // {
-    //     selectWidget = CreateWidget<USelectCharacterWidget>(GetWorld(), selectWidgetClass); 
-
-    //     if (selectWidget)
-    //     {
-    //         selectWidget->AddToViewport();
-            
-    //     }
-    // }
 }

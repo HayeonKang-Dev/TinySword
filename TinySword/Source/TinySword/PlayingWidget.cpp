@@ -118,7 +118,14 @@ FVector UPlayingWidget::GetBombSpawnPoint(FVector &FoundLocation)
     return SpawnLocation;
 }
 
-
+FVector UPlayingWidget::GetSpawnGoblinLocation(int tagId)
+{
+    FVector SpawnCharLocation = GameMode->FindCastleLocationByTagId(tagId); 
+    // SpawnCharLocation.X += 150.0f;
+    SpawnCharLocation.Y += 100.0f;
+    SpawnCharLocation.Z = -250.0f;
+    return SpawnCharLocation;
+}
 
 void UPlayingWidget::UpdateHealthBar(float HealthPercent)
 {
@@ -143,7 +150,7 @@ void UPlayingWidget::EnableSpawnButton(bool bEnable)
 void UPlayingWidget::SendSpawnResponseMsg(FVector spawnLocation, int SpawnType, int SpawnActorIndex)
 {
     struct Spawn::Response *response = new Spawn::Response(); 
-    response->H.Command = 0x31; 
+    response->H.Command = 7;//0x31; 
     response->Location = spawnLocation;
     response->SpawnType = SpawnType;
     response->SpawnActorIndex = SpawnActorIndex; 
@@ -154,7 +161,7 @@ void UPlayingWidget::SendSpawnResponseMsg(FVector spawnLocation, int SpawnType, 
 void UPlayingWidget::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
 {
     struct Spawn::Notification *noti = new Spawn::Notification(); 
-	noti->H.Command = 0x32; 
+	noti->H.Command = 8;//0x32; 
 	noti->SpawnType = spawnType; 
 	noti->SpawnActorIndex = spawnActorIndex; 
 	noti->X = X; 
@@ -167,7 +174,7 @@ void UPlayingWidget::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float 
 void UPlayingWidget::SendSelectCharResponseMsg(int playerIndex)
 {
     struct CharacterSelect::Response *response = new CharacterSelect::Response(); 
-    response->H.Command = 0x01; 
+    response->H.Command = 1;//0x01; 
     response->playerIndex = playerIndex; 
     GameMode->messageQueue.push((struct HEAD*)response);
 }
@@ -175,7 +182,7 @@ void UPlayingWidget::SendSelectCharResponseMsg(int playerIndex)
 void UPlayingWidget::SendSelectCharNotiMsg(const char playerId[40], int playerIndex)
 {
     struct CharacterSelect::Notification *noti = new CharacterSelect::Notification(); 
-    noti->H.Command = 0x02; 
+    noti->H.Command = 2;//0x02; 
     // strncpy(noti->playerId, playerId, sizeof(noti->playerId));
     strncpy_s(noti->playerId, sizeof(noti->playerId), playerId, _TRUNCATE);
 
@@ -187,11 +194,3 @@ void UPlayingWidget::SendSelectCharNotiMsg(const char playerId[40], int playerIn
 
 
 
-FVector UPlayingWidget::GetSpawnGoblinLocation(int tagId)
-{
-    FVector SpawnCharLocation = GameMode->FindCastleLocationByTagId(tagId); 
-    // SpawnCharLocation.X += 150.0f;
-    SpawnCharLocation.Y += 100.0f;
-    SpawnCharLocation.Z = -250.0f;
-    return SpawnCharLocation;
-}

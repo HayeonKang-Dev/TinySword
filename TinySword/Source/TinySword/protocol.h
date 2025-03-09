@@ -15,6 +15,7 @@ struct CharacterSelect {
 	struct Response {
 		struct HEAD H;
 		int playerIndex;
+		int bSuccess;
 	};
 
 	struct Notification {
@@ -34,7 +35,8 @@ struct Move {
 		int ActorType; // player, sheep, bomb = 0, 1, 2
 		int ActorIndex; //  playerIndex
 		char key; //  
-		//FVector Pos;
+		bool bMoveUp, bMoveDown, bMoveRight, bMoveLeft; 
+		FVector Pos;
 		float X; 
 		float Y;
 	};

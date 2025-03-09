@@ -170,7 +170,7 @@ void ABaseBomb::AddToReuseId(int32 tagId)
 void ABaseBomb::SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage)
 {
     struct Attack::Response *response = new Attack::Response(); 
-    response->H.Command = 0x21; 
+    response->H.Command = 5;//0x21; 
     response->AttackerType = attackerType;
     response->AttackerIndex = attackerIndex;
     response->TargetType = targetType; 
@@ -183,7 +183,7 @@ void ABaseBomb::SendAttackResponseMsg(int attackerType, int attackerIndex, int t
 void ABaseBomb::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y)
 {
     struct Attack::Notification *noti = new Attack::Notification(); 
-    noti->H.Command = 0x22; 
+    noti->H.Command = 6;//0x22; 
     noti->AttackerType = attackerType; 
     noti->AttackerIndex = attackerIndex; 
     noti->AttackerType = attackerType; 

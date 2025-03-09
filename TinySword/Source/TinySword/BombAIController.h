@@ -59,6 +59,8 @@ private:
 
 	void CheckOwnerTagId();
 
+	// TArray<FVector> GetAllPathPoints(FVector& StartLocation, FVector& EndLocation);
+
 	void SendBombExpResponseMsg(); 
 	void SendBombExpNotiMsg(float X, float Y);
 

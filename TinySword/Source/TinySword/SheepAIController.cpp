@@ -91,7 +91,7 @@ void ASheepAIController::FleeFrom(const FVector &AttackLocation)
 void ASheepAIController::SendMoveResponseMsg(int ActorType, int ActorIndex, FVector destination, float Speed)
 {
     struct Move::Response *response = new Move::Response(); 
-    response->H.Command = 0x11; 
+    response->H.Command = 3;//0x11; 
     response->ActorType = ActorType; 
     response->ActorIndex = ActorIndex; 
     response->Destination = destination;
@@ -102,7 +102,7 @@ void ASheepAIController::SendMoveResponseMsg(int ActorType, int ActorIndex, FVec
 void ASheepAIController::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
 {
     struct Move::Notification *noti = new Move::Notification(); 
-    noti->H.Command = 0x12;
+    noti->H.Command = 4;//0x12;
     noti->ActorType = actorType; 
     noti->ActorIndex = actorIndex; 
     noti->X = X; 

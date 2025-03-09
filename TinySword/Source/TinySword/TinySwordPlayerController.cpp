@@ -99,19 +99,19 @@ void ATinySwordPlayerController::SpawnBomb(FVector spawnLocation, int tagId)
         UObject* spawnActor = nullptr; 
         switch (tagId)
         {
-            case 0: 
+            case 1: 
                 spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Bombs/BP_Bomb.BP_Bomb'"));
                 break;
 
-            case 1: 
+            case 2: 
                 spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Bombs/BP_Bomb_Purple.BP_Bomb_Purple'"));
                 break;
 
-            case 2: 
+            case 3: 
                 spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Bombs/BP_Bomb_Red.BP_Bomb_Red'"));
                 break;
 
-            case 3: 
+            case 4: 
                 spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Bombs/BP_Bomb_Yellow.BP_Bomb_Yellow'"));
                 break;
 

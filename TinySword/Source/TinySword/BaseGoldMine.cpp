@@ -135,7 +135,7 @@ void ABaseGoldMine::SendSpawnResponseMsg(int spawnActorIndex, int SpawnType, FVe
 {
 
 	struct Spawn::Response *response = new Spawn::Response(); 
-	response->H.Command = 0x31; 
+	response->H.Command = 7;//0x31; 
 	response->successyn = 1; 
 	response->SpawnActorIndex = spawnActorIndex; 
 	response->SpawnType = SpawnType;
@@ -147,7 +147,7 @@ void ABaseGoldMine::SendSpawnResponseMsg(int spawnActorIndex, int SpawnType, FVe
 void ABaseGoldMine::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
 {
 	struct Spawn::Notification *noti = new Spawn::Notification(); 
-	noti->H.Command = 0x32; 
+	noti->H.Command = 8;//0x32; 
 	noti->SpawnType = spawnType; 
 	noti->SpawnActorIndex = spawnActorIndex; 
 	noti->X = X; 

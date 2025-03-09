@@ -69,7 +69,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="State")
 	float Damage; 
 
-	UPROPERTY(VisibleAnywhere, Category="State")
+	UPROPERTY(EditAnywhere, Category="State")
 	int32 TagId;
 
 	UPROPERTY(EditAnywhere, Category="Animation")

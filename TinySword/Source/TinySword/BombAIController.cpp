@@ -10,6 +10,9 @@
 #include "BaseBomb.h"
 #include "protocol.h"
 
+
+
+
 void ABombAIController::BeginPlay()
 {
     Super::BeginPlay(); 
@@ -137,20 +140,21 @@ void ABombAIController::MoveToCastle(const FVector &CastleLocation)
             SendMoveResponseMsg(2, controlledBomb->GetTagId(), ClosetPoint.Location, controlledBomb->GetSpeed()); 
         }
     }
+
 }
 
 ////////////////////////////////////////////////////
 void ABombAIController::SendBombExpResponseMsg()
 {
     struct BombExplode::Response *response = new BombExplode::Response(); 
-    response->H.Command = 0x51; 
+    response->H.Command = 11;//0x51; 
     GameMode->messageQueue.push((struct HEAD *)response);
 }
 
 void ABombAIController::SendBombExpNotiMsg(float X, float Y)
 {
     struct BombExplode::Notification *noti = new BombExplode::Notification(); 
-    noti->H.Command = 0x52; 
+    noti->H.Command = 12;//0x52; 
     noti->X = X; 
     noti->Y = Y; 
     GameMode->messageQueue.push((struct HEAD *)noti);
@@ -159,7 +163,7 @@ void ABombAIController::SendBombExpNotiMsg(float X, float Y)
 void ABombAIController::SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y)
 {
     struct Destroy::Response *response = new Destroy::Response(); 
-    response->H.Command = 0x71; 
+    response->H.Command = 15;//0x71; 
     response->ActorType = actorType; 
     response->ActorIndex = actorIndex; 
     response->X = X; 
@@ -170,7 +174,7 @@ void ABombAIController::SendDestroyResponseMsg(int actorType, int actorIndex, fl
 void ABombAIController::SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y)
 {
     struct Destroy::Notification *noti = new Destroy::Notification(); 
-    noti->H.Command = 0x72;
+    noti->H.Command = 16;//0x72;
     noti->ActorType = actorType; 
     noti->ActorIndex = actorIndex; 
     noti->X = X; 
@@ -181,7 +185,7 @@ void ABombAIController::SendDestroyNotiMsg(int actorType, int actorIndex, float 
 void ABombAIController::SendMoveResponseMsg(int ActorType, int ActorIndex, FVector Destination, float speed)
 {
     struct Move::Response *response = new Move::Response();      
-    response->H.Command = 0x11; 
+    response->H.Command = 3;//0x11; 
     response->ActorType = ActorType; 
     response->ActorIndex = ActorIndex; 
     response->Destination = Destination; 
@@ -192,9 +196,42 @@ void ABombAIController::SendMoveResponseMsg(int ActorType, int ActorIndex, FVect
 void ABombAIController::SendMoveNotiMsg(int actorType, int actorIndex, FVector location)
 {
     struct Move::Notification *noti = new Move::Notification(); 
-    noti->H.Command = 0x12; 
+    noti->H.Command = 4;//0x12; 
     noti->ActorType = actorType; 
     noti->ActorIndex = actorIndex; 
     noti->Location = location;
     GameMode->messageQueue.push((struct HEAD *)noti);
 }
+
+
+/////////////////////////////////////////////
+// TArray<FVector> ABombAIController::GetAllPathPoints(FVector &StartLocation, FVector &EndLocation)
+// {
+   
+//     TArray<FVector> AllPathPoints; 
+
+//     UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+//     if (!NavSystem)
+//     {
+//         return AllPathPoints;
+//     }
+    
+//     // 경로 찾기
+//     UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(GetWorld(), StartLocation, EndLocation);
+
+    
+//     if (NavPath && NavPath->IsValid())
+//     {
+       
+//         const TArray<FVector>& PathPoints = NavPath->PathPoints; 
+//         //UE_LOG(LogTemp, Log, TEXT("경로 포인트 개수: %d"), PathPoints.Num());
+    
+//         for (int i = 0; i < PathPoints.Num(); i++)
+//         {
+//             FVector Point = PathPoints[i];
+//             AllPathPoints[i] = Point;
+//             //UE_LOG(LogTemp, Log, TEXT("경유지 %d: X=%f, Y=%f, Z=%f"), i, Point.X, Point.Y, Point.Z);
+//         }
+//     }
+//     return AllPathPoints;
+// }

@@ -180,7 +180,7 @@ void ABaseAISheep::UpdateAnimation()
 void ABaseAISheep::SendMoveResponseMsg(int ActorType, int ActorIndex, float Speed)
 {
     struct Move::Response *response = new Move::Response(); 
-    response->H.Command = 0x11; 
+    response->H.Command = 3;//0x11; 
     response->ActorType = ActorType; 
     response->ActorIndex = ActorIndex; 
     response->Speed = Speed;
@@ -190,7 +190,7 @@ void ABaseAISheep::SendMoveResponseMsg(int ActorType, int ActorIndex, float Spee
 void ABaseAISheep::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
 {
     struct Move::Notification *noti = new Move::Notification(); 
-    noti->H.Command = 0x12; 
+    noti->H.Command = 4;//0x12; 
     noti->ActorType = actorType; 
     noti->ActorIndex = actorIndex; 
     noti->X = X; 
@@ -201,7 +201,7 @@ void ABaseAISheep::SendMoveNotiMsg(int actorType, int actorIndex, float X, float
 void ABaseAISheep::SendSpawnResponseMsg(FVector spawnLocation, int spawnActorIndex, int spawnType)
 {
     struct Spawn::Response *response = new Spawn::Response(); 
-    response->H.Command = 0x31; 
+    response->H.Command = 7;//0x31; 
     response->Location = spawnLocation; 
     response->SpawnType = spawnType; 
     response->SpawnActorIndex = spawnActorIndex; 
@@ -212,7 +212,7 @@ void ABaseAISheep::SendSpawnResponseMsg(FVector spawnLocation, int spawnActorInd
 void ABaseAISheep::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
 {
     struct Spawn::Notification *noti = new Spawn::Notification(); 
-	noti->H.Command = 0x32; 
+	noti->H.Command = 8;//0x32; 
 	noti->SpawnType = spawnType; 
 	noti->SpawnActorIndex = spawnActorIndex; 
 	noti->X = X; 
@@ -223,7 +223,7 @@ void ABaseAISheep::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X,
 void ABaseAISheep::SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y)
 {
     struct Destroy::Response *response = new Destroy::Response(); 
-    response->H.Command = 0x71; 
+    response->H.Command = 15;//0x71; 
     response->ActorType = actorType; 
     response->ActorIndex = actorIndex; 
     response->X = X; 
@@ -234,7 +234,7 @@ void ABaseAISheep::SendDestroyResponseMsg(int actorType, int actorIndex, float X
 void ABaseAISheep::SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y)
 {
     struct Destroy::Notification *noti = new Destroy::Notification(); 
-    noti->H.Command = 0x72; 
+    noti->H.Command = 16;//0x72; 
     noti->ActorType = actorType;  
     noti->ActorIndex = actorIndex; 
     noti->X = X; 

@@ -392,7 +392,7 @@ void AGoblin::SetPlayerController(ATinySwordPlayerController *newPlayerControlle
 void AGoblin::SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft)
 {
     struct Move::Response *response = new Move::Response(); 
-    response->H.Command = 0x11; 
+    response->H.Command = 3;//0x11; 
     response->ActorType = ActorType;
     response->ActorIndex = ActorIndex; 
     response->bMoveUp = bMoveUp; 
@@ -406,7 +406,7 @@ void AGoblin::SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, b
 void AGoblin::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
 {
     struct Move::Notification *noti = new Move::Notification(); 
-    noti->H.Command = 0x12; 
+    noti->H.Command = 4;//0x12; 
     noti->ActorType = actorType; 
     noti->ActorIndex = actorIndex; 
     noti->X = X; 
@@ -417,7 +417,7 @@ void AGoblin::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
 void AGoblin::SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage)
 {
     struct Attack::Response *response = new Attack::Response(); 
-    response->H.Command = 0x21; 
+    response->H.Command = 5;//0x21; 
     response->AttackerType = attackerType; 
     response->AttackerIndex = attackerIndex; 
     response->TargetType = targetType;
@@ -430,7 +430,7 @@ void AGoblin::SendAttackResponseMsg(int attackerType, int attackerIndex, int tar
 void AGoblin::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y)
 {
     struct Attack::Notification *noti = new Attack::Notification(); 
-    noti->H.Command = 0x22; 
+    noti->H.Command = 6;//0x22; 
     noti->AttackerType = attackerType; 
     noti->AttackerIndex = attackerIndex; 
     noti->targetType = targetType; 
@@ -445,7 +445,7 @@ void AGoblin::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetT
 void AGoblin::SendGetItemResponseMsg(int itemType)
 {
     struct GetItem::Response *response = new GetItem::Response(); 
-    response->H.Command = 0x41; 
+    response->H.Command = 9;//0x41; 
     response->successyn = 1; 
     response->playerIndex = GetTagId();
     response->ItemType = itemType; 
@@ -455,7 +455,7 @@ void AGoblin::SendGetItemResponseMsg(int itemType)
 void AGoblin::SendGetItemNotiMsg(int itemType, int itemIndex, float X, float Y)
 {
     struct GetItem::Notification *noti = new GetItem::Notification(); 
-    noti->H.Command =0x42; 
+    noti->H.Command = 10;//0x42; 
     noti->playerIndex = GetTagId(); 
     noti->playerHp = GetHealth(); 
     noti->playerCoin = GetMoneyCount(); 
@@ -469,7 +469,7 @@ void AGoblin::SendGetItemNotiMsg(int itemType, int itemIndex, float X, float Y)
 void AGoblin::SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y)
 {
     struct Destroy::Response *response = new Destroy::Response(); 
-    response->H.Command = 0x71; 
+    response->H.Command = 15;//0x71; 
     response->ActorType = actorType; 
     response->ActorIndex = actorIndex; 
     response->X = X; 
@@ -482,7 +482,7 @@ void AGoblin::SendDestroyResponseMsg(int actorType, int actorIndex, float X, flo
 void AGoblin::SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y)
 {
     struct Destroy::Notification *noti = new Destroy::Notification(); 
-    noti->H.Command = 0x72;
+    noti->H.Command = 16;//0x72;
     noti->ActorType = actorType; 
     noti->ActorIndex = actorIndex; 
     noti->X = X; 
