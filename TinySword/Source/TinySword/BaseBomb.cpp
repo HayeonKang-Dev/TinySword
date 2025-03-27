@@ -93,32 +93,32 @@ void ABaseBomb::DealRadialDamage()
     {
         if (AGoblin * goblin = Cast<AGoblin>(hittedActor)) 
         {
-            SendAttackResponseMsg(1, TagId, 0, goblin->GetTagId(), Damage);
-            SendAttackNotiMsg(1, TagId, 0, goblin->GetTagId(), Damage, goblin->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
+            // SendAttackResponseMsg(1, TagId, 0, goblin->GetTagId(), Damage);
+            // SendAttackNotiMsg(1, TagId, 0, goblin->GetTagId(), Damage, goblin->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
         }
             
         else if (ABaseBomb* bomb = Cast<ABaseBomb>(hittedActor))
         {
-            SendAttackResponseMsg(1, TagId, 1, bomb->GetTagId(), Damage);
-            SendAttackNotiMsg(1, TagId, 1, bomb->GetTagId(), Damage, bomb->GetHealth(), GetActorLocation().X, GetActorLocation().Y); 
+            // SendAttackResponseMsg(1, TagId, 1, bomb->GetTagId(), Damage);
+            // SendAttackNotiMsg(1, TagId, 1, bomb->GetTagId(), Damage, bomb->GetHealth(), GetActorLocation().X, GetActorLocation().Y); 
         }
             
         else if (ABaseCastle* castle = Cast<ABaseCastle>(hittedActor))
         {
-            SendAttackResponseMsg(1, TagId, 2, castle->GetTagId(), Damage);
-            SendAttackNotiMsg(1, TagId, 2, castle->GetTagId(), Damage, castle->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
+            // SendAttackResponseMsg(1, TagId, 2, castle->GetTagId(), Damage);
+            // SendAttackNotiMsg(1, TagId, 2, castle->GetTagId(), Damage, castle->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
         }
             
         else if (ABaseAISheep* sheep = Cast<ABaseAISheep>(hittedActor))
         {
-            SendAttackResponseMsg(1, TagId, 3, sheep->GetTagId(), Damage);
-            SendAttackNotiMsg(1, TagId, 3, sheep->GetTagId(), Damage, sheep->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
+            // SendAttackResponseMsg(1, TagId, 3, sheep->GetTagId(), Damage);
+            // SendAttackNotiMsg(1, TagId, 3, sheep->GetTagId(), Damage, sheep->GetHealth(), GetActorLocation().X, GetActorLocation().Y);
         }
             
         else if (ABaseGoldMine* goldMine = Cast<ABaseGoldMine>(hittedActor))
         {
-            SendAttackResponseMsg(1, TagId, 4, goldMine->GetTagId(), Damage);
-            SendAttackNotiMsg(1, TagId, 4, goldMine->GetTagId(), Damage, goldMine->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
+            // SendAttackResponseMsg(1, TagId, 4, goldMine->GetTagId(), Damage);
+            // SendAttackNotiMsg(1, TagId, 4, goldMine->GetTagId(), Damage, goldMine->GetDurability(), GetActorLocation().X, GetActorLocation().Y);
         }
             
     }
@@ -144,21 +144,54 @@ void ABaseBomb::SetOwnerTagId(int32 newOwnerTagId)
 
 void ABaseBomb::PlayBrinkAnim()
 {
+    FTimerHandle TimerHandle_PlayExplodeAnim;
     if (BrinkAnim && paperFlipbookComponent->GetFlipbook() != BrinkAnim)
     {
         paperFlipbookComponent->SetFlipbook(BrinkAnim);
+        paperFlipbookComponent->Play();
     }
+    GetWorld()->GetTimerManager().SetTimer(TimerHandle_PlayExplodeAnim, this, &ABaseBomb::PlayExplodeAnim, 1.0f, false);
 }
 
 void ABaseBomb::PlayExplodeAnim()
 {
     if (ExplodeAnim && paperFlipbookComponent->GetFlipbook() != ExplodeAnim)
     {
+        paperFlipbookComponent->SetLooping(false);
         paperFlipbookComponent->SetFlipbook(ExplodeAnim);
+        paperFlipbookComponent->Play();
     }
 }
 
+void ABaseBomb::PlayDeadAnim()
+{
+    if (DeadAnim) 
+    {
+        paperFlipbookComponent->SetLooping(false);
+        paperFlipbookComponent->SetFlipbook(DeadAnim);
+        paperFlipbookComponent->Play();
 
+        paperFlipbookComponent->OnFinishedPlaying.AddDynamic(this, &ABaseBomb::OnDeadAnimFinished);
+
+    }
+}
+
+void ABaseBomb::OnDeadAnimFinished()
+{
+    if (DeadDispAnim) 
+    {
+        paperFlipbookComponent->SetLooping(false);
+        paperFlipbookComponent->SetFlipbook(DeadDispAnim);
+        paperFlipbookComponent->Play();
+
+    }
+}
+
+void ABaseBomb::HandleDeath()
+{
+    PlayDeadAnim(); // 알아서 DeadDispAnim 연결 재생 
+    SetActorEnableCollision(false);
+}
 
 void ABaseBomb::AddToReuseId(int32 tagId)
 {
@@ -166,31 +199,31 @@ void ABaseBomb::AddToReuseId(int32 tagId)
     GameMode->ReuseBombId.Enqueue(tagId);
 }
 
-
-void ABaseBomb::SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage)
-{
-    struct Attack::Response *response = new Attack::Response(); 
-    response->H.Command = 5;//0x21; 
-    response->AttackerType = attackerType;
-    response->AttackerIndex = attackerIndex;
-    response->TargetType = targetType; 
-    response->TargetIndex = targetIndex; 
-    response->Damage = damage; 
-    response->hityn = 1; 
-    GameMode->messageQueue.push((struct HEAD *)response);
-}
-
-void ABaseBomb::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y)
-{
-    struct Attack::Notification *noti = new Attack::Notification(); 
-    noti->H.Command = 6;//0x22; 
-    noti->AttackerType = attackerType; 
-    noti->AttackerIndex = attackerIndex; 
-    noti->AttackerType = attackerType; 
-    noti->targetIndex = targetIndex; 
-    noti->Damage = damage; 
-    noti->targetHp = targetHp; 
-    noti->X = X; 
-    noti->Y = Y; 
-    GameMode->messageQueue.push((struct HEAD *)noti);
-}
+//
+//void ABaseBomb::SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage)
+//{
+//    struct Attack::Response *response = new Attack::Response(); 
+//    response->H.Command = 5;//0x21; 
+//    response->AttackerType = attackerType;
+//    response->AttackerIndex = attackerIndex;
+//    response->TargetType = targetType; 
+//    response->TargetIndex = targetIndex; 
+//    response->Damage = damage; 
+//    response->hityn = 1; 
+//    GameMode->messageQueue.push((struct HEAD *)response);
+//}
+//
+//void ABaseBomb::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y)
+//{
+//    struct Attack::Notification *noti = new Attack::Notification(); 
+//    noti->H.Command = 6;//0x22; 
+//    noti->AttackerType = attackerType; 
+//    noti->AttackerIndex = attackerIndex; 
+//    noti->AttackerType = attackerType; 
+//    noti->targetIndex = targetIndex; 
+//    noti->Damage = damage; 
+//    noti->targetHp = targetHp; 
+//    noti->X = X; 
+//    noti->Y = Y; 
+//    GameMode->messageQueue.push((struct HEAD *)noti);
+//}

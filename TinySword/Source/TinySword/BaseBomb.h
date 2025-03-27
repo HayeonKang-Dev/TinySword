@@ -32,6 +32,7 @@ public:
 
 	float GetHealth() const {return Health;}
 	void SetHealth(float newHealth) {Health = newHealth;} 
+	void DecreaseHealth(float damage) { Health = FMath::Max(0, Health-damage);}
 
 	int32 GetTagId() const {return TagId;}
 
@@ -44,7 +45,10 @@ public:
 
 	void PlayBrinkAnim();
 	void PlayExplodeAnim();
+	void PlayDeadAnim();
+	void OnDeadAnimFinished();
 
+	void HandleDeath();
 	void AddToReuseId(int32 tagId);
 
 
@@ -78,12 +82,18 @@ private:
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UPaperFlipbook* ExplodeAnim;
 
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* DeadAnim;
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* DeadDispAnim;
+
 	ABombAIController* bombController; 
 
 	ATinySwordGameMode* GameMode;
 
 	int32 OwnerTagId; 	
 
-	void SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage); 
-	void SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y);
+	/*void SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage); 
+	void SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y);*/
 };
