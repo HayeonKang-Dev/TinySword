@@ -8,7 +8,11 @@
 #include "protocol.h"
 #include "NavigationPath.h"
 #include "NavigationData.h"
+#include "SelectCharacterWidget.h"
+#include "AsyncNetworking.h"
+#include "TinySwordGameInstance.h"
 #include "TinySwordGameMode.generated.h"
+
 
 /**
  * 
@@ -22,6 +26,8 @@ class AGoblin;
 class ABaseGoldMine;
 class ABaseCastle;
 class ATinySwordPlayerController; 
+class ASheepAIController;
+class USelectCharacterWidget;
 
 class MessageQueue
 {
@@ -72,6 +78,15 @@ class TINYSWORD_API ATinySwordGameMode : public AGameMode
 public:
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void StartPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+
+
+	// Network 
+	// TSharedPtr<FTCPSocketClient_Async> TCPClient;
+	// FTCPSocketClient_Async TCPClient;
+
 	MessageQueue messageQueue; 
 
 	typedef void(ATinySwordGameMode::*FN_fnCallback)(struct HEAD* data);
@@ -79,28 +94,35 @@ public:
 
 	ATinySwordGameMode()
 	{
-		PROTOCOLS[1] = &ATinySwordGameMode::OnCharacterSelectResponse; 
-		PROTOCOLS[2] = &ATinySwordGameMode::OnCharacterSelectNotification;
-		PROTOCOLS[3] = &ATinySwordGameMode::OnMoveResponse;
-		PROTOCOLS[4] = &ATinySwordGameMode::OnMoveNotification;
-		PROTOCOLS[5] = &ATinySwordGameMode::OnAttackResponse;
-		PROTOCOLS[6] = &ATinySwordGameMode::OnAttackNotification;
-		PROTOCOLS[7] = &ATinySwordGameMode::OnSpawnResponse;
-		PROTOCOLS[8] = &ATinySwordGameMode::OnSpawnNotification;
-		PROTOCOLS[9] = &ATinySwordGameMode::OnGetItemResponse;
-		PROTOCOLS[10] = &ATinySwordGameMode::OnGetItemNotification;
-		PROTOCOLS[11] = &ATinySwordGameMode::OnBombExplodeResponse;
-		PROTOCOLS[12] = &ATinySwordGameMode::OnBombExplodeNotification;
-		PROTOCOLS[13] = &ATinySwordGameMode::OnPlayerDeadResponse;
-		PROTOCOLS[14] = &ATinySwordGameMode::OnPlayerDeadNotification;
-		PROTOCOLS[15] = &ATinySwordGameMode::OnDestroyResponse;
-		PROTOCOLS[16] = &ATinySwordGameMode::OnDestroyNotification;
-		PROTOCOLS[17] = &ATinySwordGameMode::OnEndGameResponse;
-		PROTOCOLS[18] = &ATinySwordGameMode::OnEndGameNotification;
-		PROTOCOLS[19] = &ATinySwordGameMode::OnStartGameResponse;
-		PROTOCOLS[20] = &ATinySwordGameMode::OnStartGameNotification;
-		PROTOCOLS[21] = &ATinySwordGameMode::OnPauseGameResponse;
-		PROTOCOLS[22] = &ATinySwordGameMode::OnPauseGameNotification;
+		// PROTOCOLS[3] = &ATinySwordGameMode::OnCharacterSelectNotification;
+		// PROTOCOLS[6] = &ATinySwordGameMode::OnMoveNotification; 
+		// PROTOCOLS[9] = &ATinySwordGameMode::OnAttackNotification;
+		// PROTOCOLS[12] = &ATinySwordGameMode::OnGetItemNotification;
+		// PROTOCOLS[15] = &ATinySwordGameMode::OnSpawnNotification;
+		// PROTOCOLS[16] = &ATinySwordGameMode::OnDeadNotification;
+
+		// PROTOCOLS[1] = &ATinySwordGameMode::OnCharacterSelectResponse; 
+		// PROTOCOLS[2] = &ATinySwordGameMode::OnCharacterSelectNotification;
+		// PROTOCOLS[3] = &ATinySwordGameMode::OnMoveResponse;
+		// PROTOCOLS[4] = &ATinySwordGameMode::OnMoveNotification;
+		// PROTOCOLS[5] = &ATinySwordGameMode::OnAttackResponse;
+		// PROTOCOLS[6] = &ATinySwordGameMode::OnAttackNotification;
+		// PROTOCOLS[7] = &ATinySwordGameMode::OnSpawnResponse;
+		// PROTOCOLS[8] = &ATinySwordGameMode::OnSpawnNotification;
+		// PROTOCOLS[9] = &ATinySwordGameMode::OnGetItemResponse;
+		// PROTOCOLS[10] = &ATinySwordGameMode::OnGetItemNotification;
+		// PROTOCOLS[11] = &ATinySwordGameMode::OnBombExplodeResponse;
+		// PROTOCOLS[12] = &ATinySwordGameMode::OnBombExplodeNotification;
+		// PROTOCOLS[13] = &ATinySwordGameMode::OnPlayerDeadResponse;
+		// PROTOCOLS[14] = &ATinySwordGameMode::OnPlayerDeadNotification;
+		// PROTOCOLS[15] = &ATinySwordGameMode::OnDestroyResponse;
+		// PROTOCOLS[16] = &ATinySwordGameMode::OnDestroyNotification;
+		// PROTOCOLS[17] = &ATinySwordGameMode::OnEndGameResponse;
+		// PROTOCOLS[18] = &ATinySwordGameMode::OnEndGameNotification;
+		// PROTOCOLS[19] = &ATinySwordGameMode::OnStartGameResponse;
+		// PROTOCOLS[20] = &ATinySwordGameMode::OnStartGameNotification;
+		// PROTOCOLS[21] = &ATinySwordGameMode::OnPauseGameResponse;
+		// PROTOCOLS[22] = &ATinySwordGameMode::OnPauseGameNotification;
 
 	}
 
@@ -112,48 +134,81 @@ public:
 
 	TMap<int32, FVector>& GetCastleMap() { return CastleMap;}
 	
-	TMap<ABaseBomb*, int32> ActiveBombId;
-    TQueue<int32> ReuseBombId;
 	ABaseBomb* FindBombById(const TMap<ABaseBomb*, int32>& Map, int32 TargetValue);
-
-	TMap<ABaseGoldBag*, int32> ActiveGoldBagId; 
-	TQueue<int32> ReuseGoldBagId;
+	
 	ABaseGoldBag* FindGoldBagById(const TMap<ABaseGoldBag*, int32>&Map, int32 TargetValue);
 
-	TMap<ABaseGoldMine*, int32> ActiveGoldMineMap; 
 	void CollectGoldMine();
 	ABaseGoldMine* FindGoldMineById(const TMap<ABaseGoldMine*, int32>&Map, int32 TargetValue);
 	
-
-	TMap<ABaseAISheep*, int32> ActiveSheepId;
     ABaseAISheep* FindSheepById(const TMap<ABaseAISheep*, int32>& Map, int32 TargetValue);
-
-	TMap<ABaseMeat*, int32> ActiveMeatId; 
+	
     ABaseMeat* FindMeatById(const TMap<ABaseMeat*, int32>&Map, int32 TargetValue);
-
-	TMap<AGoblin*, int32> GoblinMap;
+	
 	AGoblin* FindGoblinById(const TMap<AGoblin*, int32>& Map, int32 TargetValue);
+	TMap<AGoblin*, int32> GetGoblinMap() { return GoblinMap;}
 
-	TMap<int32, FVector> CastleMap;
 	FVector FindCastleLocationByTagId(int32 TagId);
 	
 	void FindCastlesLocation();
 
-	TMap<ABaseCastle*, int32> ActiveCastleMap; 
+	
 	void CollectAllCastles(); 
 	ABaseCastle* FindCastleById(const TMap<ABaseCastle*, int32>&Map, int32 TargetValue);
+
+	FTCPSocketClient_Async& GetTCPSocketClient() { return TCPSocketClient_Async; }
 	
-protected:
-	virtual void BeginPlay() override; 
+	void SetCharacterSelectWidget(USelectCharacterWidget* widget) { 
+		UE_LOG(LogTemp, Warning, TEXT("[SETTING] SELECT CHARACTER WIDGET"));
+		CharacterSelectWidget = widget;}
+
+
+	void FindAllGoblins(UWorld* world);
+
+	TMap<ABaseBomb*, int32> ActiveBombId;
+	TQueue<int32> ReuseBombId;
+	TMap<ABaseGoldBag*, int32> ActiveGoldBagId; 
+	TQueue<int32> ReuseGoldBagId;
+	TMap<ABaseAISheep*, int32> ActiveSheepId;
+	TMap<ABaseMeat*, int32> ActiveMeatId; 
+
 
 private:
 	
+	TMap<ABaseGoldMine*, int32> ActiveGoldMineMap;
+	
+	TMap<AGoblin*, int32> GoblinMap;
+	TMap<ABaseCastle*, int32> ActiveCastleMap; 
+	TMap<int32, FVector> CastleMap;
+
+
+	UTinySwordGameInstance* GI;
+
+
+
+
+protected:
+	virtual void BeginPlay() override; 
+
+
+private:
+
+	TSharedPtr<FTCPSocketClient_Async> TCPClient;	
+
+	bool bIsConnected;
+	bool bHasInitialized = false; 
+	
+	FTCPSocketClient_Async TCPSocketClient_Async;
+
+	FSocket* RawSocket; 
 
 	// void FindAllGoblins();
 
+public:
 	// packet processing functions
 	void OnCharacterSelectResponse(struct HEAD* data);
-	void OnCharacterSelectNotification(struct HEAD* data);
+	// void OnCharacterSelectNotification(struct HEAD* data);
+	void OnCharacterSelectNotification(struct CharacterSelect::Notification* data);
 
 	void OnMoveResponse(struct HEAD *data); 
 	void OnMoveNotification(struct HEAD* data); 
@@ -167,22 +222,21 @@ private:
 	void OnGetItemResponse(struct HEAD* data);
 	void OnGetItemNotification(struct HEAD* data);
 
-	void OnBombExplodeResponse(struct HEAD* data);
-	void OnBombExplodeNotification(struct HEAD* data);
+	void OnDeadNotification(struct HEAD* data);
 
-	void OnPlayerDeadResponse(struct HEAD* data);
-	void OnPlayerDeadNotification(struct HEAD* data); 
+	void OnBombExpNotification(struct HEAD* data);
 
-	void OnDestroyResponse(struct HEAD* data); 
-	void OnDestroyNotification(struct HEAD* data);
-
-	void OnEndGameResponse(struct HEAD* data);
-	void OnEndGameNotification(struct HEAD* data); 
-
-	void OnStartGameResponse(struct HEAD* data); 
-	void OnStartGameNotification(struct HEAD* data);
-
-	void OnPauseGameResponse(struct HEAD* data); 
-	void OnPauseGameNotification(struct HEAD* data); 
+private:
+	FVector ValidateLocation(ASheepAIController* controller, const FVector& Destination);
 	
+	void Interpolation(AActor* actor, FVector Destination, double seconds);
+	void SpawnBomb(FVector spawnLocation, int tagId);
+	void SpawnMeat(FVector Location, short tagId);
+	void SpawnGoldBag(FVector spawnLocation, short tagId);
+	// void SpawnGoblin(FVector spawnLocation, int tagId);
+
+	USelectCharacterWidget* CharacterSelectWidget;
+	void DisableCharacterButton(FName buttonName);
+
+	void FindCharacterSelectWidget();
 };
