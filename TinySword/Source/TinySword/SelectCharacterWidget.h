@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "PlayingWidget.h"
+
 #include "SelectCharacterWidget.generated.h"
 
 /**
@@ -16,6 +17,7 @@ class UMainWidget;
 class UTinySwordGameInstance;
 
 
+extern short ClickCnt = 0;
 UCLASS()
 class TINYSWORD_API USelectCharacterWidget : public UUserWidget
 {
@@ -72,15 +74,17 @@ protected:
 	void OnQuitButtonClicked();
 
 private:
-	int32 ClickCnt = 0;
+	UTinySwordGameInstance* GI;	
 
 	ATinySwordPlayerController* PC; 
 
 	ATinySwordGameMode* GameMode;
 
-	void SendSelectCharResponseMsg(int playerIndex); 
+	void SendCharacterSelectRequestMsg(short tagId);
+
+	/*void SendSelectCharResponseMsg(int playerIndex); 
 	void SendSelectCharNotiMsg(const char playerId[40], int playerIndex);
 
 	void SendSpawnResponseMsg(); 
-	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
+	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);*/
 };
