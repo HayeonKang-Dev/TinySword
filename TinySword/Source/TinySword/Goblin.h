@@ -8,6 +8,9 @@
 #include "PaperZDCharacter.h"
 #include "PaperFlipbookComponent.h"
 #include "TinySwordPlayerController.h"
+#include "AsyncNetworking.h"
+#include "Serialization/ArrayWriter.h"
+#include "protocol.h"
 #include "Goblin.generated.h"
 
 /**
@@ -36,6 +39,7 @@ public:
 
 	bool DecreaseMoney(float Amount);
 
+	void DecreaseHealth(float Amount) { Health = FMath::Max(0, Health-Amount);}
 	// variable
 	UPROPERTY(EditDefaultsOnly)
 	float MaxHealth = 100.0f; 
@@ -66,6 +70,7 @@ public:
 	float GetHealth() const {return Health;}
 	void SetHealth(float newHealth) { Health = newHealth;}
 
+
 	UFUNCTION(BlueprintPure)
 	float GetHealthPercent() const; 
 
@@ -76,6 +81,7 @@ public:
 	void UpdateMoneyCount_(int money);
 
 	void UpdateAnimation();
+	void PlayAttackAnimation();
 
 	
 	// Actions
@@ -89,8 +95,8 @@ public:
 
 	void SetPlayerController(ATinySwordPlayerController* newPlayerController);
 
-	void SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft); 
-	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
+	/*void SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft); 
+	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);*/
 
 protected:
 	virtual void BeginPlay() override;
@@ -111,9 +117,12 @@ private:
 
 	void FlipCharacter(int MoveDirec);
 
+	void PlayDeadAnim();
+
 	float Timer; 
 
 	ATinySwordGameMode* GameMode; 
+	UTinySwordGameInstance* GI;
 
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UPaperFlipbook* IdleAnim; 
@@ -124,6 +133,9 @@ private:
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UPaperFlipbook* AttackAnim;
 
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* DeadAnim;
+
 	FTimerHandle TimerHandleAttack;
 
 
@@ -133,20 +145,21 @@ private:
 
 	void ResetToIdle();
 
-	void PlayAttackAnimation();
-
+	void SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft);
+	void SendAttackRequestMsg(short ActorTagId, ActorType TargetActorType, short TargetTagId, Vector TargetLocation, Vector AttackLocation, int damage);
+	void SendGetItemRequestMsg(ActorType ItemType, short ItemTagId);
 
 	ATinySwordPlayerController* playerController;
 
 	
 
-	void SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage); 
+	/*void SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage); 
 	void SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y);
 
 	void SendGetItemResponseMsg(int itemType); 
 	void SendGetItemNotiMsg(int itemType, int itemIndex, float X, float Y);
 
 	void SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y); 
-	void SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y);
+	void SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y);*/
  
 };
