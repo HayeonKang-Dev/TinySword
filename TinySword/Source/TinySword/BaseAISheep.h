@@ -33,7 +33,7 @@ public:
 	float GetHealth() const {return Health;}
 	void SetHealth(float newHealth) {Health = newHealth;}
 
-	
+	void DecreaseHealth(float damage) { Health = FMath::Max(0, Health-damage);}
 
 protected:
 	virtual void BeginPlay() override;
@@ -66,6 +66,12 @@ private:
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UPaperFlipbook* MoveAnim;
 
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* DeadAnim;
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* DeadDispAnim;
+
 	UPROPERTY(EditAnywhere, Category="State")
 	int32 TagId; 
 
@@ -77,15 +83,19 @@ private:
 	void FlipCharacter(float MoveDirec);
 
 	void UpdateAnimation();
+	// void HandleDeath(); 
+
+	// void PlayDeadAnim(); 
+	// void PlayDeadDispAnim();
 
 	float Timer = 0.0f; 
 
-	void SendMoveResponseMsg(int ActorType, int ActorIndex, float Speed); 
+	/*void SendMoveResponseMsg(int ActorType, int ActorIndex, float Speed); 
 	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
 
 	void SendSpawnResponseMsg(FVector spawnLocation, int spawnActorIndex, int spawnType); 
 	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
 
 	void SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y); 
-	void SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y);
+	void SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y);*/
 };
