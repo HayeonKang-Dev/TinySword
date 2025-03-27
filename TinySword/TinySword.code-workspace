@@ -23,7 +23,21 @@
 			"xlocmes": "cpp",
 			"xlocmon": "cpp",
 			"xlocnum": "cpp",
-			"xloctime": "cpp"
+			"xloctime": "cpp",
+			"filesystem": "cpp",
+			"__tree": "cpp",
+			"set": "cpp",
+			"bitset": "cpp",
+			"complex": "cpp",
+			"valarray": "cpp",
+			"xutility": "cpp",
+			"fft": "cpp",
+			"alignedvector3": "cpp",
+			"array": "cpp",
+			"span": "cpp",
+			"string": "cpp",
+			"string_view": "cpp",
+			"vector": "cpp"
 		}
 	},
 	"extensions": {
