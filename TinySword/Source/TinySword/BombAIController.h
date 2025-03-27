@@ -61,14 +61,14 @@ private:
 
 	// TArray<FVector> GetAllPathPoints(FVector& StartLocation, FVector& EndLocation);
 
-	void SendBombExpResponseMsg(); 
+	/*void SendBombExpResponseMsg(); 
 	void SendBombExpNotiMsg(float X, float Y);
 
 	void SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y); 
 	void SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y);
 
 	void SendMoveResponseMsg(int ActorType, int ActorIndex, FVector Destination, float speed); 
-	void SendMoveNotiMsg(int actorType, int actorIndex, FVector location);
+	void SendMoveNotiMsg(int actorType, int actorIndex, FVector location);*/
 
 
 };

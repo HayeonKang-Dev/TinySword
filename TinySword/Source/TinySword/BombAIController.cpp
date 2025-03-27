@@ -76,8 +76,8 @@ void ABombAIController::Tick(float DeltaTime)
                 {
                     bIsReadyToExplode = true; 
                     controlledBomb->PlayExplodeAnim();
-                    SendBombExpResponseMsg(); 
-                    SendBombExpNotiMsg(controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y);
+                    /*SendBombExpResponseMsg(); 
+                    SendBombExpNotiMsg(controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y);*/
 
                     ElapsedTime = 0.0f;
                 }
@@ -92,8 +92,8 @@ void ABombAIController::Tick(float DeltaTime)
                 controlledBomb->DealRadialDamage();
                 // AddToReuseId(); 
 
-                SendDestroyResponseMsg(0, controlledBomb->GetTagId(), controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y); 
-                SendDestroyNotiMsg(0, controlledBomb->GetTagId(), controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y);
+                /*SendDestroyResponseMsg(0, controlledBomb->GetTagId(), controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y); 
+                SendDestroyNotiMsg(0, controlledBomb->GetTagId(), controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y);*/
 
                 // controlledBomb->Destroy();
             }
@@ -137,71 +137,71 @@ void ABombAIController::MoveToCastle(const FVector &CastleLocation)
         UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()); 
         if (NavSystem && NavSystem->ProjectPointToNavigation(CastleLocation, ClosetPoint, FVector(150.0f, 150.0f, 70.0f)))
         {
-            SendMoveResponseMsg(2, controlledBomb->GetTagId(), ClosetPoint.Location, controlledBomb->GetSpeed()); 
+            // SendMoveResponseMsg(2, controlledBomb->GetTagId(), ClosetPoint.Location, controlledBomb->GetSpeed()); 
         }
     }
 
 }
 
 ////////////////////////////////////////////////////
-void ABombAIController::SendBombExpResponseMsg()
-{
-    struct BombExplode::Response *response = new BombExplode::Response(); 
-    response->H.Command = 11;//0x51; 
-    GameMode->messageQueue.push((struct HEAD *)response);
-}
-
-void ABombAIController::SendBombExpNotiMsg(float X, float Y)
-{
-    struct BombExplode::Notification *noti = new BombExplode::Notification(); 
-    noti->H.Command = 12;//0x52; 
-    noti->X = X; 
-    noti->Y = Y; 
-    GameMode->messageQueue.push((struct HEAD *)noti);
-}
-
-void ABombAIController::SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y)
-{
-    struct Destroy::Response *response = new Destroy::Response(); 
-    response->H.Command = 15;//0x71; 
-    response->ActorType = actorType; 
-    response->ActorIndex = actorIndex; 
-    response->X = X; 
-    response->Y = Y; 
-    GameMode->messageQueue.push((struct HEAD *)response);
-}
-
-void ABombAIController::SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y)
-{
-    struct Destroy::Notification *noti = new Destroy::Notification(); 
-    noti->H.Command = 16;//0x72;
-    noti->ActorType = actorType; 
-    noti->ActorIndex = actorIndex; 
-    noti->X = X; 
-    noti->Y = Y; 
-    GameMode->messageQueue.push((struct HEAD *)noti);
-}
-
-void ABombAIController::SendMoveResponseMsg(int ActorType, int ActorIndex, FVector Destination, float speed)
-{
-    struct Move::Response *response = new Move::Response();      
-    response->H.Command = 3;//0x11; 
-    response->ActorType = ActorType; 
-    response->ActorIndex = ActorIndex; 
-    response->Destination = Destination; 
-    response->Speed = speed; 
-    GameMode->messageQueue.push((struct HEAD *)response);
-}
-
-void ABombAIController::SendMoveNotiMsg(int actorType, int actorIndex, FVector location)
-{
-    struct Move::Notification *noti = new Move::Notification(); 
-    noti->H.Command = 4;//0x12; 
-    noti->ActorType = actorType; 
-    noti->ActorIndex = actorIndex; 
-    noti->Location = location;
-    GameMode->messageQueue.push((struct HEAD *)noti);
-}
+//void ABombAIController::SendBombExpResponseMsg()
+//{
+//    struct BombExplode::Response *response = new BombExplode::Response(); 
+//    response->H.Command = 11;//0x51; 
+//    GameMode->messageQueue.push((struct HEAD *)response);
+//}
+//
+//void ABombAIController::SendBombExpNotiMsg(float X, float Y)
+//{
+//    struct BombExplode::Notification *noti = new BombExplode::Notification(); 
+//    noti->H.Command = 12;//0x52; 
+//    noti->X = X; 
+//    noti->Y = Y; 
+//    GameMode->messageQueue.push((struct HEAD *)noti);
+//}
+//
+//void ABombAIController::SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y)
+//{
+//    struct Destroy::Response *response = new Destroy::Response(); 
+//    response->H.Command = 15;//0x71; 
+//    response->ActorType = actorType; 
+//    response->ActorIndex = actorIndex; 
+//    response->X = X; 
+//    response->Y = Y; 
+//    GameMode->messageQueue.push((struct HEAD *)response);
+//}
+//
+//void ABombAIController::SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y)
+//{
+//    struct Destroy::Notification *noti = new Destroy::Notification(); 
+//    noti->H.Command = 16;//0x72;
+//    noti->ActorType = actorType; 
+//    noti->ActorIndex = actorIndex; 
+//    noti->X = X; 
+//    noti->Y = Y; 
+//    GameMode->messageQueue.push((struct HEAD *)noti);
+//}
+//
+//void ABombAIController::SendMoveResponseMsg(int ActorType, int ActorIndex, FVector Destination, float speed)
+//{
+//    struct Move::Response *response = new Move::Response();      
+//    response->H.Command = 3;//0x11; 
+//    response->ActorType = ActorType; 
+//    response->ActorIndex = ActorIndex; 
+//    response->Destination = Destination; 
+//    response->Speed = speed; 
+//    GameMode->messageQueue.push((struct HEAD *)response);
+//}
+//
+//void ABombAIController::SendMoveNotiMsg(int actorType, int actorIndex, FVector location)
+//{
+//    struct Move::Notification *noti = new Move::Notification(); 
+//    noti->H.Command = 4;//0x12; 
+//    noti->ActorType = actorType; 
+//    noti->ActorIndex = actorIndex; 
+//    noti->Location = location;
+//    GameMode->messageQueue.push((struct HEAD *)noti);
+//}
 
 
 /////////////////////////////////////////////
