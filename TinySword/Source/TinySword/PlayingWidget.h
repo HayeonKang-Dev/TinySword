@@ -21,6 +21,7 @@ class AGoblin;
 class ABaseBomb;
 class USettingWidget;
 class UTinySwordGameInstance;
+class FTCPSocketClient_Async;
 
 UCLASS()
 class TINYSWORD_API UPlayingWidget : public UUserWidget
@@ -63,7 +64,7 @@ protected:
 	UFUNCTION()
 	void OnSettingButtonClicked();
 
-	bool DecreasePlayerMoney();
+	bool DecreasePlayerMoney(AGoblin* goblin);
 
 	// void SpawnBomb(FVector spawnLocation); 
 
@@ -88,12 +89,13 @@ private:
 
 	void SpawnGoblin(ATinySwordPlayerController* PlayerController);
 
-	void SendSpawnResponseMsg(FVector spawnLocation, int SpawnType, int SpawnActorIndex); 
+	/*void SendSpawnResponseMsg(FVector spawnLocation, int SpawnType, int SpawnActorIndex); 
 	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
 
 	void SendSelectCharResponseMsg(int playerIndex); 
-	void SendSelectCharNotiMsg(const char playerId[40], int playerIndex);
+	void SendSelectCharNotiMsg(const char playerId[40], int playerIndex);*/
 
 	FVector GetSpawnGoblinLocation(int tagId);
 
+	TSharedPtr<FTCPSocketClient_Async> TCPClient;
 };
