@@ -34,7 +34,7 @@ void ABaseGoldBag::BeginPlay()
 	
 	GameMode = Cast<ATinySwordGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	SetGoldBagId();
+	// SetGoldBagId();
 }
 
 // Called every frame

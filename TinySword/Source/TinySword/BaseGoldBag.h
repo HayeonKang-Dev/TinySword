@@ -31,7 +31,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	int32 GetTagId() const {return TagId;}
-
+	void SetTagId(short newTagId) { TagId = newTagId;}
 	
 
 private:
