@@ -58,10 +58,10 @@ void ABaseCastle::BeginPlay()
 void ABaseCastle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (IsCollapse())
-	{
-		OnCollapse();
-	}
+	// if (IsCollapse())
+	// {
+	// 	OnCollapse();
+	// }
 	
 }
 

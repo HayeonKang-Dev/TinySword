@@ -23,12 +23,13 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-
+	void OnCollapse();
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void OnCollapse();
+	
 
 	UPROPERTY(EditAnywhere, Category="Components")
 	USceneComponent* RootSceneComponent; 
@@ -54,6 +55,7 @@ public:
 
 	float GetDurability() const {return Durability;}
 	void SetDurability(float newDurability) {Durability = newDurability;}
+	void DecreaseDurability(float damage) { Durability = FMath::Max(0, Durability-damage);}
 
 	bool IsCollapse();
 
