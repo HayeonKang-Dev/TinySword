@@ -29,6 +29,8 @@ public:
 	float GetDurability() const {return Durability;}
 	void SetDurability(float newDurability) {Durability = newDurability;}
 
+	void DecreaseDurability(float damage) {Durability = FMath::Max(0, Durability-damage);} 
+
 	UPROPERTY(EditAnywhere, Category="Sprite")
 	UPaperSprite* collapseSprite; 
 
@@ -72,8 +74,8 @@ private:
 
 	ATinySwordGameMode* GameMode; 
 
-	void SendSpawnResponseMsg(int spawnActorIndex, int SpawnType, FVector location); 
-	void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
+	//void SendSpawnResponseMsg(int spawnActorIndex, int SpawnType, FVector location); 
+	//void SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y);
 
 	FVector GoldBagSpawnLocation();
 };

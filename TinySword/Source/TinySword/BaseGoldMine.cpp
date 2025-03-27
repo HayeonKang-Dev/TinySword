@@ -60,7 +60,7 @@ float ABaseGoldMine::TakeDamage(float DamageAmount, FDamageEvent const &DamageEv
 	// Durability -= DamageAmount;
 	if (Durability > 0) 
 	{
-		SendSpawnResponseMsg(TagId, 3, GoldBagSpawnLocation());
+		// SendSpawnResponseMsg(TagId, 3, GoldBagSpawnLocation());
 		// DropGoldBag(GoldBagSpawnLocation());
 	}
 
@@ -83,9 +83,7 @@ void ABaseGoldMine::DropGoldBag(FVector spawnLocation)
 		SpawnParams.Owner = this; 
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; 
 
-		
 
-		
 
 		AActor* SpawnedActor; 
 		SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, spawnLocation, GetActorRotation(), SpawnParams);
@@ -94,7 +92,7 @@ void ABaseGoldMine::DropGoldBag(FVector spawnLocation)
 		if (GameMode)
 		{
 			// SendSpawnResponseMsg(2, SpawnLocation); 
-			SendSpawnNotiMsg(3, SpawnedGoldBag->GetTagId(), spawnLocation.X, spawnLocation.Y);
+			// SendSpawnNotiMsg(3, SpawnedGoldBag->GetTagId(), spawnLocation.X, spawnLocation.Y);
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("Game Mode is null (in goldmine.cpp)"));
 		
@@ -131,28 +129,28 @@ void ABaseGoldMine::UpdateSprite()
 }
 
 
-void ABaseGoldMine::SendSpawnResponseMsg(int spawnActorIndex, int SpawnType, FVector location)
-{
-
-	struct Spawn::Response *response = new Spawn::Response(); 
-	response->H.Command = 7;//0x31; 
-	response->successyn = 1; 
-	response->SpawnActorIndex = spawnActorIndex; 
-	response->SpawnType = SpawnType;
-	response->Location = location;
-	GameMode->messageQueue.push((struct HEAD *)response);
-
-}
-
-void ABaseGoldMine::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
-{
-	struct Spawn::Notification *noti = new Spawn::Notification(); 
-	noti->H.Command = 8;//0x32; 
-	noti->SpawnType = spawnType; 
-	noti->SpawnActorIndex = spawnActorIndex; 
-	noti->X = X; 
-	noti->Y = Y; 
-	GameMode->messageQueue.push((struct HEAD *)noti);
-}
+//void ABaseGoldMine::SendSpawnResponseMsg(int spawnActorIndex, int SpawnType, FVector location)
+//{
+//
+//	struct Spawn::Response *response = new Spawn::Response(); 
+//	response->H.Command = 7;//0x31; 
+//	response->successyn = 1; 
+//	response->SpawnActorIndex = spawnActorIndex; 
+//	response->SpawnType = SpawnType;
+//	response->Location = location;
+//	GameMode->messageQueue.push((struct HEAD *)response);
+//
+//}
+//
+//void ABaseGoldMine::SendSpawnNotiMsg(int spawnType, int spawnActorIndex, float X, float Y)
+//{
+//	struct Spawn::Notification *noti = new Spawn::Notification(); 
+//	noti->H.Command = 8;//0x32; 
+//	noti->SpawnType = spawnType; 
+//	noti->SpawnActorIndex = spawnActorIndex; 
+//	noti->X = X; 
+//	noti->Y = Y; 
+//	GameMode->messageQueue.push((struct HEAD *)noti);
+//}
 
 
