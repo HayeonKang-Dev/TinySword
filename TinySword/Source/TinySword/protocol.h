@@ -1,269 +1,233 @@
 #pragma once
 #include "CoreMinimal.h"
 
-struct HEAD {
-	short Command;
+
+
+#define DECLARE_PROTOCOL(ID)			ID##_REQUEST, ID##_RESPONSE, ID##_NOTIFICATION
+
+typedef enum {
+	NONE,
+	DECLARE_PROTOCOL(CHARACTERSELECT), 			// 1, 2, 3
+	DECLARE_PROTOCOL(MOVE), 					// 4, 5, 6
+	DECLARE_PROTOCOL(ATTACK), 					// 7, 8, 9
+	DECLARE_PROTOCOL(GETITEM), 					// 10, 11, 12
+	DECLARE_PROTOCOL(SPAWN), 					// 13, 14, 15
+	DEAD_NOTIFICATION, 							// 16
+	BOMBEXPLODE_NOTIFICATION, 					// 17
+ 	GAMESTART_NOTIFICATION, 					// 18
+	GAMEEND_NOTIFICATION 						// 19
+} PROTOCOL_IDS;
+
+typedef enum {
+	NONEACTOR, 
+	GOBLIN,
+	CASTLE,
+	BOMB,
+	SHEEP,
+	GOLDMINE,
+	MEAT,
+	GOLDBAG
+} ActorType;
+
+#pragma pack(push, 1)
+#ifndef VECTOR_H
+
+#define VECTOR_H
+
+struct Vector {
+	double X, Y, Z;
+	Vector() : X(0), Y(0), Z(0) {}
+	Vector(double x, double y, double z) : X(x), Y(y), Z(z) {}
+
+	Vector(const FVector& FVectorValue) : X(FVectorValue.X), Y(FVectorValue.Y), Z(FVectorValue.Z) {}
+
+	Vector operator+(const Vector& other) const {
+		return { X + other.X, Y + other.Y, Z + other.Z };
+	}
+
+	Vector operator*(double scalar) const {
+		return { X * scalar, Y * scalar, Z * scalar };
+	}
+
+	Vector operator-(const Vector& other) const {
+		return { X - other.X, Y - other.Y, Z - other.Z };
+	}
+
+	bool operator==(const Vector& other) const {
+		const double epsilon = 1e-6f; // 허용 오차
+		return std::fabs(X - other.X) < epsilon &&
+			std::fabs(Y - other.Y) < epsilon;
+	}
+
+	double Length() const { return std::sqrt(X * X + Y * Y + Z * Z); }
+
+	Vector Normalize() const {
+		double length = Length(); 
+		if (length == 0) return  Vector(); 
+		return { X / length, Y / length, Z / length };
+	}
+
+	double Dot(const Vector& other) const {
+		return X * other.X + Y * other.Y + Z * other.Z;
+	}
+
+	// 두 Vector 간 거리 계산 
+	double DistanceTo(const Vector& other) const { return std::sqrt(std::pow(X - other.X, 2) + std::pow(Y - other.Y, 2)); }
+
+	// 반경 200.0f 이내에 존재하는지 판단
+	bool IsWithinRadius(const Vector& target, float radius = 200.0f) const { return DistanceTo(target) <= radius; }
+
+	FVector ToFVector() const { return FVector(X, Y, Z);}
+};
+#endif // !VECTOR_H
+
+// #pragma pack(push, 1)
+struct HEAD 
+{
+	unsigned short Length;
+	short Index;
+};
+// #pragma pack(pop)
+
+
+
+struct CharacterSelect
+{
+	struct Request
+	{
+		short TagId; 
+	};
+
+	struct Response
+	{
+		bool bSuccess;
+	};
+
+	struct Notification
+	{
+		short SelectedTagId;
+		Vector SpawnLocation;
+	};
 };
 
-struct CharacterSelect {
-	struct Request {
-		struct HEAD H;
-		char playerId[40];
-		int selectCharIndex; 
+struct Move
+{
+	struct Request
+	{
+		Vector Location; 
+		ActorType MoveActorType;
+		short MoveActorTagId;
+		bool bMoveUp, bMoveDown, bMoveRight, bMoveLeft;
 	};
 
-	struct Response {
-		struct HEAD H;
-		int playerIndex;
-		int bSuccess;
+	struct Response
+	{
+		bool bIsSuccess;
 	};
 
-	struct Notification {
-		struct HEAD H;
-		char playerId[40];
-		int playerIndex;
-	};
-};
-
-struct Move {
-	// 0x10, 0x11, 0x12
-	// key => 'W' : 0x01, 'A' : 0x02, 'S' : 0x04, 'D': 0x08
-	//   0x01 + 0x-8 = 0x09
-	// key = index 
-	struct Request {
-		struct HEAD H;
-		int ActorType; // player, sheep, bomb = 0, 1, 2
-		int ActorIndex; //  playerIndex
-		char key; //  
-		bool bMoveUp, bMoveDown, bMoveRight, bMoveLeft; 
-		FVector Pos;
-		float X; 
-		float Y;
-	};
-
-	struct Response {
-		struct HEAD H;
-		int ActorType; 
-		int ActorIndex; 
-		bool bMoveUp, bMoveDown, bMoveRight, bMoveLeft; 
-		float Speed; 
-		float X, Y;
-		FVector Destination;
-	};
-
-	struct Notification {
-		struct HEAD H;
-		int ActorType;
-		int ActorIndex;
-		char key;
-		FVector Location;
-		float X; 
-		float Y; 
+	struct Notification
+	{
+		Vector Location;
+		ActorType MoveActorType;
+		short MoveActorTagId;
 	};
 };
 
-struct Attack { // 0x2
-	struct Request {
-		struct HEAD H;
-		int targetIndex;
-		int targetType;
-		int AttackerType;
-		int AttackerIndex;
-		int Damage; 
-		float X, Y;
-	};
-
-	struct Response {
-		struct HEAD H;
-		int AttackerType; 
-		int AttackerIndex; 
-		int TargetType; // goblin, bomb, castle, sheep, goldmine = 0, 1, 2, 3, 4
-		int TargetIndex; 
-		int Damage; 
-		int hityn;
-		FVector Location;
-	};
-
-	struct Notification {
-		struct HEAD H;
-		int AttackerType; // player, bomb = 0, 1
-		int AttackerIndex;
-		int targetType; // player, bomb, castle, sheep, goldmine = 0, 1, 2, 3, 4
-		int targetIndex;
-		//FVector Pos;
+struct Attack
+{
+	struct Request
+	{
+		ActorType TargetActorType, AttackerActorType;
+		short TargetTagId, AttackerTagId;
+		Vector TargetLocation, AttackLocation;
 		int Damage;
-		int targetHp;
-		float X, Y;
+
+	};
+
+	struct Response
+	{
+		bool bSuccess;
+	};
+
+	struct Notification
+	{
+		ActorType AttackerActorType, TargetActorType;
+		short AttackerTagId, TargetTagId;
+		Vector TargetLocation, AttackLocation;
 	};
 };
 
-struct Spawn { // 0x3
+
+
+struct Spawn
+{
+	struct Request
+	{
+		int Cost;
+		short TagId; 
+	};
+
+	struct Response
+	{
+		bool bSuccess; 
+		int CurrentCoin; 
+	};
+
+	struct Notification
+	{
+		ActorType SpawnActorType; 
+		short SpawnActorTagId; 
+		Vector Location;
+	};
+};
+
+
+
+struct GetItem {
 	struct Request {
-		struct HEAD H;
-		int SpawnActorIndex; 
-		int SpawnType; // player, bomb, meat, goldbag = 0, 1, 2, 3
-		//FVector Pos;
-		int playerIndex;
-		float X, Y;
+		ActorType ItemType; 
+		short ItemTagId, PlayerTagId; 
+		Vector Location;
+		int IncreaseVal;
 	};
-
 	struct Response {
-		struct HEAD H;
-		int SpawnType; // goblin, bomb, meat, goldbag = 0, 1, 2, 3
-		int SpawnActorIndex; 
-		FVector Location; 
-		int successyn;
+		bool bSuccess;
+		int Coin, HP;
 	};
-
 	struct Notification {
-		struct HEAD H;
-		//FVector Pos;
-		int SpawnType;
-		int SpawnActorIndex;
-		FVector Location;
-		float X, Y;
+		ActorType ItemType;
+		short ItemTagId, PlayerTagId; 
+		Vector Location;
+		int Coin, HP;
 	};
 };
 
-struct GetItem { // 0x4
-	struct Request {
-		struct HEAD H;
-		int playerIndex;
-		int ItemType; // Meat, Coin = 0, 1
-		int itemIndex;
-		int playerHp; 
-		int playerCoin; 
-		float X, Y;
-	};
-
-	struct Response {
-		struct HEAD H;
-		int successyn;
-		int playerIndex; 
-		int ItemType; // Meat, Coin = 0, 1
-
-	};
-
+struct Dead {
 	struct Notification {
-		struct HEAD H;
-		int playerIndex;
-		//FVector Pos;
-		int playerHp;
-		int playerCoin;
-		int ItemType;
-		int ItemIndex;
-		float X, Y;
+		ActorType DeadActorType; 
+		short DeadActorTagId; 
+		Vector Location;
 	};
 };
 
-struct BombExplode { // 0x5
-	struct Request {
-		struct HEAD H;
-		int BombIndex;
-		int Damage; 
-		int targetType; // player, castle, bomb, sheep, goldmine = 0, 1, 2, 3, 4 
-		//int targetIndex; 
-		int DamagedActorIndex;
-		float X, Y;
-	};
 
-	struct Response {
-		struct HEAD H;
-	};
-
+struct BombExplode {
 	struct Notification {
-		struct HEAD H;
-		//FVector Pos;
-		//int DamagedActorIndex;
-		//int Damage;
-		// int targetType;
-		// int targetHp; // target last hp
-		float X, Y;
+		Vector Location; 
+		short TagId; 
 	};
 };
 
-struct PlayerDead { // 0x6
-	struct Request {
-		struct HEAD H;
-		int playerIndex;
-		float X, Y;
-	};
-
-	struct Response {
-		struct HEAD H;
-	};
-
+struct GameStart {
 	struct Notification {
-		struct HEAD H;
-		//FVector Pos;
-		int playerIndex;
-		float X, Y;
+		bool bStart;
 	};
 };
 
-struct Destroy { // 0x7
-	struct Request {
-		struct HEAD H;
-		int ActorType;
-		int ActorIndex;
-		float X, Y;
-	};
-
-	struct Response {
-		struct HEAD H;
-		int ActorType; 
-		int ActorIndex; 
-		float X, Y;
-	};
-
+struct GameEnd {
 	struct Notification {
-		struct HEAD H;
-		int ActorType; // bomb, goldbag, sheep, meat = 0, 1, 2, 3
-		int ActorIndex;
-		//FVector Pos;
-		float X, Y;
+		short winnerId;
 	};
 };
-
-struct EndGame {
-	struct Request {
-		struct HEAD H;
-
-	};
-
-	struct Response {
-		struct HEAD H;
-	};
-
-	struct Notification {
-		struct HEAD H;
-	};
-};
-
-struct StartGame {
-	struct Request {
-		struct HEAD H;
-	};
-
-	struct Response {
-		struct HEAD H;
-	};
-
-	struct Notification {
-		struct HEAD H;
-	};
-};
-
-struct PauseGame {
-	struct Request {
-		struct HEAD H;
-	};
-
-	struct Response {
-		struct HEAD H;
-	};
-
-	struct Notification {
-		struct HEAD H;
-	};
-};
+#pragma pack(pop)
+//  
