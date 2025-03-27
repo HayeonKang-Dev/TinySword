@@ -7,12 +7,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "TinySwordPlayerController.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "TinySwordGameInstance.h"
 
 void USettingWidget::NativeConstruct()
 {
     Super::NativeConstruct(); 
 
-    playerController = Cast<ATinySwordPlayerController>(GetOwningPlayer()); 
+    playerController = Cast<ATinySwordPlayerController>(GetOwningPlayer());
+    GI = Cast<UTinySwordGameInstance>(GetWorld()->GetGameInstance()); 
 
     ContinueButton = Cast<UButton>(GetWidgetFromName(TEXT("ContinueButton")));
     MainMenuButton = Cast<UButton>(GetWidgetFromName(TEXT("MainMenuButton"))); 
@@ -42,7 +44,10 @@ void USettingWidget::OnMainMenuButtonClicked()
         playerController->OnUnPossess();
         pawn->Destroy();
 
+        GI->GetTCPClient()->Disconnect(); ////////////////////////////// socket 정리 
+
         UWidgetLayoutLibrary::RemoveAllWidgets(this);
+
 
         UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenuLevel"));
     }

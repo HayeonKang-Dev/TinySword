@@ -41,8 +41,8 @@ private:
 
 	ATinySwordGameMode* GameMode; 
 
-	void SendMoveResponseMsg(int ActorType, int ActorIndex, FVector destination, float Speed); 
-	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);
+	/*void SendMoveResponseMsg(int ActorType, int ActorIndex, FVector destination, float Speed); 
+	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);*/
 
 	
 };

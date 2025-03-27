@@ -15,4 +15,8 @@ void UMainWidget::NativeConstruct()
 void UMainWidget::OnStartGameButtonClicked()
 {
     UGameplayStatics::OpenLevel(GetWorld(), FName("SelectCharLevel"));
+    // if (UWorld* World = GetWorld())
+    // {
+    //     World->ServerTravel(TEXT("/Game/SelectCharLevel"), true);
+    // }
 }

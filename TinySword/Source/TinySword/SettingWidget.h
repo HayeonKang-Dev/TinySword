@@ -12,6 +12,7 @@
 
 class ATinySwordPlayerController; 
 class UMainWidget; 
+class UTinySwordGameInstance;
 
 UCLASS()
 class TINYSWORD_API USettingWidget : public UUserWidget
@@ -43,4 +44,5 @@ protected:
 private:
 	ATinySwordPlayerController* playerController; 
 	
+	UTinySwordGameInstance* GI;
 };

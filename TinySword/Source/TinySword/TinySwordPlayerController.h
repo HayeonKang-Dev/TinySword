@@ -47,7 +47,7 @@ public:
 
 	FVector GetBombSpawnPoint(FVector &FoundLocation);
 
-	void SpawnGoblin(FVector spawnLocation, int tagId);
+	// void SpawnGoblin(FVector spawnLocation, int tagId);
 	
 protected: 
 	virtual void BeginPlay() override; 

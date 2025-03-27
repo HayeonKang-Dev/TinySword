@@ -18,8 +18,13 @@ void ATinySwordPlayerController::BeginPlay()
     GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
     GI = Cast<UTinySwordGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
-    bShowMouseCursor = true; 
     
+    bShowMouseCursor = true;
+  
+    
+    
+    // onpossess
+
 
 }
 
@@ -47,7 +52,7 @@ void ATinySwordPlayerController::Tick(float DeltaTime)
     bool bMoveLeft = IsInputKeyDown(EKeys::A); 
     if (bMoveUp || bMoveDown || bMoveLeft || bMoveRight)
     {
-        controlledChar->SendMoveResponseMsg(0, controlledChar->GetTagId(), bMoveUp, bMoveDown, bMoveRight, bMoveLeft);
+        // controlledChar->SendMoveResponseMsg(0, controlledChar->GetTagId(), bMoveUp, bMoveDown, bMoveRight, bMoveLeft);
     }
 
 
@@ -184,71 +189,71 @@ FVector ATinySwordPlayerController::GetBombSpawnPoint(FVector &FoundLocation)
 }
 
 ////////////////////////////////////////////////////////////////
-void ATinySwordPlayerController::SpawnGoblin(FVector spawnLocation, int tagId)
-{
-    if (GameMode)
-    {
-        TMap<int32, FVector>& CastleMap = GameMode->GetCastleMap();
-        UObject* spawnActor = nullptr; 
+// void ATinySwordPlayerController::SpawnGoblin(FVector spawnLocation, int tagId)
+// {
+//     if (GameMode)
+//     {
+//         TMap<int32, FVector>& CastleMap = GameMode->GetCastleMap();
+//         UObject* spawnActor = nullptr; 
 
      
-        // if (GI)
-        // {
-            switch(tagId)
-            {
-                case 0: 
-                    spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Blue.Goblin_Blue'")); 
-                    break; 
+//         // if (GI)
+//         // {
+//             switch(tagId)
+//             {
+//                 case 0: 
+//                     spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Blue.Goblin_Blue'")); 
+//                     break; 
 
-                case 1: 
-                    spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Purple.Goblin_Purple'")); 
-                    break; 
+//                 case 1: 
+//                     spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Purple.Goblin_Purple'")); 
+//                     break; 
 
-                case 2: 
-                    spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Red.Goblin_Red'")); 
-                    break; 
+//                 case 2: 
+//                     spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Red.Goblin_Red'")); 
+//                     break; 
 
-                case 3: 
-                    spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Yellow.Goblin_Yellow'")); 
-                    break; 
+//                 case 3: 
+//                     spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Yellow.Goblin_Yellow'")); 
+//                     break; 
 
-                default: 
-                    UE_LOG(LogTemp, Warning, TEXT("Spawn Actor is not valid"));
-                    break;
+//                 default: 
+//                     UE_LOG(LogTemp, Warning, TEXT("Spawn Actor is not valid"));
+//                     break;
 
-            // }
+//             // }
 
-        }
+//         }
 
         
-        UBlueprint* GeneratedBP = Cast<UBlueprint>(spawnActor); 
-        UWorld* World = GetWorld(); 
+//         UBlueprint* GeneratedBP = Cast<UBlueprint>(spawnActor); 
+//         UWorld* World = GetWorld(); 
 
-        if (!spawnActor || !GeneratedBP || !GeneratedBP->GeneratedClass || !World) return; 
+//         if (!spawnActor || !GeneratedBP || !GeneratedBP->GeneratedClass || !World) return; 
         
-        FActorSpawnParameters SpawnParams; 
-        SpawnParams.Owner = this; 
-        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; 
+//         FActorSpawnParameters SpawnParams; 
+//         SpawnParams.Owner = this; 
+//         SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; 
 
 
-        FRotator SpawnRotation(0.0f, 0.0f, 0.0f);
-        AGoblin* SpawnedChar = World->SpawnActor<AGoblin>(GeneratedBP->GeneratedClass, spawnLocation, SpawnRotation, SpawnParams);
+//         FRotator SpawnRotation(0.0f, 0.0f, 0.0f);
+//         AGoblin* SpawnedChar = World->SpawnActor<AGoblin>(GeneratedBP->GeneratedClass, spawnLocation, SpawnRotation, SpawnParams);
 
-        if (SpawnedChar) 
-        {
-            UE_LOG(LogTemp, Warning, TEXT("SpawnedChar : %s"), *SpawnedChar->GetName());
-            // PlayerController->
-            OnPossess(SpawnedChar);
-            // PlayerController->SetViewTargetWithBlend(SpawnedChar, 0.0f);
+//         if (SpawnedChar) 
+//         {
+//             UE_LOG(LogTemp, Warning, TEXT("SpawnedChar : %s"), *SpawnedChar->GetName());
+//             // PlayerController->
+//             OnPossess(SpawnedChar);
+//             // PlayerController->SetViewTargetWithBlend(SpawnedChar, 0.0f);
 
-            // SendSelectCharResponseMsg(tagId);
-            char myPlayerId[40] = "test";
-            // SendSelectCharNotiMsg(myPlayerId, tagId);
+//             // SendSelectCharResponseMsg(tagId);
+//             char myPlayerId[40] = "test";
+//             // SendSelectCharNotiMsg(myPlayerId, tagId);
 
-            //SendSpawnResponseMsg(0, GI->GetTagId(), SpawnCharLocation); /////////////////////////////////////
-            // SendSpawnNotiMsg(0, tagId, spawnLocation.X, spawnLocation.Y);
-            GI->SetChar(SpawnedChar);
-            GameMode->GoblinMap.Add(SpawnedChar, tagId);
-        }
-    }
-}
+//             //SendSpawnResponseMsg(0, GI->GetTagId(), SpawnCharLocation); /////////////////////////////////////
+//             // SendSpawnNotiMsg(0, tagId, spawnLocation.X, spawnLocation.Y);
+//             GI->SetChar(SpawnedChar);
+//             GameMode->GoblinMap.Add(SpawnedChar, tagId);
+//         }
+//     }
+// }
