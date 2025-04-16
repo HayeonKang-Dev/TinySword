@@ -27,7 +27,7 @@ public:
 
 	TSharedPtr<FBufferArchive> CreatePacket(uint32 Type, const FString& Text);
 
-	void Initialize(UWorld* World);
+	void Initialize(UWorld* world);
 
 // private:
 	// all phase functions will be called at GameThread
@@ -55,6 +55,7 @@ public:
 	void SetSocket(TSharedPtr<FSocket> InSocket) { Socket = InSocket; }
 
 	void* GetDataPtr(const uint8* Data, int32 DataSize);
+
 private:
 	// FSocket* Socket;
 	TSharedPtr<FSocket> Socket; 
@@ -65,7 +66,9 @@ private:
 
 	ATinySwordGameMode* GameMode; 
 
+	UWorld* World;
 	
+	short SelectCnt = 0;
 
 };
 
