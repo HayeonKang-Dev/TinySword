@@ -62,7 +62,7 @@ void USelectCharacterWidget::NativeTick(const FGeometry &MyGeometry, float InDel
     {
         UE_LOG(LogTemp, Warning, TEXT("Click Cnt == 4!!"));
 
-        UGameplayStatics::OpenLevel(GetWorld(), FName("PlayLevel"));
+        // UGameplayStatics::OpenLevel(GetWorld(), FName("PlayLevel"));
     }
 
 }

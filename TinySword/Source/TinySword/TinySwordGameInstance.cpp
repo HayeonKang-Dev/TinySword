@@ -2,7 +2,9 @@
 
 
 #include "TinySwordGameInstance.h"
+#include "UObject/UObjectGlobals.h"
 #include "Kismet/GameplayStatics.h"
+
 
 // void UTinySwordGameInstance::Init()
 // {
@@ -62,10 +64,11 @@ void UTinySwordGameInstance::Init()
     if (TCPClient.IsValid())
     {
         UWorld* World = GetWorld();
-        // TCPClient->Connect(); /////////////////////////////////////// 실행 됐는데 연결 안됨 
-        TCPClient->Initialize(World);
+        if (World) TCPClient->Initialize(World);
+
+        // FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UTinySwordGameInstance::HandlePostLoadMap);
         UE_LOG(LogTemp, Warning, TEXT("TCPClient->Connect() running."));
-        bIsConnect = true;
+        //bIsConnect = true;
     }
     else
     {
@@ -78,3 +81,4 @@ UTinySwordGameInstance *UTinySwordGameInstance::GetInstance(UWorld *World)
     if (World) return World->GetGameInstance<UTinySwordGameInstance>();
     return nullptr;
 }
+
