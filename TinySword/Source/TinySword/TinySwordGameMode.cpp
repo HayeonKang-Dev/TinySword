@@ -20,9 +20,50 @@
 #include "Sockets.h"
 #include "SelectCharacterWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 #include "AsyncNetworking.h"
+#include "Misc/DateTime.h"
+
+ATinySwordGameMode::ATinySwordGameMode()
+{
+    PlayerSpawnLocations.SetNum(5); // 0~4번까지
+
+    PlayerSpawnLocations[1] = FVector(-6401.79f, -5111.76f, -247.27f);
+    PlayerSpawnLocations[2] = FVector(-4080.1f, -5107.36f, -247.27f);
+    PlayerSpawnLocations[3] = FVector(-6439.94f, -4075.64f, -247.27f);
+    PlayerSpawnLocations[4] = FVector(-4038.44f, -4100.43f, -247.27f);
+}
+// void ATinySwordGameMode::SaveAllPathsToTextFile()
+// {
+//     FString FullText;
+
+//     for (int32 i = 1; i <= 4; ++i)
+//     {
+//         for (int32 j = 1; j <= 4; ++j)
+//         {
+//             if (i == j) continue;
+
+//             FVector Start = PlayerSpawnLocations[i];
+//             FVector End = PlayerSpawnLocations[j];
+//             TArray<FVector> PathPoints = GetAllPathPoints(Start, End);
+
+//             UE_LOG(LogTemp, Warning, TEXT("Start: %s, End: %s => PathPoints: %d"), *Start.ToString(), *End.ToString(), PathPoints.Num());
+
+
+//             FullText += FString::Printf(TEXT("Path from %d to %d:\n"), i, j);
+//             for (const FVector& Point : PathPoints)
+//             {
+//                 FullText += Point.ToString() + TEXT("\n");
+//             }
+//             FullText += TEXT("\n");
+//         }
+//     }
+
+//     FString FilePath = FPaths::ProjectDir() + TEXT("SavedPaths.txt");
+//     FFileHelper::SaveStringToFile(FullText, *FilePath);
+// }
 
 
 
@@ -30,7 +71,7 @@ void ATinySwordGameMode::StartPlay()
 {
     Super::StartPlay(); 
 
-    UE_LOG(LogTemp, Warning, TEXT("GameMode::StartPlay is Running"));
+    // UE_LOG(LogTemp, Warning, TEXT("GameMode::StartPlay is Running"));
 
     //TCPSocketClient_Async.Connect();
     ClickCnt = 0;
@@ -40,14 +81,16 @@ void ATinySwordGameMode::StartPlay()
     // GI->Init();
 
     TCPClient = GI->GetTCPClient();
-    // TCPClient->Initialize(GetWorld());
+    // if (TCPClient.IsValid())
+    // {
+    //     TCPClient->Initialize(GetWorld());
+    // }
 
-
-
+    NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
     
     // TCPClient = GI->GetTCPClient();
 
-
+    
 
 }
 
@@ -56,6 +99,47 @@ void ATinySwordGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
     TCPSocketClient_Async.Disconnect(); 
     Super::EndPlay(EndPlayReason);
 }
+
+void ATinySwordGameMode::PossessPlayer(ATinySwordPlayerController *PC, short TagId)
+{
+
+    // ATinySwordPlayerController* PC = Cast<ATinySwordPlayerController>(NewPlayer); 
+    // if (PC)
+    // {
+    //     const short TagId = PC->GetTagId(); 
+        AGoblin* myGoblin = FindGoblinById(GoblinMap, TagId); 
+        if (myGoblin)
+        {
+            // UE_LOG(LogTemp, Warning, TEXT("Player Possess Goblin %d"), TagId);
+            PC->Possess(myGoblin);
+        }
+
+        for (auto& Pair : GoblinMap)
+        {
+            if (Pair.Value != TagId)
+            {
+                AGoblin* otherGoblin = Pair.Key; 
+                if (otherGoblin && otherGoblin->GetController() == nullptr)
+                {
+                    AAIController* AICon = GetWorld()->SpawnActor<AAIController>(
+                        AAIController::StaticClass(), otherGoblin->GetActorLocation(), otherGoblin->GetActorRotation());
+                    if (AICon)
+                    {
+                        AICon->Possess(otherGoblin); 
+                        // UE_LOG(LogTemp, Warning, TEXT("AI Possess Goblin %d"), Pair.Value);
+                    }
+                    
+                }
+            }
+        }
+    // }
+}
+
+
+
+
+
+
 
 void ATinySwordGameMode::FindAllGoblins(UWorld *world)
 {
@@ -75,7 +159,7 @@ void ATinySwordGameMode::BeginPlay()
     Super::BeginPlay();
 
     
-    UE_LOG(LogTemp, Warning, TEXT("Starting GameMode"));
+    // UE_LOG(LogTemp, Warning, TEXT("Starting GameMode"));
     
     // GI = Cast<UTinySwordGameInstance>(GetWorld()->GetGameInstance());
     // GI->GetInstance(GetWorld());
@@ -91,7 +175,7 @@ void ATinySwordGameMode::BeginPlay()
     
     // TCPClient = GI->GetTCPClient();
 
-
+    
 }
 
 
@@ -113,7 +197,7 @@ void ATinySwordGameMode::Tick(float DeltaTime)
         uint32 PendingDataSize = 0;
         if (TCPClient->GetSocket().Get()->HasPendingData(PendingDataSize) && PendingDataSize > 0)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Is Packet Comming.!"));
+            // UE_LOG(LogTemp, Warning, TEXT("Is Packet Comming.!"));
             TCPClient->BeginRecvPhase();
         }
         
@@ -152,12 +236,13 @@ TArray<FVector> ATinySwordGameMode::GetAllPathPoints(FVector &StartLocation, FVe
     {
        
         const TArray<FVector>& PathPoints = NavPath->PathPoints; 
-        //UE_LOG(LogTemp, Log, TEXT("경로 포인트 개수: %d"), PathPoints.Num());
+        UE_LOG(LogTemp, Log, TEXT("경로 포인트 개수: %d"), PathPoints.Num());
     
         for (int i = 0; i < PathPoints.Num(); i++)
         {
-            FVector Point = PathPoints[i];
-            AllPathPoints[i] = Point;
+            // FVector Point = PathPoints[i];
+            // AllPathPoints[i] = Point;
+            AllPathPoints.Add(PathPoints[i]);
             //UE_LOG(LogTemp, Log, TEXT("경유지 %d: X=%f, Y=%f, Z=%f"), i, Point.X, Point.Y, Point.Z);
         }
     }
@@ -197,6 +282,18 @@ void ATinySwordGameMode::CollectGoldMine()
         ActiveGoldMineMap.Add(GoldMine, GoldMine->GetTagId());
     }
 }
+
+void ATinySwordGameMode::CollectSheep() 
+{
+    TArray<AActor*> AllSheep; 
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseAISheep::StaticClass(), AllSheep); 
+    for (AActor* sheep : AllSheep)
+    {
+        ABaseAISheep* Sheep = Cast<ABaseAISheep>(sheep); 
+        ActiveSheepId.Add(Sheep, Sheep->GetTagId());
+    }
+}
+
 
 ATinySwordPlayerController *ATinySwordGameMode::FindControllerById(const TMap<ATinySwordPlayerController *, int32> &Map, int32 TargetValue)
 {
@@ -277,7 +374,8 @@ ABaseMeat *ATinySwordGameMode::FindMeatById(const TMap<ABaseMeat *, int32> &Map,
     return nullptr;
 }
 
-FVector ATinySwordGameMode::ValidateLocation(ASheepAIController *controller, const FVector &Destination)
+// FVector ATinySwordGameMode::ValidateLocation(ASheepAIController *controller, const FVector &Destination)
+FVector ATinySwordGameMode::ValidateLocation(AAIController *controller, const FVector &Destination)
 {
     UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(controller->GetWorld());
     if (!controller || !NavSystem) return Destination; 
@@ -296,29 +394,62 @@ FVector ATinySwordGameMode::ValidateLocation(ASheepAIController *controller, con
 
 void ATinySwordGameMode::Interpolation(AActor *actor, FVector Destination, double seconds)
 {
-    UPrimitiveComponent* root = Cast<UPrimitiveComponent>(actor->GetRootComponent()); 
-        if (root) {
-            UKismetSystemLibrary::MoveComponentTo(
-                root,                       // 이동 대상: 루트 컴포넌트
-                Destination,             // 목표 위치
-                FRotator(0, 0, 0),           // 목표 회전
-                true,                       // 부드러운 가속
-                true,                       // 부드러운 감속
-                seconds,                        // 이동 시간 (초)
-                false,                      // 최단 회전 경로 사용 여부
-                EMoveComponentAction::Move, // Move 동작
-                FLatentActionInfo() // 비동기 작업 정보
-            );
+    if (!actor || seconds <= 0.0f)
+    {
+        if (actor)
+        {
+            actor->SetActorLocation(Destination, true);
         }
+        return;
+    }
+
+    // 기존 보간 중이면 타이머 정지 및 제거
+    if (FTimerHandle* ExistingHandle = ActiveInterpolations.Find(actor))
+    {
+        GetWorld()->GetTimerManager().ClearTimer(*ExistingHandle);
+        ActiveInterpolations.Remove(actor);
+    }
+
+
+    FVector StartLocation = actor->GetActorLocation();
+    float ElapsedTime = 0.f;
+
+    FTimerHandle TimerHandle;
+
+    // 새 타이머 등록
+    ActiveInterpolations.Add(actor, TimerHandle);
+
+    GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]() mutable {
+        if (!IsValid(actor))
+        {
+            GetWorld()->GetTimerManager().ClearTimer(ActiveInterpolations[actor]);
+            ActiveInterpolations.Remove(actor);
+            return;
+        }
+
+        ElapsedTime += GetWorld()->GetDeltaSeconds();
+        float Alpha = FMath::Clamp(ElapsedTime / seconds, 0.0f, 1.0f);
+
+        FVector NewLocation = FMath::Lerp(StartLocation, Destination, Alpha);
+        actor->SetActorLocation(NewLocation, true);
+
+        if (Alpha >= 1.0f)
+        {
+            GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+            ActiveInterpolations.Remove(actor);
+        }
+
+    }), GetWorld()->GetDeltaSeconds(), true);
 }
 
 
-void ATinySwordGameMode::SpawnBomb(FVector spawnLocation, int tagId)
+void ATinySwordGameMode::SpawnBomb(FVector spawnLocation, short OwnertagId, short BombTagId)
 {
     // TMap<int32, FVector>& CastleMap = GameMode->GetCastleMap();
     UObject* spawnActor = nullptr; 
-    switch (tagId)
+    switch (OwnertagId)
     {
+        UE_LOG(LogTemp, Warning, TEXT("!>!>!>!>!>!>!>!>!>!>!>!> SPAWNACTOR BOMB IS NOT NULLPTR"));
         case 1: 
             spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Bombs/BP_Bomb.BP_Bomb'"));
             break;
@@ -358,8 +489,9 @@ void ATinySwordGameMode::SpawnBomb(FVector spawnLocation, int tagId)
     {
         ABaseBomb* SpawnedBomb = Cast<ABaseBomb>(SpawnedActor); 
         if (SpawnedBomb) {
-            SpawnedBomb->SetTagId(tagId);
+            SpawnedBomb->SetTagId(BombTagId);
             // SpawnedBomb->SetOwnerTagId(tagId); 
+            ActiveBombId.Add(SpawnedBomb, BombTagId); 
         }
     }
 }
@@ -397,6 +529,13 @@ void ATinySwordGameMode::SpawnMeat(FVector Location, short tagId)
 
 void ATinySwordGameMode::SpawnGoldBag(FVector spawnLocation, short tagId)
 {
+
+    // 시간 출력
+    FDateTime Now = FDateTime::Now();
+    FString TimeString = Now.ToString(TEXT("%H:%M:%S.%s"));
+    UE_LOG(LogTemp, Warning, TEXT("[SpawnGoldBag] Time: %s | tagId: %d"), *TimeString, tagId);
+
+
     // drop goldbag logic
     UObject* SpawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/BP_GoldBag.BP_GoldBag'"));
     UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
@@ -427,7 +566,7 @@ void ATinySwordGameMode::SpawnGoldBag(FVector spawnLocation, short tagId)
 
 // Packet Processing Function 
 
-void ATinySwordGameMode::OnCharacterSelectNotification(CharacterSelect::Notification *data)
+void ATinySwordGameMode::OnCharacterSelectNotification(struct CharacterSelect::Notification *data)
 // void ATinySwordGameMode::OnCharacterSelectNotification(HEAD *data)
 {
     if (!data)
@@ -436,26 +575,16 @@ void ATinySwordGameMode::OnCharacterSelectNotification(CharacterSelect::Notifica
         return;
     }
 
-    // CharacterSelect::Notification *noti = reinterpret_cast<CharacterSelect::Notification*>(
-    //     reinterpret_cast<uint8*>(data) + sizeof(HEAD)
-    // );
+    // ClickCnt++;
 
-    // CharacterSelect::Notification* noti = reinterpret_cast<CharacterSelect::Notification*>(data+1); // +1
-
-    // struct CharacterSelect::Notification *noti = (struct CharacterSelect::Notification *)data;
-    // UI의 버튼 비활성화 시키기 
-
-    // struct CharacterSelect::Notification *noti = (struct CharacterSelect::Notification *)data; 
-    ClickCnt++;
-
-    if (data==nullptr) 
-    {
-        UE_LOG(LogTemp, Warning, TEXT("[OnMoveNotification] MOVE_NOTIFICATION NOT AVAILABLE"));
-        return;
-    }
-    else if (data != nullptr) {
-        UE_LOG(LogTemp, Warning, TEXT("[OnMoveNotification] MOVE_NOTIFICATION AVAILABLE : %d"), data->SelectedTagId);
-    }
+    // if (data==nullptr) 
+    // {
+    //     UE_LOG(LogTemp, Warning, TEXT("[OnMoveNotification] MOVE_NOTIFICATION NOT AVAILABLE"));
+    //     return;
+    // }
+    // else if (data != nullptr) {
+    //     UE_LOG(LogTemp, Warning, TEXT("[OnMoveNotification] MOVE_NOTIFICATION AVAILABLE : %d"), data->SelectedTagId);
+    // }
 
     if (!GI)
     {
@@ -498,40 +627,69 @@ void ATinySwordGameMode::OnCharacterSelectNotification(CharacterSelect::Notifica
     // delete noti;
 }
 
-void ATinySwordGameMode::OnMoveNotification(HEAD *data)
+// void ATinySwordGameMode::OnMoveResponse(HEAD *data)
+// {
+//     if (data->MoveAc)
+// }
+
+void ATinySwordGameMode::OnMoveNotification(struct Move::Notification *data)
 {
-    struct Move::Notification *noti = (struct Move::Notification *)data; 
-
+    // struct Move::Notification *noti = (struct Move::Notification *)data; 
+    
     // GOBLIN
-    if (noti->MoveActorType == GOBLIN){
-        UE_LOG(LogTemp, Warning, TEXT("[OnMoveNotification] MOVE_NOTIFICATION: GOBLIN AVAILABLE"));
+    if (data->MoveActorType == GOBLIN){
+        
         // GOBLIN TagId로 찾아서 SimpleMove
-        AGoblin* goblin = FindGoblinById(GoblinMap, noti->MoveActorTagId);
+        AGoblin* goblin = FindGoblinById(GoblinMap, data->MoveActorTagId);
+        if (goblin) // NOT MY CHARACTER
+        {
+            //goblin->SetActorLocation(data->Location.ToFVector());
+            AAIController* AICon = Cast<AAIController>(goblin->GetController());
+            if (AICon)
+            {
+                FVector ValidLocation = ValidateLocation(AICon, data->Location.ToFVector());
+                
+                if (!goblin->bIsMovingToTarget || FVector::Dist(goblin->LastTargetLocation, ValidLocation) > 0.01f) // 10.0f
+                {
+                    goblin->LastTargetLocation = data->Location.ToFVector(); // ValidLocation; 
+                    goblin->bIsMovingToTarget = true; 
 
-        // [보간] 서버가 준 위치로 0.5초 간 이동 
-        Interpolation(goblin, noti->Location.ToFVector(), 0.5);
+
+                    FVector Direc = ValidLocation - goblin->GetActorLocation(); 
+
+                    if (Direc.X > 0) goblin->FlipCharacter(1);
+                    else if (Direc.X < 0) goblin->FlipCharacter(-1);
+
+                    UAIBlueprintHelperLibrary::SimpleMoveToLocation(AICon, ValidLocation);
+                }
+            }
+        }
 
     }
 
     // SHEEP 
         // noti->Location이 이동 불가 지역일 경우, 수정해서 Request 전송 
-    if (noti->MoveActorType == SHEEP) {
-        ABaseAISheep* sheep = FindSheepById(ActiveSheepId, noti->MoveActorTagId);
+    if (data->MoveActorType == SHEEP) {
+        
+        ABaseAISheep* sheep = FindSheepById(ActiveSheepId, data->MoveActorTagId);
         if (sheep)
         {
             ASheepAIController* sheepController = Cast<ASheepAIController>(sheep->GetController());
             if (sheepController)
             {
-                FVector ValidLocation = ValidateLocation(sheepController, noti->Location.ToFVector());
+                //UE_LOG(LogTemp, Warning, TEXT("================= RECV [%d] SHEEP MOVE NOTIFICATION : X=%f, Y=%f, Z=%f ======================"),
+                //                                data->MoveActorTagId, data->Location.ToFVector().X, data->Location.ToFVector().Y, data->Location.ToFVector().Z);
+                // FVector ValidLocation = ValidateLocation(sheepController, data->Location.ToFVector());
+                FVector ValidLocation = ValidateLocation(Cast<AAIController>(sheepController), data->Location.ToFVector());
 
-                if (noti->Location.ToFVector() != ValidLocation)
+                if (data->Location.ToFVector() != ValidLocation)
                 {
                     // request 전송해야 함 
                     Move::Request Request; 
                     
                     Request.Location = Vector(ValidLocation.X, ValidLocation.Y, ValidLocation.Z); 
                     Request.MoveActorType = SHEEP; 
-                    Request.MoveActorTagId = noti->MoveActorTagId;
+                    Request.MoveActorTagId = data->MoveActorTagId;
 
                     // TArray<uint8> ByteArray = StructToByteArray(Request);
 
@@ -540,24 +698,36 @@ void ATinySwordGameMode::OnMoveNotification(HEAD *data)
                     TSharedPtr<FBufferArchive> Packet = FTCPSocketClient_Async::CreatePacket((short)MOVE_REQUEST, WriterArray.GetData(), WriterArray.Num());
                     
                     // Send PACKET 
-                    TCPSocketClient_Async.BeginSendPhase(Packet);
+                    TCPClient->BeginSendPhase(Packet);
                 }
 
                 UAIBlueprintHelperLibrary::SimpleMoveToLocation(sheepController, ValidLocation);
+                // sheepController->MoveToLocation(ValidLocation);
             }
         }
         
     }
 
     // BOMB
-    if (noti->MoveActorType == BOMB) {
-        ABaseBomb* bomb = FindBombById(ActiveBombId, noti->MoveActorTagId);
+    if (data->MoveActorType == BOMB) {
+        UE_LOG(LogTemp, Warning, TEXT("[ON MOVE NOTIFICATION] BOMB MOVING... [X = %f, Y = %f, Z = %f]"), 
+                                data->Location.ToFVector().X, data->Location.ToFVector().Y, data->Location.ToFVector().Z);
+        ABaseBomb* bomb = FindBombById(ActiveBombId, data->MoveActorTagId);
         if (bomb)
         {
+            // UE_LOG(LogTemp, Warning, TEXT(">!>!>!>>!>!>!>!>!> BOMB ACTOR IS AVAILABLE"));
             ABombAIController* bombController = Cast<ABombAIController>(bomb->GetController()); 
             if (bombController)
             {
-                UAIBlueprintHelperLibrary::SimpleMoveToLocation(bombController, noti->Location.ToFVector());
+                //FVector ValidLocation = ValidateLocation(Cast<AAIController>(bombController), data->Location.ToFVector());
+                if (bombController->LastTargetLocation != data->Location.ToFVector())
+                {
+                    // UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>> BOMB CONTROLLER IS AVAILABLE"));
+                    bombController->bIsMoving = true; 
+                    bombController->LastTargetLocation = data->Location.ToFVector();
+                    UAIBlueprintHelperLibrary::SimpleMoveToLocation(bombController, data->Location.ToFVector());
+                }
+                
             }
         }
     }
@@ -566,33 +736,34 @@ void ATinySwordGameMode::OnMoveNotification(HEAD *data)
     // delete noti; 
 }
 
-void ATinySwordGameMode::OnAttackNotification(HEAD *data)
+void ATinySwordGameMode::OnAttackNotification(struct Attack::Notification* data)
 {
-    struct Attack::Notification *noti = (struct Attack::Notification *)(data+1); 
+    // struct Attack::Notification *noti = (struct Attack::Notification *)(data+1); 
     
     ////////////////// ATTACKER //////////////////
     // GOBLIN
-    if (noti->AttackerActorType == GOBLIN)
+    if (data->AttackerActorType == GOBLIN)
     {
         // CASTING
-        AGoblin* goblin = FindGoblinById(GoblinMap, noti->AttackerTagId);
+        AGoblin* goblin = FindGoblinById(GoblinMap, data->AttackerTagId);
         if (!goblin) return;
 
         // 공격 위치 보간 
-        Interpolation(goblin, noti->AttackLocation.ToFVector(), 0.1);
+        // Interpolation(goblin, data->AttackLocation.ToFVector(), 0.1);
 
         // play animation 
         goblin->PlayAttackAnimation();
+        
     }
 
     // BOMB
-    if (noti->AttackerActorType == BOMB)
+    if (data->AttackerActorType == BOMB)
     {
-        ABaseBomb* bomb = FindBombById(ActiveBombId, noti->AttackerTagId);
+        ABaseBomb* bomb = FindBombById(ActiveBombId, data->AttackerTagId);
         if (!bomb) return; 
 
         // 공격 위치 보간
-        Interpolation(bomb, noti->AttackLocation.ToFVector(), 0.1);
+        // Interpolation(bomb, data->AttackLocation.ToFVector(), 0.1);
 
         // play Anim
         bomb->PlayExplodeAnim();
@@ -600,55 +771,65 @@ void ATinySwordGameMode::OnAttackNotification(HEAD *data)
 
     /////////////// TARGET ////////////////
     // 보간 -> 데미지 처리 
-    switch (noti->TargetActorType)
+    switch (data->TargetActorType)
     {
     case GOBLIN:
     {
-        AGoblin* goblin = FindGoblinById(GoblinMap, noti->TargetTagId); 
-        if (!goblin) return; 
+        UE_LOG(LogTemp, Warning, TEXT("********************** Target = GOBLIN"));
+        AGoblin* goblin = FindGoblinById(GoblinMap, data->TargetTagId); 
+        if (!goblin) {
+            UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>> GOBLIN IS NULLPTR"));
+            return; 
+        }
 
-        Interpolation(goblin, noti->TargetLocation.ToFVector(), 0.1);
+        // Interpolation(goblin, data->TargetLocation.ToFVector(), 0.1);
         goblin->DecreaseHealth(10);
+        // ui 반영 
+
         break;
     }
 
     case BOMB:
     {
-        ABaseBomb* bomb = FindBombById(ActiveBombId, noti->TargetTagId);
+        ABaseBomb* bomb = FindBombById(ActiveBombId, data->TargetTagId);
         if (!bomb) return;
 
-        Interpolation(bomb, noti->TargetLocation.ToFVector(), 0.1);
+        // Interpolation(bomb, data->TargetLocation.ToFVector(), 0.1);
         bomb->DecreaseHealth(10);
         break;
     }
 
     case CASTLE:
     {
-        ABaseCastle* castle = FindCastleById(ActiveCastleMap, noti->TargetTagId);
+        ABaseCastle* castle = FindCastleById(ActiveCastleMap, data->TargetTagId);
         if (!castle) return; 
 
-        Interpolation(castle, noti->TargetLocation.ToFVector(), 0.1);
+        // Interpolation(castle, data->TargetLocation.ToFVector(), 0.1);
         castle->DecreaseDurability(10);
         break;
     }
 
     case GOLDMINE:
     {
-        ABaseGoldMine* goldmine = FindGoldMineById(ActiveGoldMineMap, noti->TargetTagId);
+        UE_LOG(LogTemp, Warning, TEXT("********************** Target = GOLDMINE"));
+        ABaseGoldMine* goldmine = FindGoldMineById(ActiveGoldMineMap, data->TargetTagId);
         if (!goldmine) return; 
 
-        Interpolation(goldmine, noti->TargetLocation.ToFVector(), 0.1);
+        // Interpolation(goldmine, data->TargetLocation.ToFVector(), 0.1);
         goldmine->DecreaseDurability(10);
         break;
     }
 
     case SHEEP:
     {
-        ABaseAISheep* sheep = FindSheepById(ActiveSheepId, noti->TargetTagId); 
+        UE_LOG(LogTemp, Warning, TEXT("********************** Target = SHEEP"));
+        ABaseAISheep* sheep = FindSheepById(ActiveSheepId, data->TargetTagId); 
         if (!sheep) return; 
 
-        Interpolation(sheep, noti->TargetLocation.ToFVector(), 0.1);
+        // Interpolation(sheep, data->TargetLocation.ToFVector(), 0.1);
         sheep->DecreaseHealth(10);
+
+
         break;
     }
 
@@ -661,63 +842,73 @@ void ATinySwordGameMode::OnAttackNotification(HEAD *data)
 }
 
 
-void ATinySwordGameMode::OnSpawnNotification(HEAD *data)
+void ATinySwordGameMode::OnSpawnNotification(struct Spawn::Notification *data)
 {
     
-    struct Spawn::Notification *noti = (struct Spawn::Notification *)(data+1);
-    UE_LOG(LogTemp, Warning, TEXT("Entered in OnSpawnNotification: %d"), static_cast<int>(noti->SpawnActorType));
+    // struct Spawn::Notification *noti = (struct Spawn::Notification *)(data+1);
+    UE_LOG(LogTemp, Warning, TEXT("Entered in OnSpawnNotification: %d"), static_cast<int>(data->SpawnActorType));
 
     // CHARACTERSELECT_NOTI처리에서 GOBLIN 스폰 처리 
 
     // BOMB
-    if (noti->SpawnActorType == BOMB)
+    if (data->SpawnActorType == BOMB)
     {
-        SpawnBomb(noti->Location.ToFVector(), noti->SpawnActorTagId);
+        UE_LOG(LogTemp, Warning, TEXT("!>!>!>!>!>!>!>!>!> BOMB SPAWNING.....: %d"), data->SpawnActorTagId);
+        SpawnBomb(data->Location.ToFVector(), data->OwnerTagId, data->SpawnActorTagId);
     }
 
     // MEAT
-    if (noti->SpawnActorType == MEAT)
+    if (data->SpawnActorType == MEAT)
     {
-        SpawnMeat(noti->Location.ToFVector(), noti->SpawnActorTagId);
+        SpawnMeat(data->Location.ToFVector(), data->SpawnActorTagId);
     }
 
     // GOLDBAG
-    if (noti->SpawnActorType == GOLDBAG)
+    if (data->SpawnActorType == GOLDBAG)
     {
         UE_LOG(LogTemp, Warning, TEXT("SPAWN ACTOR TYPE == GOLDBAG"));
-        SpawnGoldBag(noti->Location.ToFVector(), noti->SpawnActorTagId);
+        SpawnGoldBag(data->Location.ToFVector(), data->SpawnActorTagId);
     }
 
     //delete noti; 
 }
 
-void ATinySwordGameMode::OnGetItemNotification(HEAD *data)
+void ATinySwordGameMode::OnGetItemNotification(struct GetItem::Notification *data)
 {
-    struct GetItem::Notification *noti = (struct GetItem::Notification *)data; 
-
+    UE_LOG(LogTemp, Warning, TEXT("~*~*~*~**~*~*~*~*~*~**~ [GET ITEM] NOTIFICATION F"));
+    // struct GetItem::Notification *noti = (struct GetItem::Notification *)data; 
+    AGoblin* goblin = FindGoblinById(GoblinMap, data->PlayerTagId);
+    if (!goblin) 
+    {
+        UE_LOG(LogTemp, Fatal, TEXT(">>>>>>>>>>>>> [ON GETITEM NOTI] CANNOT FIND GOBLIN"));
+        return; 
+    }
 
     // Coin/HP update
     // destroy actor (Remove Actor from Entry)
-    if (noti->ItemType == MEAT)
+    if (data->ItemType == MEAT)
     {
-        AGoblin* goblin = FindGoblinById(GoblinMap, noti->PlayerTagId);
-        if (!goblin) return; 
-
-        goblin->IncreaseHealth(10);
+        UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> ITEM TYPE == MEAT"));
+        //goblin->IncreaseHealth(10);
 
         // remove
-        ABaseMeat* meat = FindMeatById(ActiveMeatId, noti->ItemTagId); 
+        ABaseMeat* meat = FindMeatById(ActiveMeatId, data->ItemTagId); 
         if (meat) 
         {
             meat->Destroy();
             ActiveMeatId.Remove(meat);
         }    
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("> > > >  > >  CANNOT FIND MEAT...: %d / (Size:%d)"), data->ItemTagId, ActiveMeatId.Num());
+        }
         
     }
 
-    if (noti->ItemType == GOLDBAG)
+    if (data->ItemType == GOLDBAG)
     {
-        ABaseGoldBag* coin = FindGoldBagById(ActiveGoldBagId, noti->ItemTagId);
+        //goblin->IncreaseMoney(10);
+        ABaseGoldBag* coin = FindGoldBagById(ActiveGoldBagId, data->ItemTagId);
         if (coin)
         {
             coin->Destroy(); 
@@ -729,9 +920,10 @@ void ATinySwordGameMode::OnGetItemNotification(HEAD *data)
     // delete noti; 
 }
 
-void ATinySwordGameMode::OnDeadNotification(HEAD *data)
+void ATinySwordGameMode::OnDeadNotification(struct Dead::Notification *data)
 {
-    struct Dead::Notification *noti = (struct Dead::Notification *)data; 
+    UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>> ENTERED IN ON DEAD NOTIFICATION"));
+    // struct Dead::Notification *noti = (struct Dead::Notification *)data; 
 
     // GOBLIN Dead -> Goblin.HandleDeath
 
@@ -743,15 +935,21 @@ void ATinySwordGameMode::OnDeadNotification(HEAD *data)
 
     // GOLDMINE Dead -> Change Sprite
 
-    switch (noti->DeadActorType)
+    switch (data->DeadActorType)
     {
+    UE_LOG(LogTemp, Log, TEXT("Entered in DeadActorType Switch-case"));
     case GOBLIN:
     {
-        AGoblin* goblin = FindGoblinById(GoblinMap, noti->DeadActorTagId); 
-        if (!goblin) return; 
+        AGoblin* goblin = FindGoblinById(GoblinMap, data->DeadActorTagId); 
+        if (!goblin) 
+        {
+            UE_LOG(LogTemp, Warning, TEXT("[ON DEAD NOTI] CANNOT FIND GOBLIN!!!"));
+            return; 
+        }
 
-        Interpolation(goblin, noti->Location.ToFVector(), 0.05); // 보간 
-        goblin->SetHealth(0);
+        // Interpolation(goblin, data->Location.ToFVector(), 0.05); // 보간 
+        // goblin->SetHealth(0);
+        // goblin->DecreaseHealth(100);
         goblin->HandleDeath(); 
 
         break;
@@ -759,17 +957,18 @@ void ATinySwordGameMode::OnDeadNotification(HEAD *data)
     
     case CASTLE:
     {
-        ABaseCastle* castle = FindCastleById(ActiveCastleMap, noti->DeadActorTagId); 
+        ABaseCastle* castle = FindCastleById(ActiveCastleMap, data->DeadActorTagId); 
         if (!castle) return; 
         castle->SetDurability(0);
         castle->OnCollapse();
+        DeadCastleCnt++;
         break;
     }
         
 
     case BOMB:
     {
-        ABaseBomb* bomb = FindBombById(ActiveBombId, noti->DeadActorTagId); 
+        ABaseBomb* bomb = FindBombById(ActiveBombId, data->DeadActorTagId); 
         if (!bomb) return; 
         bomb->SetHealth(0);
         bomb->HandleDeath();
@@ -783,7 +982,7 @@ void ATinySwordGameMode::OnDeadNotification(HEAD *data)
     case SHEEP: 
     {
         // Spawn Meat는 Spawn::Noti 도착하면 수행함. 
-        ABaseAISheep* sheep = FindSheepById(ActiveSheepId, noti->DeadActorTagId);
+        ABaseAISheep* sheep = FindSheepById(ActiveSheepId, data->DeadActorTagId);
         if (!sheep) return; 
         sheep->SetHealth(0);
         ActiveSheepId.Remove(sheep);
@@ -796,7 +995,7 @@ void ATinySwordGameMode::OnDeadNotification(HEAD *data)
 
     case GOLDMINE: 
     {
-        ABaseGoldMine* goldmine = FindGoldMineById(ActiveGoldMineMap, noti->DeadActorTagId); 
+        ABaseGoldMine* goldmine = FindGoldMineById(ActiveGoldMineMap, data->DeadActorTagId); 
         if (!goldmine) return; 
         goldmine->SetDurability(0);
         break;
@@ -810,14 +1009,14 @@ void ATinySwordGameMode::OnDeadNotification(HEAD *data)
     }
 }
 
-void ATinySwordGameMode::OnBombExpNotification(HEAD *data)
+void ATinySwordGameMode::OnBombExpNotification(struct BombExplode::Notification *data)
 {
     // cf. 방사형 데미지는 서버에서 Attack으로 전송할 예정. 
 
-    struct BombExplode::Notification *noti = (struct BombExplode::Notification *)data; 
+    // struct BombExplode::Notification *noti = (struct BombExplode::Notification *)data; 
 
     // play brink->exp anim.
-    ABaseBomb* bomb = FindBombById(ActiveBombId, noti->TagId);
+    ABaseBomb* bomb = FindBombById(ActiveBombId, data->TagId);
     if (!bomb) return; 
 
     bomb->PlayBrinkAnim(); 
@@ -852,11 +1051,16 @@ void ATinySwordGameMode::FindCharacterSelectWidget()
         CharacterSelectWidget = Cast<USelectCharacterWidget>(FoundWidgets[0]);
         if (CharacterSelectWidget)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Found and set CharacterSelectWidget."));
+            // UE_LOG(LogTemp, Warning, TEXT("Found and set CharacterSelectWidget."));
         }
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("No CharacterSelectWidget found."));
+        // UE_LOG(LogTemp, Error, TEXT("No CharacterSelectWidget found."));
     }
+}
+
+void ATinySwordGameMode::OpenPlayingLevel()
+{
+    UGameplayStatics::OpenLevel(GetWorld(), FName("PlayLevel"));
 }
