@@ -27,14 +27,22 @@ void UPlayingWidget::NativeOnInitialized()
     GameMode->FindCastlesLocation();
     GameMode->CollectAllCastles();
     GameMode->CollectGoldMine();
+    GameMode->CollectSheep();
     
     // Send Goblin Spawn Packet
     //SendSpawnResponseMsg(GetSpawnGoblinLocation(GI->GetTagId()), 0, GI->GetTagId());
 
     GameMode->FindAllGoblins(GetWorld());
+    
 
     // goblin onpossess
     playerController->OnPossess(GameMode->FindGoblinById(GameMode->GetGoblinMap(), GI->GetTagId()));
+
+    // possess
+    if (playerController && GameMode && playerController->HasAuthority())
+    {
+        GameMode->PossessPlayer(playerController, GI->GetTagId());
+    }
 
     GI->GetInstance(GetWorld());
     TCPClient = GI->GetTCPClient();
@@ -48,6 +56,7 @@ void UPlayingWidget::NativeConstruct()
 
     if (playerController)
     {
+        UE_LOG(LogTemp, Warning, TEXT("[SETTING WIDGET] PLAYING WIDGET"));
         playerController->SetPlayingWidget(this); 
     }
     else if (!playerController)
@@ -69,6 +78,7 @@ void UPlayingWidget::NativeConstruct()
     moneyCount->SetText(FText::AsNumber(0));
     controlledChar = GI->GetChar();
 
+    
 }
 
 
@@ -76,6 +86,8 @@ void UPlayingWidget::OnSpawnButtonClicked()
 {
     UE_LOG(LogTemp, Warning, TEXT("SpawnButton Clicked!"));
     controlledChar = Cast<AGoblin>(playerController->GetPawn());
+    
+    if (GameMode->DeadCastleCnt >=3 ) return;
 
     if (DecreasePlayerMoney(controlledChar))
     {
