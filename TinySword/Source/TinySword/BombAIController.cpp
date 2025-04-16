@@ -30,10 +30,10 @@ void ABombAIController::OnPossess(APawn *InPawn)
     bIsReadyToExplode = false; 
     ElapsedTime = 0.0f;
 
-    if (controlledBomb)
-    {
-        GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ABombAIController::CheckOwnerTagId);
-    }
+    // if (controlledBomb)
+    // {
+    //     GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ABombAIController::CheckOwnerTagId);
+    // }
     
 }
 
@@ -63,41 +63,45 @@ void ABombAIController::Tick(float DeltaTime)
 
     if (!IsDead())
     {   
-        MoveToCastle(EnemyCastleLocation);
-        const float DistanceSquared = FVector::DistSquared(controlledBomb->GetActorLocation(), EnemyCastleLocation); 
-        if (DistanceSquared <= FMath::Square(100.0f))
+        if (LastTargetLocation == controlledBomb->GetActorLocation())
         {
-            if (!bHasArrived) bHasArrived = true;
-            else if (bHasArrived && !bIsReadyToExplode)
-            {
-                controlledBomb->PlayBrinkAnim();
-                ElapsedTime += DeltaTime; 
-                if (ElapsedTime >= 1.5f)
-                {
-                    bIsReadyToExplode = true; 
-                    controlledBomb->PlayExplodeAnim();
-                    /*SendBombExpResponseMsg(); 
-                    SendBombExpNotiMsg(controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y);*/
-
-                    ElapsedTime = 0.0f;
-                }
-            }
+            bIsMoving = false; 
         }
+        // MoveToCastle(EnemyCastleLocation);
+        // const float DistanceSquared = FVector::DistSquared(controlledBomb->GetActorLocation(), EnemyCastleLocation); 
+        // if (DistanceSquared <= FMath::Square(100.0f))
+        // {
+        //     if (!bHasArrived) bHasArrived = true;
+        //     else if (bHasArrived && !bIsReadyToExplode)
+        //     {
+        //         controlledBomb->PlayBrinkAnim();
+        //         ElapsedTime += DeltaTime; 
+        //         if (ElapsedTime >= 1.5f)
+        //         {
+        //             bIsReadyToExplode = true; 
+        //             controlledBomb->PlayExplodeAnim();
+        //             /*SendBombExpResponseMsg(); 
+        //             SendBombExpNotiMsg(controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y);*/
 
-        if (bIsReadyToExplode && controlledBomb)
-        {
-            ElapsedTime += DeltaTime; 
-            if (ElapsedTime >= 0.25f)
-            {
-                controlledBomb->DealRadialDamage();
-                // AddToReuseId(); 
+        //             ElapsedTime = 0.0f;
+        //         }
+        //     }
+        // }
 
-                /*SendDestroyResponseMsg(0, controlledBomb->GetTagId(), controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y); 
-                SendDestroyNotiMsg(0, controlledBomb->GetTagId(), controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y);*/
+        // if (bIsReadyToExplode && controlledBomb)
+        // {
+        //     ElapsedTime += DeltaTime; 
+        //     if (ElapsedTime >= 0.25f)
+        //     {
+        //         controlledBomb->DealRadialDamage();
+        //         // AddToReuseId(); 
 
-                // controlledBomb->Destroy();
-            }
-        }
+        //         /*SendDestroyResponseMsg(0, controlledBomb->GetTagId(), controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y); 
+        //         SendDestroyNotiMsg(0, controlledBomb->GetTagId(), controlledBomb->GetActorLocation().X, controlledBomb->GetActorLocation().Y);*/
+
+        //         // controlledBomb->Destroy();
+        //     }
+        // }
     }
 
     

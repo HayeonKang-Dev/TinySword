@@ -25,6 +25,8 @@ public:
 	bool IsDead() const; 
 
 	// void AddToReuseId();
+	FVector LastTargetLocation; 
+	bool bIsMoving = false; 
 
 protected:
 	virtual void BeginPlay() override; 
