@@ -9,6 +9,10 @@
 #include "TinySwordGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "NavigationSystem.h"
+#include "PlayingWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "GameFramework/HUD.h"
+
 
 
 void ATinySwordPlayerController::BeginPlay()
@@ -21,7 +25,7 @@ void ATinySwordPlayerController::BeginPlay()
     
     bShowMouseCursor = true;
   
-    
+    FindPlayingWidget();
     
     // onpossess
 
@@ -32,30 +36,16 @@ void ATinySwordPlayerController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime); 
 
-    // SendTimer += GetWorld()->DeltaTimeSeconds; 
-    // if (SendTimer >= 0.2f)
+
+    // float Right = IsInputKeyDown(EKeys::D) - IsInputKeyDown(EKeys::A); 
+    // float Up = IsInputKeyDown(EKeys::W) - IsInputKeyDown(EKeys::S); 
+    // if (Right != 0.0f || Up != 0.0f)
     // {
-    //     bool bMoveUp = IsInputKeyDown(EKeys::W); 
-    //     bool bMoveDown = IsInputKeyDown(EKeys::S); 
-    //     bool bMoveRight = IsInputKeyDown(EKeys::D); 
-    //     bool bMoveLeft = IsInputKeyDown(EKeys::A); 
-    //     if (bMoveUp || bMoveDown || bMoveLeft || bMoveRight)
+    //     if (controlledChar)
     //     {
-    //         controlledChar->SendMoveResponseMsg(0, controlledChar->GetTagId(), bMoveUp, bMoveDown, bMoveRight, bMoveLeft);
+    //         SendMoveRequestMsg(controlledChar->GetTagId(), Up < 0.0f, Up > 0.0f, Right > 0.0f, Right < 0.0f); 
     //     }
-    //     SendTimer = 0.0f;
     // }
-
-    bool bMoveUp = IsInputKeyDown(EKeys::W); 
-    bool bMoveDown = IsInputKeyDown(EKeys::S); 
-    bool bMoveRight = IsInputKeyDown(EKeys::D); 
-    bool bMoveLeft = IsInputKeyDown(EKeys::A); 
-    if (bMoveUp || bMoveDown || bMoveLeft || bMoveRight)
-    {
-        // controlledChar->SendMoveResponseMsg(0, controlledChar->GetTagId(), bMoveUp, bMoveDown, bMoveRight, bMoveLeft);
-    }
-
-
 }
 
 void ATinySwordPlayerController::SetPlayingWidget(UPlayingWidget* playing)
@@ -188,72 +178,38 @@ FVector ATinySwordPlayerController::GetBombSpawnPoint(FVector &FoundLocation)
     return SpawnLocation;
 }
 
-////////////////////////////////////////////////////////////////
-// void ATinySwordPlayerController::SpawnGoblin(FVector spawnLocation, int tagId)
+void ATinySwordPlayerController::FindPlayingWidget()
+{
+    TArray<UUserWidget*> FoundWidgets;
+    UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), FoundWidgets, UPlayingWidget::StaticClass(), true);
+
+    if (FoundWidgets.Num() > 0)
+    {
+        playingWidget = Cast<UPlayingWidget>(FoundWidgets[0]);
+        if (playingWidget)
+        {
+            // UE_LOG(LogTemp, Warning, TEXT("Found and set CharacterSelectWidget."));
+        }
+    }
+}
+
+
+// void ATinySwordPlayerController::SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft)
 // {
-//     if (GameMode)
-//     {
-//         TMap<int32, FVector>& CastleMap = GameMode->GetCastleMap();
-//         UObject* spawnActor = nullptr; 
 
-     
-//         // if (GI)
-//         // {
-//             switch(tagId)
-//             {
-//                 case 0: 
-//                     spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Blue.Goblin_Blue'")); 
-//                     break; 
+//     Move::Request Request; 
+//     Request.MoveActorType = GOBLIN;
+//     Request.MoveActorTagId = ActorTagId; 
+//     Request.bMoveUp = bMoveUp; 
+//     Request.bMoveDown = bMoveDown; 
+//     Request.bMoveRight = bMoveRight; 
+//     Request.bMoveLeft = bMoveLeft;
+//     Request.Location = controlledChar->GetActorLocation(); /////////////
 
-//                 case 1: 
-//                     spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Purple.Goblin_Purple'")); 
-//                     break; 
+//     FArrayWriter WriterArray; 
+//     WriterArray.Serialize((UTF8CHAR*)&Request, sizeof(Request));
+//     TSharedPtr<FBufferArchive> Packet = FTCPSocketClient_Async::CreatePacket((short)MOVE_REQUEST, WriterArray.GetData(), WriterArray.Num());
 
-//                 case 2: 
-//                     spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Red.Goblin_Red'")); 
-//                     break; 
-
-//                 case 3: 
-//                     spawnActor = StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Goblins/Goblin_Yellow.Goblin_Yellow'")); 
-//                     break; 
-
-//                 default: 
-//                     UE_LOG(LogTemp, Warning, TEXT("Spawn Actor is not valid"));
-//                     break;
-
-//             // }
-
-//         }
-
-        
-//         UBlueprint* GeneratedBP = Cast<UBlueprint>(spawnActor); 
-//         UWorld* World = GetWorld(); 
-
-//         if (!spawnActor || !GeneratedBP || !GeneratedBP->GeneratedClass || !World) return; 
-        
-//         FActorSpawnParameters SpawnParams; 
-//         SpawnParams.Owner = this; 
-//         SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn; 
-
-
-//         FRotator SpawnRotation(0.0f, 0.0f, 0.0f);
-//         AGoblin* SpawnedChar = World->SpawnActor<AGoblin>(GeneratedBP->GeneratedClass, spawnLocation, SpawnRotation, SpawnParams);
-
-//         if (SpawnedChar) 
-//         {
-//             UE_LOG(LogTemp, Warning, TEXT("SpawnedChar : %s"), *SpawnedChar->GetName());
-//             // PlayerController->
-//             OnPossess(SpawnedChar);
-//             // PlayerController->SetViewTargetWithBlend(SpawnedChar, 0.0f);
-
-//             // SendSelectCharResponseMsg(tagId);
-//             char myPlayerId[40] = "test";
-//             // SendSelectCharNotiMsg(myPlayerId, tagId);
-
-//             //SendSpawnResponseMsg(0, GI->GetTagId(), SpawnCharLocation); /////////////////////////////////////
-//             // SendSpawnNotiMsg(0, tagId, spawnLocation.X, spawnLocation.Y);
-//             GI->SetChar(SpawnedChar);
-//             GameMode->GoblinMap.Add(SpawnedChar, tagId);
-//         }
-//     }
+//     // GameMode->GetTCPSocketClient().BeginSendPhase(Packet);
+//     GI->GetTCPClient()->BeginSendPhase(Packet);
 // }

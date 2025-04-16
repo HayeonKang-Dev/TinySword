@@ -48,6 +48,8 @@ public:
 	FVector GetBombSpawnPoint(FVector &FoundLocation);
 
 	// void SpawnGoblin(FVector spawnLocation, int tagId);
+
+	void FindPlayingWidget(); 
 	
 protected: 
 	virtual void BeginPlay() override; 
@@ -68,5 +70,7 @@ private:
 	ABaseBomb* SpawnedBomb;
 
 	float SendTimer = 0.0f;
+
+	// void SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft);
 
 };
