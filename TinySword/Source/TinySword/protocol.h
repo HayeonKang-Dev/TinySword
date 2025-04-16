@@ -130,6 +130,7 @@ struct Move
 		Vector Location;
 		ActorType MoveActorType;
 		short MoveActorTagId;
+		bool bMoveUp, bMoveDown, bMoveRight, bMoveLeft;
 	};
 };
 
@@ -147,6 +148,7 @@ struct Attack
 	struct Response
 	{
 		bool bSuccess;
+		
 	};
 
 	struct Notification
@@ -154,6 +156,7 @@ struct Attack
 		ActorType AttackerActorType, TargetActorType;
 		short AttackerTagId, TargetTagId;
 		Vector TargetLocation, AttackLocation;
+		int TargetHP; 
 	};
 };
 
@@ -176,7 +179,7 @@ struct Spawn
 	struct Notification
 	{
 		ActorType SpawnActorType; 
-		short SpawnActorTagId; 
+		short SpawnActorTagId, OwnerTagId; 
 		Vector Location;
 	};
 };
