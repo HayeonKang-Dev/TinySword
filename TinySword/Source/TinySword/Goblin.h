@@ -25,6 +25,11 @@ class TINYSWORD_API AGoblin : public APaperZDCharacter
 	GENERATED_BODY()
 	
 public:
+	AGoblin(); 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    class UCharacterMovementComponent* GoblinMovement;
+
 	// override
 	virtual void Tick(float DeltaTime) override; 
 
@@ -39,7 +44,8 @@ public:
 
 	bool DecreaseMoney(float Amount);
 
-	void DecreaseHealth(float Amount) { Health = FMath::Max(0, Health-Amount);}
+	void DecreaseHealth(float Amount);// { Health = FMath::Max(0, Health-Amount);}
+	
 	// variable
 	UPROPERTY(EditDefaultsOnly)
 	float MaxHealth = 100.0f; 
@@ -65,6 +71,8 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* OverlapComponent;
 
+
+
 	// for UI 
 	UFUNCTION(BlueprintCallable)
 	float GetHealth() const {return Health;}
@@ -79,6 +87,7 @@ public:
 	void SetMoney(int newMoney) {Money = newMoney;}
 
 	void UpdateMoneyCount_(int money);
+	
 
 	void UpdateAnimation();
 	void PlayAttackAnimation();
@@ -90,13 +99,26 @@ public:
 
 	void MoveRight(float Value);
 	void UpDown(float Value);
+	// FVector LastRecvLocation;
 
 	void HandleDeath();
 
 	void SetPlayerController(ATinySwordPlayerController* newPlayerController);
 
+	// bool bIsMoving; // Is Move::Notification AVAILABLE
+	
+
+	// void SetMoveDir(FVector2D &newMoveDir) { MoveDir = newMoveDir; }
+
+	FVector LastTargetLocation; 
+	bool bIsMovingToTarget= false; 
+
+	void FlipCharacter(int MoveDirec);
+	
+	// void SetLocation(const FVector &newLocation) { SetActorLocation(newLocation);}
 	/*void SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft); 
 	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);*/
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -109,13 +131,13 @@ protected:
 
 	UPaperFlipbookComponent* paperFlipbookComponent;
 
-	
+	FVector2D MoveDir; 
 
 private:
 	UPROPERTY(EditAnywhere)
-	float Speed = 50.0f; 
+	float Speed = 80.0f; // 50
 
-	void FlipCharacter(int MoveDirec);
+	
 
 	void PlayDeadAnim();
 
@@ -140,6 +162,7 @@ private:
 
 
 	bool bIsAttacking; 
+	
 
 	
 

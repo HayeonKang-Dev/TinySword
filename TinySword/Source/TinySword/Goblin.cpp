@@ -23,10 +23,17 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
+AGoblin::AGoblin()
+{
+    // GetCharacterMovement();    
+}
+
+
 void AGoblin::BeginPlay()
 {
     Super::BeginPlay(); 
 
+    UE_LOG(LogTemp, Error, TEXT(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Goblin is Reseted. : %d"), TagId);
     //playerController = Cast<ATinySwordPlayerController>(GetController());
     GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
     GI = Cast<UTinySwordGameInstance>(GetWorld()->GetGameInstance());
@@ -50,6 +57,11 @@ void AGoblin::BeginPlay()
 
     // GI
 
+    // 생성자나 BeginPlay에서 설정
+    SetReplicates(true);
+    SetReplicateMovement(true); // 위치, 회전 등 자동 동기화
+
+
 }
 
 
@@ -58,22 +70,35 @@ void AGoblin::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
     //UE_LOG(LogTemp, Warning, TEXT("bIsAttacking: %s, Velocity: %s"), bIsAttacking ? TEXT("true") : TEXT("false"), *GetVelocity().ToString());
 
-    UpdateAnimation();
-
-    if (!IsDead() && playerController)
+    if (!IsDead())
     {
-        playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
+        UpdateAnimation();
+    }
+    
 
-        if (IsDead())
-        {
-            HandleDeath(); 
-            GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        }
+    if (!playerController)
+    {
+        playerController = Cast<ATinySwordPlayerController>(GetController());
     }
 
+    // if (!IsDead() && playerController)
+    // {
+    //     // playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
+
+    //     if (IsDead())
+    //     {
+    //         // HandleDeath(); 
+    //         // GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    //     }
+    // }
 
 
+    if (bIsMovingToTarget && FVector::Dist(GetActorLocation(), LastTargetLocation) < 0.01f)
+    {
+        bIsMovingToTarget = false; 
+    }
 
+    
 }
 
 // Control Character
@@ -91,9 +116,11 @@ void AGoblin::MoveRight(float Value)
 {
     if (FMath::Abs(Value) > KINDA_SMALL_NUMBER) // if (Value != 0.0f)
     {
-        AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
 
         SendMoveRequestMsg(GetTagId(), 0, 0, Value>0.0, Value<0.0);
+
+        AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
+
         FlipCharacter(Value);
     }
 }
@@ -102,8 +129,8 @@ void AGoblin::UpDown(float Value)
 {
     if (FMath::Abs(Value) > KINDA_SMALL_NUMBER)
     {
-        AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
         SendMoveRequestMsg(GetTagId(), Value<0.0, Value>0.0, 0, 0);
+        AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
     }
 }
 
@@ -123,6 +150,8 @@ void AGoblin::PlayDeadAnim()
 {
     if (DeadAnim)
     {
+        UE_LOG(LogTemp, Warning, TEXT("PLAY DEAD ANIM! && DeadAnim IS AVAILABLE"));
+        paperFlipbookComponent->Stop();
         paperFlipbookComponent->SetLooping(false);
         paperFlipbookComponent->SetFlipbook(DeadAnim);
         paperFlipbookComponent->Play();
@@ -132,6 +161,7 @@ void AGoblin::PlayDeadAnim()
 void AGoblin::UpdateAnimation()
 {
     if (bIsAttacking) return; 
+    
 
     FVector Velocity = GetVelocity();
 
@@ -196,21 +226,46 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
 
     if (!OtherActor || OtherActor==this) return; 
 
+    if (!playerController || !playerController->IsA(ATinySwordPlayerController::StaticClass()))
+    {
+        //UE_LOG(LogTemp, Error, TEXT("PLAYER CONTROLLER IS NOT A TINY SWORD'S"));
+        return;
+    }
+
     if (OtherActor->IsA(ABaseMeat::StaticClass())) 
     {
         UE_LOG(LogTemp, Warning, TEXT("Overlap with Meat"));
         ABaseMeat* meat = Cast<ABaseMeat>(OtherActor); 
-       
-        if (playerController && playerController->playingWidget) playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
-
+        
         SendGetItemRequestMsg(MEAT, meat->GetTagId());
+        IncreaseHealth(10);
+        meat->Destroy();
+       
+        if (playerController && playerController->playingWidget) 
+        {
+            playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("PLAYER CONTROLLER IS NULL"));
+        }
+
+        
+
     }
     if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
     {
         UE_LOG(LogTemp, Warning, TEXT("Overlap with GoldBag"));
         ABaseGoldBag* gold = Cast<ABaseGoldBag>(OtherActor); 
 
+        /////////////////////
+        // IncreaseMoney(10);
+        // gold->Destroy();
+        ////////////////////
+
         SendGetItemRequestMsg(GOLDBAG, gold->GetTagId());
+        IncreaseMoney(10); 
+        gold->Destroy(); 
 
     }
 }
@@ -225,6 +280,7 @@ void AGoblin::NotifyActorEndOverlap(AActor *OtherActor)
 /////////////////
 float AGoblin::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
+    UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>!!!!! Called TakeDamage"));
     ABaseBomb* impactedBomb = Cast<ABaseBomb>(DamageCauser); 
     if (impactedBomb && impactedBomb->GetTagId()==TagId) return 0.0f; 
 
@@ -272,24 +328,30 @@ void AGoblin::Attack()
     FCollisionQueryParams CollisionParams; 
     CollisionParams.AddIgnoredActor(this);
 
-    UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>>>>>>> ATTACKING!!!"));
     // Line Trace
     if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
     {
-        UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>>>>>>>>>>>>>> Attacking Success."));
+        UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>>>>>>>>>>>>>> ATTACKING"));
         AActor* HitActor = Cast<AActor>(HitResult.GetActor());
         if (HitActor)
         {
+            UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>>>>>> HIT ACTOR AVAILABLE"));
             
             FDamageEvent DamageEvent; 
-            HitActor->TakeDamage(Damage, DamageEvent, nullptr, this);
+            //HitActor->TakeDamage(Damage, DamageEvent, nullptr, this);
 
             if (AGoblin* targetPlayer = Cast<AGoblin>(HitActor))
             {
                 UE_LOG(LogTemp, Warning, TEXT("Target is PLAYER"));
                 if (targetPlayer)
+                {
                     SendAttackRequestMsg(GetTagId(), GOBLIN, targetPlayer->GetTagId(), 
                                         Vector(targetPlayer->GetActorLocation()), Vector(GetActorLocation()), Damage);
+                    return;
+                    
+                }
+                    
+                
             }
             else if (ABaseBomb* targetBomb = Cast<ABaseBomb>(HitActor))
             {
@@ -301,8 +363,12 @@ void AGoblin::Attack()
                 }
 
                 if (targetBomb) 
+                {
                     SendAttackRequestMsg(GetTagId(), BOMB, targetBomb->GetTagId(), 
                                     Vector(targetBomb->GetActorLocation()), Vector(GetActorLocation()), Damage);
+                    return;
+                }
+                    
             }
             else if (ABaseCastle* targetCastle = Cast<ABaseCastle>(HitActor))
             {
@@ -316,28 +382,40 @@ void AGoblin::Attack()
 
 
                 if (targetCastle)
+                {
                     SendAttackRequestMsg(GetTagId(), CASTLE, targetCastle->GetTagId(), 
                                     Vector(targetCastle->GetActorLocation()), Vector(GetActorLocation()), Damage);
+                    return;
+                }
+                    
             }
             else if (ABaseAISheep* targetSheep = Cast<ABaseAISheep>(HitActor))
             {
                 UE_LOG(LogTemp, Warning, TEXT("Target is SHEEP"));
                 if (targetSheep)
+                {
                     SendAttackRequestMsg(GetTagId(), SHEEP, targetSheep->GetTagId(), 
                                     Vector(targetSheep->GetActorLocation()), Vector(GetActorLocation()), Damage);
+                    return;
+                }
+                    
             }
             else if (ABaseGoldMine* targetGoldMine = Cast<ABaseGoldMine>(HitActor))
             {
                 UE_LOG(LogTemp, Warning, TEXT("Target is GOLDMINE"));
                 if (targetGoldMine)
+                {
                     SendAttackRequestMsg(GetTagId(), GOLDMINE, targetGoldMine->GetTagId(),
                                     Vector(targetGoldMine->GetActorLocation()), Vector(GetActorLocation()), Damage);
+                    return;
+                }
+                    
             }
             
         }
         
     }
-    else SendAttackRequestMsg(GetTagId(), NONEACTOR, 0, Vector(0, 0, 0), Vector(GetActorLocation()), Damage);
+    SendAttackRequestMsg(GetTagId(), NONEACTOR, 0, Vector(0, 0, 0), Vector(GetActorLocation()), Damage);
 }
 
 //////////////////
@@ -355,6 +433,13 @@ bool AGoblin::DecreaseMoney(float Amount)
     Money -= Amount;
     UpdateMoneyCount_(Money);
     return true;
+}
+
+void AGoblin::DecreaseHealth(float Amount)
+{
+    Health = FMath::Max(0, Health-Amount);
+    if (!playerController) playerController = Cast<ATinySwordPlayerController>(GetController());
+    if (playerController) playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
 }
 
 void AGoblin::IncreaseHealth(float Amount)
@@ -378,6 +463,10 @@ int AGoblin::GetMoneyCount() const
 void AGoblin::UpdateMoneyCount_(int money)
 {
     UE_LOG(LogTemp, Warning, TEXT("Entered in UpdateMoneyCount"));
+    if (!playerController)
+    {
+        playerController = Cast<ATinySwordPlayerController>(GetController()); 
+    }
 
     if (playerController)
     {
@@ -387,6 +476,12 @@ void AGoblin::UpdateMoneyCount_(int money)
         {
             UE_LOG(LogTemp, Warning, TEXT("Goblin-> playingWidget is not null"));
             playing->UpdateMoneyCount(money);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("[PLAYING WIDGET IS NULL]"));
+            playerController->FindPlayingWidget(); 
+            playerController->GetPlayingWidget()->UpdateMoneyCount(money);
         }
     }
     
@@ -402,6 +497,9 @@ void AGoblin::HandleDeath()
     // enable collision
     SetActorEnableCollision(false);
 
+    if (!playerController) playerController = Cast<ATinySwordPlayerController>(GetController());
+    if (playerController) playerController->DisableInput(GetWorld()->GetFirstPlayerController());
+
     //////////// 본진도 부서지면 Lose 위젯 띄우기 ////////////////
 }
 
@@ -409,6 +507,7 @@ void AGoblin::SetPlayerController(ATinySwordPlayerController *newPlayerControlle
 {
     playerController = newPlayerController;
 }
+
 
 
 void AGoblin::SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft)
@@ -421,6 +520,7 @@ void AGoblin::SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown,
     Request.bMoveDown = bMoveDown; 
     Request.bMoveRight = bMoveRight; 
     Request.bMoveLeft = bMoveLeft;
+    Request.Location = GetActorLocation(); /////////////
 
     FArrayWriter WriterArray; 
     WriterArray.Serialize((UTF8CHAR*)&Request, sizeof(Request));
@@ -449,13 +549,16 @@ void AGoblin::SendAttackRequestMsg(short ActorTagId, ActorType TargetActorType, 
     WriterArray.Serialize((UTF8CHAR*)&Request, sizeof(Request));
     TSharedPtr<FBufferArchive> Packet = FTCPSocketClient_Async::CreatePacket((short)ATTACK_REQUEST, WriterArray.GetData(), WriterArray.Num());
 
-    UE_LOG(LogTemp, Warning, TEXT("End Create Packet / Before Call BeginSendPhase..."));
+    // UE_LOG(LogTemp, Warning, TEXT("End Create Packet / Before Call BeginSendPhase..."));
     // GameMode->GetTCPSocketClient().BeginSendPhase(Packet);
     GI->GetTCPClient()->BeginSendPhase(Packet);
+    //GI->GetTCPClient()->BeginRecvPhase(); 
+
 }
 
 void AGoblin::SendGetItemRequestMsg(ActorType ItemType, short ItemTagId)
 {
+    UE_LOG(LogTemp, Warning, TEXT("[SEND] GETITEM REQUEST MSG"));
     GetItem::Request Request; 
     Request.ItemType = ItemType;
     Request.ItemTagId = ItemTagId;
@@ -465,7 +568,7 @@ void AGoblin::SendGetItemRequestMsg(ActorType ItemType, short ItemTagId)
 
     FArrayWriter WriterArray; 
     WriterArray.Serialize((UTF8CHAR*)&Request, sizeof(Request));
-    TSharedPtr<FBufferArchive> Packet = FTCPSocketClient_Async::CreatePacket((short)SPAWN_REQUEST, WriterArray.GetData(), WriterArray.Num());
+    TSharedPtr<FBufferArchive> Packet = FTCPSocketClient_Async::CreatePacket((short)GETITEM_REQUEST, WriterArray.GetData(), WriterArray.Num());
     // GameMode->GetTCPSocketClient().BeginSendPhase(Packet);
     GI->GetTCPClient()->BeginSendPhase(Packet);
 }
