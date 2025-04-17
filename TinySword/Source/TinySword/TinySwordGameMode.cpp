@@ -24,7 +24,10 @@
 
 
 #include "AsyncNetworking.h"
-#include "Misc/DateTime.h"
+// #include "Misc/DateTime.h"
+
+FCriticalSection ItemLock;
+
 
 ATinySwordGameMode::ATinySwordGameMode()
 {
@@ -479,8 +482,13 @@ void ATinySwordGameMode::SpawnBomb(FVector spawnLocation, short OwnertagId, shor
     }
 
     FActorSpawnParameters SpawnParams; 
-
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
+    // SpawnParams.Instigator = GetInstigator(); 
+    // SpawnParams.bNoFail = true; 
+    
+
+
+
       
     // AActor* SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GetBombSpawnPoint(*FoundLocation), OwnerActor->GetActorRotation(), SpawnParams);
     AActor* SpawnedActor = World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, spawnLocation, FRotator(0, 0, 0), SpawnParams);
@@ -489,9 +497,36 @@ void ATinySwordGameMode::SpawnBomb(FVector spawnLocation, short OwnertagId, shor
     {
         ABaseBomb* SpawnedBomb = Cast<ABaseBomb>(SpawnedActor); 
         if (SpawnedBomb) {
+            UE_LOG(LogTemp, Warning, TEXT("SPAWN BOMB - SPAWNEDACTOR IS AVAILABLE"));
             SpawnedBomb->SetTagId(BombTagId);
+            SpawnedBomb->SetOwnerTagId(OwnertagId);
             // SpawnedBomb->SetOwnerTagId(tagId); 
-            ActiveBombId.Add(SpawnedBomb, BombTagId); 
+            // Lock!
+            {
+                FScopeLock Lock(&ItemLock);
+                ActiveBombId.Add(SpawnedBomb, BombTagId); 
+            }
+            
+
+            // ///////////////////////////////////
+            // ABombAIController* BombController = World->SpawnActor<ABombAIController>(ABombAIController::StaticClass());
+            // if (BombController) BombController->OnPossess(SpawnedBomb);
+
+            // SpawnedBomb->GetController()->LastTargetLocation = ; ////////////////////
+            ///////////////////////////////////
+
+
+            /////////////////////
+            // ABombAIController* BombController = Cast<ABombAIController>(SpawnedBomb->GetController()); 
+            // if (!BombController) {
+            //     UE_LOG(LogTemp, Warning, TEXT("Bomb Has No AICONTROLLER"));
+            //     BombController = World->SpawnActor<ABombAIController>(); 
+            //     if (BombController)
+            //     {
+            //         BombController->OnPossess(SpawnedBomb);
+            //     }
+            // }
+            ///////////////////
         }
     }
 }
@@ -521,7 +556,10 @@ void ATinySwordGameMode::SpawnMeat(FVector Location, short tagId)
     if (SpawnedMeat)
     {
         SpawnedMeat->SetTagId(tagId); 
-        ActiveMeatId.Add(SpawnedMeat, tagId);
+        {
+            FScopeLock Lock(&ItemLock);
+            ActiveMeatId.Add(SpawnedMeat, tagId);
+        }
         
     }
 
@@ -552,7 +590,11 @@ void ATinySwordGameMode::SpawnGoldBag(FVector spawnLocation, short tagId)
     if (SpawnedGoldBag)
     {
         SpawnedGoldBag->SetTagId(tagId);
-        ActiveGoldBagId.Add(SpawnedGoldBag, tagId);
+        {
+            FScopeLock Lock(&ItemLock);
+            ActiveGoldBagId.Add(SpawnedGoldBag, tagId);
+        }
+        
     }
 }
 
@@ -710,24 +752,31 @@ void ATinySwordGameMode::OnMoveNotification(struct Move::Notification *data)
 
     // BOMB
     if (data->MoveActorType == BOMB) {
-        UE_LOG(LogTemp, Warning, TEXT("[ON MOVE NOTIFICATION] BOMB MOVING... [X = %f, Y = %f, Z = %f]"), 
+        UE_LOG(LogTemp, Warning, TEXT("[ON MOVE NOTIFICATION] %d(type) BOMB MOVING... [X = %f, Y = %f, Z = %f]"), data->MoveActorType,
                                 data->Location.ToFVector().X, data->Location.ToFVector().Y, data->Location.ToFVector().Z);
         ABaseBomb* bomb = FindBombById(ActiveBombId, data->MoveActorTagId);
         if (bomb)
         {
-            // UE_LOG(LogTemp, Warning, TEXT(">!>!>!>>!>!>!>!>!> BOMB ACTOR IS AVAILABLE"));
+            UE_LOG(LogTemp, Warning, TEXT(">!>!>!>>!>!>!>!>!> BOMB ACTOR IS AVAILABLE: %d(color), %d"), bomb->GetOwnerTagId(), bomb->GetTagId());
             ABombAIController* bombController = Cast<ABombAIController>(bomb->GetController()); 
             if (bombController)
             {
+                // if (!bombController->HasAuthority()) return;
+
+                UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>>>>>>>>>> BOMB CONTROLLER IS NOT NULL"));
                 //FVector ValidLocation = ValidateLocation(Cast<AAIController>(bombController), data->Location.ToFVector());
                 if (bombController->LastTargetLocation != data->Location.ToFVector())
                 {
-                    // UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>> BOMB CONTROLLER IS AVAILABLE"));
+                    UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>> LAST TARGET LOCATION != DATA->LOCATION"));
                     bombController->bIsMoving = true; 
                     bombController->LastTargetLocation = data->Location.ToFVector();
                     UAIBlueprintHelperLibrary::SimpleMoveToLocation(bombController, data->Location.ToFVector());
                 }
-                
+
+                // UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>> BOMB CONTROLLER IS AVAILABLE"));
+                //     bombController->bIsMoving = true; 
+                //     bombController->LastTargetLocation = data->Location.ToFVector();
+                //     UAIBlueprintHelperLibrary::SimpleMoveToLocation(bombController, data->Location.ToFVector());
             }
         }
     }
@@ -740,34 +789,7 @@ void ATinySwordGameMode::OnAttackNotification(struct Attack::Notification* data)
 {
     // struct Attack::Notification *noti = (struct Attack::Notification *)(data+1); 
     
-    ////////////////// ATTACKER //////////////////
-    // GOBLIN
-    if (data->AttackerActorType == GOBLIN)
-    {
-        // CASTING
-        AGoblin* goblin = FindGoblinById(GoblinMap, data->AttackerTagId);
-        if (!goblin) return;
-
-        // 공격 위치 보간 
-        // Interpolation(goblin, data->AttackLocation.ToFVector(), 0.1);
-
-        // play animation 
-        goblin->PlayAttackAnimation();
-        
-    }
-
-    // BOMB
-    if (data->AttackerActorType == BOMB)
-    {
-        ABaseBomb* bomb = FindBombById(ActiveBombId, data->AttackerTagId);
-        if (!bomb) return; 
-
-        // 공격 위치 보간
-        // Interpolation(bomb, data->AttackLocation.ToFVector(), 0.1);
-
-        // play Anim
-        bomb->PlayExplodeAnim();
-    }
+    
 
     /////////////// TARGET ////////////////
     // 보간 -> 데미지 처리 
@@ -837,7 +859,41 @@ void ATinySwordGameMode::OnAttackNotification(struct Attack::Notification* data)
         break;
     }
 
+    ////////////////// ATTACKER //////////////////
+    // GOBLIN
+    if (data->AttackerActorType == GOBLIN)
+    {
+        // CASTING
+        AGoblin* goblin = FindGoblinById(GoblinMap, data->AttackerTagId);
+        if (!goblin) return;
 
+        // 공격 위치 보간 
+        // Interpolation(goblin, data->AttackLocation.ToFVector(), 0.1);
+
+        // play animation 
+        goblin->PlayAttackAnimation();
+        
+    }
+
+    // BOMB
+    if (data->AttackerActorType == BOMB)
+    {
+        ABaseBomb* bomb = FindBombById(ActiveBombId, data->AttackerTagId);
+        if (!bomb) return; 
+
+        // 공격 위치 보간
+        // Interpolation(bomb, data->AttackLocation.ToFVector(), 0.1);
+
+        // play Anim
+        bomb->PlayExplodeAnim();
+
+        {
+            FScopeLock Lock(&ItemLock);
+            ActiveBombId.Remove(bomb);
+        }
+        
+        bomb->Destroy();
+    }
     //delete noti; 
 }
 
@@ -853,7 +909,7 @@ void ATinySwordGameMode::OnSpawnNotification(struct Spawn::Notification *data)
     // BOMB
     if (data->SpawnActorType == BOMB)
     {
-        UE_LOG(LogTemp, Warning, TEXT("!>!>!>!>!>!>!>!>!> BOMB SPAWNING.....: %d"), data->SpawnActorTagId);
+        UE_LOG(LogTemp, Warning, TEXT("!>!>!>!>!>!>!>!>!> BOMB SPAWNING.....: %d(color)"), data->OwnerTagId);
         SpawnBomb(data->Location.ToFVector(), data->OwnerTagId, data->SpawnActorTagId);
     }
 
@@ -880,7 +936,7 @@ void ATinySwordGameMode::OnGetItemNotification(struct GetItem::Notification *dat
     AGoblin* goblin = FindGoblinById(GoblinMap, data->PlayerTagId);
     if (!goblin) 
     {
-        UE_LOG(LogTemp, Fatal, TEXT(">>>>>>>>>>>>> [ON GETITEM NOTI] CANNOT FIND GOBLIN"));
+        UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>> [ON GETITEM NOTI] CANNOT FIND GOBLIN"));
         return; 
     }
 
@@ -893,10 +949,17 @@ void ATinySwordGameMode::OnGetItemNotification(struct GetItem::Notification *dat
 
         // remove
         ABaseMeat* meat = FindMeatById(ActiveMeatId, data->ItemTagId); 
-        if (meat) 
+        if (meat && IsValid(meat)) 
         {
-            meat->Destroy();
-            ActiveMeatId.Remove(meat);
+            // meat->Destroy();
+            // ActiveMeatId.Remove(meat);
+            {
+                FScopeLock Lock(&ItemLock);
+                ActiveMeatId.Remove(meat);
+                meat->Destroy(); 
+                meat = nullptr; 
+            }
+            
         }    
         else
         {
@@ -909,10 +972,15 @@ void ATinySwordGameMode::OnGetItemNotification(struct GetItem::Notification *dat
     {
         //goblin->IncreaseMoney(10);
         ABaseGoldBag* coin = FindGoldBagById(ActiveGoldBagId, data->ItemTagId);
-        if (coin)
+        if (coin && IsValid(coin))
         {
-            coin->Destroy(); 
-            ActiveGoldBagId.Remove(coin);    
+            {
+                FScopeLock Lock(&ItemLock);
+                ActiveGoldBagId.Remove(coin); 
+                coin->Destroy(); 
+                coin = nullptr;
+            }
+            
         }
         
     }
@@ -970,11 +1038,18 @@ void ATinySwordGameMode::OnDeadNotification(struct Dead::Notification *data)
     {
         ABaseBomb* bomb = FindBombById(ActiveBombId, data->DeadActorTagId); 
         if (!bomb) return; 
-        bomb->SetHealth(0);
-        bomb->HandleDeath();
-        ActiveBombId.Remove(bomb);
-        bomb->Destroy();
 
+        {
+            FScopeLock Lock(&ItemLock); 
+            bomb->SetHealth(0);
+            bomb->HandleDeath();
+        
+            ActiveBombId.Remove(bomb);
+            bomb->Destroy();
+            
+            
+        }
+       
         break;
     }
         
@@ -984,10 +1059,12 @@ void ATinySwordGameMode::OnDeadNotification(struct Dead::Notification *data)
         // Spawn Meat는 Spawn::Noti 도착하면 수행함. 
         ABaseAISheep* sheep = FindSheepById(ActiveSheepId, data->DeadActorTagId);
         if (!sheep) return; 
-        sheep->SetHealth(0);
-        ActiveSheepId.Remove(sheep);
-        sheep->Destroy(); 
-
+        {
+            FScopeLock Lock(&ItemLock);
+            sheep->SetHealth(0);
+            ActiveSheepId.Remove(sheep);
+            sheep->Destroy(); 
+        }
         // MEAT SPAWN이 이루어질 것... 
         break;
     }
@@ -1027,7 +1104,9 @@ void ATinySwordGameMode::OnBombExpNotification(struct BombExplode::Notification 
         TimerHandle,
         FTimerDelegate::CreateLambda([this, bomb]()
         {
-            bomb->Destroy();
+            //ActiveBombId.Remove(bomb);
+            //bomb->Destroy();
+
         }),
         1.9f,  // 딜레이 시간 (초)
         false  // 반복 실행 안함
