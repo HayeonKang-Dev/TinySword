@@ -22,6 +22,9 @@ class TINYSWORD_API ABaseBomb : public APaperCharacter
 	GENERATED_BODY()
 
 public: 
+
+	ABaseBomb(); 
+
 	bool IsDead() const; 
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -29,6 +32,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void DealRadialDamage();
+
+	void SetController(ABombAIController* newController) {
+		bombController = newController; 
+	}
+	ABombAIController* GetController() { return bombController; }
+
 
 	float GetHealth() const {return Health;}
 	void SetHealth(float newHealth) {Health = newHealth;} 

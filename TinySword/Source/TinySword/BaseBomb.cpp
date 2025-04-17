@@ -12,6 +12,14 @@
 
 #include "protocol.h"
 
+
+ABaseBomb::ABaseBomb()
+{
+    // bombController = Cast<ABombAIController>(GetController());
+}
+
+
+
 void ABaseBomb::BeginPlay()
 {
     Super::BeginPlay();
@@ -20,7 +28,7 @@ void ABaseBomb::BeginPlay()
     GetCharacterMovement()->MaxWalkSpeed = Speed; 
     Damage = 10.0f; 
 
-    bombController = Cast<ABombAIController>(GetController());
+    // bombController = Cast<ABombAIController>(GetController());
     GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
 
     paperFlipbookComponent = FindComponentByClass<UPaperFlipbookComponent>();
@@ -36,6 +44,12 @@ void ABaseBomb::Tick(float DeltaTime)
     CurrentRotation.Pitch = 0.0f; 
     CurrentRotation.Yaw = 0.0f; 
     SetActorRotation(CurrentRotation);
+
+    // if (!bombController)
+    // {
+    //     bombController = Cast<ABombAIController>(GetController());
+    // }
+        
 
 }
 
