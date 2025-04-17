@@ -25,7 +25,15 @@ void ABombAIController::OnPossess(APawn *InPawn)
 {
     Super::OnPossess(InPawn); 
     UE_LOG(LogTemp, Warning, TEXT("Start Possess Bomb"));
-    controlledBomb = Cast<ABaseBomb>(GetPawn()); 
+    controlledBomb = Cast<ABaseBomb>(InPawn); // Cast<ABaseBomb>(GetPawn()); 
+    if (controlledBomb)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("ONPOSSESS - CONTROLLED BOMB IS AVAILABLE"));
+        controlledBomb->SetController(this);
+        //LastTargetLocation = controlledBomb->GetActorLocation();
+    }
+
+
     bHasArrived = false; 
     bIsReadyToExplode = false; 
     ElapsedTime = 0.0f;
@@ -60,6 +68,17 @@ void ABombAIController::CheckOwnerTagId()
 void ABombAIController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    // if (!HasAuthority()) return;
+
+    // if (!controlledBomb)
+    // {
+    //     controlledBomb = Cast<ABaseBomb>(GetPawn());
+    //     if (controlledBomb)
+    //     {
+    //         UE_LOG(LogTemp, Warning, TEXT("[BOMB CONTROLLER] CONTROLLED BOMB WAS NULL -> NOW UPDATED"));
+    //     }
+    // }
 
     if (!IsDead())
     {   

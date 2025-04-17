@@ -25,13 +25,15 @@ public:
 	bool IsDead() const; 
 
 	// void AddToReuseId();
-	FVector LastTargetLocation; 
+	FVector LastTargetLocation = FVector(); 
 	bool bIsMoving = false; 
+
+	virtual void OnPossess(APawn* InPawn) override;
 
 protected:
 	virtual void BeginPlay() override; 
 
-	virtual void OnPossess(APawn* InPawn) override;
+	
 
 	virtual void OnUnPossess() override;
 
