@@ -239,7 +239,7 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
         
         SendGetItemRequestMsg(MEAT, meat->GetTagId());
         IncreaseHealth(10);
-        meat->Destroy();
+        // meat->Destroy();
        
         if (playerController && playerController->playingWidget) 
         {
@@ -265,7 +265,7 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
 
         SendGetItemRequestMsg(GOLDBAG, gold->GetTagId());
         IncreaseMoney(10); 
-        gold->Destroy(); 
+        // gold->Destroy(); 
 
     }
 }
