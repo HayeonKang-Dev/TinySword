@@ -38,7 +38,8 @@
 			"string": "cpp",
 			"string_view": "cpp",
 			"vector": "cpp",
-			"chrono": "cpp"
+			"chrono": "cpp",
+			"*.imp": "cpp"
 		}
 	},
 	"extensions": {

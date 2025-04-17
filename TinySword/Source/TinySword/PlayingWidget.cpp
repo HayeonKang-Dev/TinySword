@@ -91,7 +91,7 @@ void UPlayingWidget::OnSpawnButtonClicked()
 
     if (DecreasePlayerMoney(controlledChar))
     {
-        UE_LOG(LogTemp, Warning, TEXT("Decrease Player's Money Success"));
+        UE_LOG(LogTemp, Warning, TEXT("Decrease Player's Money Success: %d"), controlledChar->GetTagId());
         
         // SEND Spawn::Request 
         Spawn::Request Request; 
