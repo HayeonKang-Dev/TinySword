@@ -71,7 +71,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* OverlapComponent;
 
-
+	// ATinySwordPlayerController* GetPlayerController(); //  { return playerController; }
 
 	// for UI 
 	UFUNCTION(BlueprintCallable)
@@ -120,6 +120,18 @@ public:
 	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);*/
 
 
+///////////////////////////////////////
+	void ShowLoseWidget(); 
+	void ShowWinWidget(); 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	TSubclassOf<UUserWidget> LoseWidgetClass; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	TSubclassOf<UUserWidget> WinWidgetClass; 
+
+	bool IsMyChar(); 
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -135,7 +147,7 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere)
-	float Speed = 80.0f; // 50
+	float Speed = 100.0f; // 80
 
 	
 

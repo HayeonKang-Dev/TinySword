@@ -28,6 +28,11 @@ AGoblin::AGoblin()
     // GetCharacterMovement();    
 }
 
+bool AGoblin::IsMyChar()
+{
+    AController* controller = GetController(); 
+    return !Controller->IsA(AAIController::StaticClass());    
+}
 
 void AGoblin::BeginPlay()
 {
@@ -214,11 +219,49 @@ void AGoblin::PlayAttackAnimation()
 }
 
 
+void AGoblin::ShowLoseWidget()
+{
+    if (LoseWidgetClass)
+    {
+        UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), LoseWidgetClass);
+        if (Widget)
+        {
+            Widget->AddToViewport(); 
+        }
+    }
+}
+
+void AGoblin::ShowWinWidget()
+{
+    if (WinWidgetClass)
+    {
+        UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), WinWidgetClass);
+        if (Widget)
+        {
+            Widget->AddToViewport(); 
+        }
+    }
+}
+////////////
 //////////////
 void AGoblin::SetTagId(int32 newTagId)
 {
     TagId = newTagId;
 }
+
+// ATinySwordPlayerController *AGoblin::GetPlayerController()
+// {
+//     if (playerController) playerController;
+//     else
+//     {
+//         playerController = Cast<ATinySwordPlayerController>(GetController()); 
+//         if (playerController) return playerController;
+//         else {
+//             UE_LOG(LogTemp, Warning, TEXT("PLAYER CONTROLLER IS NOT VALID... (Goblin.cpp)"));
+//         }
+//     }
+//     return nullptr;
+// }
 //////////////
 void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
 {
@@ -309,6 +352,8 @@ bool AGoblin::IsDead() const
 
 void AGoblin::Attack()
 {
+    if (IsDead()) return;
+    
     PlayAttackAnimation();
     IsAttack = true; 
     FVector Start, End;
@@ -343,7 +388,7 @@ void AGoblin::Attack()
             if (AGoblin* targetPlayer = Cast<AGoblin>(HitActor))
             {
                 UE_LOG(LogTemp, Warning, TEXT("Target is PLAYER"));
-                if (targetPlayer)
+                if (targetPlayer && !targetPlayer->IsDead())
                 {
                     SendAttackRequestMsg(GetTagId(), GOBLIN, targetPlayer->GetTagId(), 
                                         Vector(targetPlayer->GetActorLocation()), Vector(GetActorLocation()), Damage);
@@ -374,7 +419,7 @@ void AGoblin::Attack()
             {
                 UE_LOG(LogTemp, Warning, TEXT("Target is CASTLE"));
 
-                if (targetCastle->GetTagId() == GetTagId()) 
+                if (targetCastle->GetTagId() == GetTagId() && !targetCastle->IsCollapse()) 
                 {
                     SendAttackRequestMsg(GetTagId(), NONEACTOR, 0, Vector(0, 0, 0), Vector(GetActorLocation()), Damage);
                     return; 
@@ -500,7 +545,7 @@ void AGoblin::HandleDeath()
     if (!playerController) playerController = Cast<ATinySwordPlayerController>(GetController());
     if (playerController) playerController->DisableInput(GetWorld()->GetFirstPlayerController());
 
-    //////////// 본진도 부서지면 Lose 위젯 띄우기 ////////////////
+
 }
 
 void AGoblin::SetPlayerController(ATinySwordPlayerController *newPlayerController)
