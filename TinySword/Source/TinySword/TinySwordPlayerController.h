@@ -41,6 +41,17 @@ public:
 	void SetPlayingWidget(UPlayingWidget* playing);
 	UPlayingWidget* GetPlayingWidget() const {return playingWidget;}
 
+	/////////////////////////////////
+	// void ShowLoseWidget(); 
+	// void ShowWinWidget(); 
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	// TSubclassOf<UUserWidget> LoseWidgetClass; 
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	// TSubclassOf<UUserWidget> WinWidgetClass; 
+	/////////////////////////////////
+
 	void SpawnBomb(FVector spawnLocation, int tagId);
 
 	void SetBombIndex();
@@ -72,5 +83,7 @@ private:
 	float SendTimer = 0.0f;
 
 	// void SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft);
+
+	
 
 };
