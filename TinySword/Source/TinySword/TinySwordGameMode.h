@@ -189,6 +189,7 @@ public:
 	TMap<ABaseMeat*, int32> ActiveMeatId; 
 
 	int DeadCastleCnt = 0;
+	int DeadPlayerSet = 0;
 
 private:
 	
@@ -244,7 +245,12 @@ public:
 
 	void OnBombExpNotification(struct BombExplode::Notification* data);
 
+	void OnWinNotification(struct Win::Notification* data); 
+	void OnLoseNotification(struct Lose::Notification* data);
+
 	void OpenPlayingLevel();
+
+	AGoblin* FindAliveGoblin();
 
 private:
 	FVector ValidateLocation(AAIController* controller, const FVector& Destination);

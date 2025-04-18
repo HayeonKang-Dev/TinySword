@@ -956,10 +956,10 @@ void ATinySwordGameMode::OnGetItemNotification(struct GetItem::Notification *dat
             {
                 FScopeLock Lock(&ItemLock);
                 ActiveMeatId.Remove(meat);
-                meat->Destroy(); 
-                meat = nullptr; 
+                
             }
-            
+            meat->Destroy(); 
+            meat = nullptr; 
         }    
         else
         {
@@ -977,10 +977,10 @@ void ATinySwordGameMode::OnGetItemNotification(struct GetItem::Notification *dat
             {
                 FScopeLock Lock(&ItemLock);
                 ActiveGoldBagId.Remove(coin); 
-                coin->Destroy(); 
-                coin = nullptr;
+                
             }
-            
+            coin->Destroy(); 
+            coin = nullptr;
         }
         
     }
@@ -1018,7 +1018,22 @@ void ATinySwordGameMode::OnDeadNotification(struct Dead::Notification *data)
         // Interpolation(goblin, data->Location.ToFVector(), 0.05); // 보간 
         // goblin->SetHealth(0);
         // goblin->DecreaseHealth(100);
-        goblin->HandleDeath(); 
+        if (goblin->IsMyChar()) goblin->HandleDeath(); 
+
+        // 같은 TagId 가진 CASTLE도 무너졌는지 확인 
+        // ABaseCastle* castle = FindCastleById(ActiveCastleMap, goblin->GetTagId());
+        // if (castle&& castle->IsCollapse() && goblin->IsMyChar())
+        // {
+        //     goblin->ShowLoseWidget();
+        //     DeadPlayerSet++;
+        //     UE_LOG(LogTemp, Warning, TEXT("DEAD PLAYER SET CNT: %d"), DeadPlayerSet);
+        //     if (DeadPlayerSet==3)
+        //     {
+        //         FindAliveGoblin()->ShowWinWidget();
+        //     }
+        // }
+
+        // 
 
         break;
     }
@@ -1030,6 +1045,19 @@ void ATinySwordGameMode::OnDeadNotification(struct Dead::Notification *data)
         castle->SetDurability(0);
         castle->OnCollapse();
         DeadCastleCnt++;
+
+        // 같은 TagId 가진 GOBLIN도 죽었는지 확인 
+        // AGoblin* goblin = FindGoblinById(GoblinMap, castle->GetTagId());
+        // if (goblin && goblin->IsDead() && goblin->IsMyChar())
+        // {
+        //     goblin->ShowLoseWidget(); 
+        //     DeadPlayerSet++;
+        //     if (DeadPlayerSet==3)
+        //     {
+        //         FindAliveGoblin()->ShowWinWidget();
+        //     }
+        // }
+
         break;
     }
         
@@ -1113,6 +1141,22 @@ void ATinySwordGameMode::OnBombExpNotification(struct BombExplode::Notification 
     );
 }
 
+void ATinySwordGameMode::OnWinNotification(Win::Notification *data)
+{
+    AGoblin* goblin = FindGoblinById(GoblinMap, data->winnerTagId);
+    if (goblin && goblin->IsMyChar()) {
+        goblin->ShowWinWidget();
+    }
+}
+
+void ATinySwordGameMode::OnLoseNotification(Lose::Notification *data)
+{
+    AGoblin* goblin = FindGoblinById(GoblinMap, data->LoserTagId);
+    if (goblin && goblin->IsMyChar()) {
+        goblin->ShowLoseWidget();
+    }
+}
+
 void ATinySwordGameMode::DisableCharacterButton(FName buttonName)
 {
     UButton* button = Cast<UButton>(CharacterSelectWidget->GetWidgetFromName(buttonName));
@@ -1142,4 +1186,17 @@ void ATinySwordGameMode::FindCharacterSelectWidget()
 void ATinySwordGameMode::OpenPlayingLevel()
 {
     UGameplayStatics::OpenLevel(GetWorld(), FName("PlayLevel"));
+}
+
+AGoblin *ATinySwordGameMode::FindAliveGoblin()
+{
+    for (auto& pair : GoblinMap)
+    {
+        AGoblin* goblin = pair.Key; 
+        if (goblin && !goblin->IsDead())
+        {
+            return goblin;
+        }
+    }
+    return nullptr;
 }

@@ -15,7 +15,8 @@ typedef enum {
 	DEAD_NOTIFICATION, 							// 16
 	BOMBEXPLODE_NOTIFICATION, 					// 17
  	GAMESTART_NOTIFICATION, 					// 18
-	GAMEEND_NOTIFICATION 						// 19
+	WIN_NOTIFICATION, 
+	LOSE_NOTIFICATION
 } PROTOCOL_IDS;
 
 typedef enum {
@@ -227,9 +228,21 @@ struct GameStart {
 	};
 };
 
-struct GameEnd {
+// struct GameEnd {
+// 	struct Notification {
+// 		short winnerId;
+// 	};
+// };
+
+struct Win {
 	struct Notification {
-		short winnerId;
+		short winnerTagId; 
+	};
+};
+
+struct Lose {
+	struct Notification {
+		short LoserTagId; 
 	};
 };
 #pragma pack(pop)

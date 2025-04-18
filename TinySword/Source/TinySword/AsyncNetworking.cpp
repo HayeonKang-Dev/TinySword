@@ -676,6 +676,24 @@ void FTCPSocketClient_Async::OnRecvCompleted(short Index, const TArray<uint8> &I
         GameMode->OnBombExpNotification(Noti);
         break;
     }
+
+    case WIN_NOTIFICATION: 
+    {
+        UE_LOG(LogTemp, Log, TEXT("[RECEIVED] WIN_NOTIFICATION"));
+        Win::Notification *Noti =
+            const_cast<Win::Notification *>(reinterpret_cast<const Win::Notification *>(InPayload.GetData()));
+        GameMode->OnWinNotification(Noti);
+        break;
+    }
+
+    case LOSE_NOTIFICATION: 
+    {
+        UE_LOG(LogTemp, Log, TEXT("[RECEIVED] LOSE_NOTIFICATION"));
+        Lose::Notification *Noti =
+            const_cast<Lose::Notification *>(reinterpret_cast<const Lose::Notification *>(InPayload.GetData()));
+        GameMode->OnLoseNotification(Noti);
+        break;
+    }
     }
 
     // TArray<uint8> Payload;
