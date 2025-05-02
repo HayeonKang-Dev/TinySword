@@ -162,22 +162,6 @@ void ATinySwordGameMode::BeginPlay()
     Super::BeginPlay();
 
     
-    // UE_LOG(LogTemp, Warning, TEXT("Starting GameMode"));
-    
-    // GI = Cast<UTinySwordGameInstance>(GetWorld()->GetGameInstance());
-    // GI->GetInstance(GetWorld());
-    // GI->Init();
-
-    // if (!bHasInitialized) {
-    //     GI->Init();
-    //     bHasInitialized = true;
-    // // }
-    // TCPClient = GI->GetTCPClient();
-    // TCPClient->Initialize(GetWorld());
-
-    
-    // TCPClient = GI->GetTCPClient();
-
     
 }
 
@@ -683,30 +667,37 @@ void ATinySwordGameMode::OnMoveNotification(struct Move::Notification *data)
         
         // GOBLIN TagId로 찾아서 SimpleMove
         AGoblin* goblin = FindGoblinById(GoblinMap, data->MoveActorTagId);
-        if (goblin) // NOT MY CHARACTER
+        if (goblin && !goblin->IsMyChar()) // NOT MY CHARACTER
         {
-            //goblin->SetActorLocation(data->Location.ToFVector());
+            FVector TargetLocation = data->Location.ToFVector(); 
+            FVector CurrentLocation = goblin->GetActorLocation(); 
+            FVector Direc = (TargetLocation - CurrentLocation).GetSafeNormal(); // data->Location.ToFVector() - goblin->GetActorLocation(); 
+            float Dist = FVector::Dist(CurrentLocation, TargetLocation);
+            
+
             AAIController* AICon = Cast<AAIController>(goblin->GetController());
-            if (AICon)
+            if (AICon) // && Dist > 5.0f)
             {
-                FVector ValidLocation = ValidateLocation(AICon, data->Location.ToFVector());
-                
-                if (!goblin->bIsMovingToTarget || FVector::Dist(goblin->LastTargetLocation, ValidLocation) > 0.01f) // 10.0f
-                {
-                    goblin->LastTargetLocation = data->Location.ToFVector(); // ValidLocation; 
-                    goblin->bIsMovingToTarget = true; 
+                // AICon->StopMovement();
+                // UAIBlueprintHelperLibrary::SimpleMoveToLocation(AICon, data->Location.ToFVector());
+
+                // AICon->MoveToLocation(TargetLocation, 0.5f, true, true, false, true, 0, true);
+
+                FAIMoveRequest MoveRequest;
+                MoveRequest.SetGoalLocation(TargetLocation);
+                MoveRequest.SetAcceptanceRadius(0.2f);
+                MoveRequest.SetUsePathfinding(false); // 추가
+                MoveRequest.SetCanStrafe(true);
+                MoveRequest.SetAllowPartialPath(false);
+                AICon->MoveTo(MoveRequest);
 
 
-                    FVector Direc = ValidLocation - goblin->GetActorLocation(); 
-
-                    if (Direc.X > 0) goblin->FlipCharacter(1);
-                    else if (Direc.X < 0) goblin->FlipCharacter(-1);
-
-                    UAIBlueprintHelperLibrary::SimpleMoveToLocation(AICon, ValidLocation);
-                }
+                goblin->targetLocation = TargetLocation; 
+                goblin->bShouldInterp = true;
             }
+            
         }
-
+            
     }
 
     // SHEEP 
@@ -1185,7 +1176,9 @@ void ATinySwordGameMode::FindCharacterSelectWidget()
 
 void ATinySwordGameMode::OpenPlayingLevel()
 {
-    UGameplayStatics::OpenLevel(GetWorld(), FName("PlayLevel"));
+
+    UE_LOG(LogTemp, Warning, TEXT("OpenPlayingLevel........"));
+    UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/PlayLevel"));
 }
 
 AGoblin *ATinySwordGameMode::FindAliveGoblin()
