@@ -7,7 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "PaperFlipbookComponent.h"
-#include "PaperFlipbook.h" 
+#include "PaperFlipbook.h"
 
 #include "BaseMeat.h"
 #include "BaseBomb.h"
@@ -20,53 +20,60 @@
 #include "GameFramework/HUD.h"
 #include "TinySwordGameMode.h"
 #include "protocol.h"
-#include "GameFramework/CharacterMovementComponent.h"
+
 
 
 AGoblin::AGoblin()
 {
-    // GetCharacterMovement();    
+    // GetCharacterMovement();
 }
 
 bool AGoblin::IsMyChar()
 {
-    AController* controller = GetController(); 
-    return !Controller->IsA(AAIController::StaticClass());    
+    AController* controller = GetController();
+    return !Controller->IsA(AAIController::StaticClass());
 }
 
 void AGoblin::BeginPlay()
 {
-    Super::BeginPlay(); 
+    Super::BeginPlay();
 
-    UE_LOG(LogTemp, Error, TEXT(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Goblin is Reseted. : %d"), TagId);
+    // UE_LOG(LogTemp, Error, TEXT(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Goblin is Reseted. : %d"), TagId);
     //playerController = Cast<ATinySwordPlayerController>(GetController());
     GameMode = Cast<ATinySwordGameMode>(GetWorld()->GetAuthGameMode());
     GI = Cast<UTinySwordGameInstance>(GetWorld()->GetGameInstance());
 
-    Health = MaxHealth; 
-    Money = 0; 
-    GetCharacterMovement()->MaxWalkSpeed = Speed; 
+    Health = MaxHealth;
+    Money = 0;
+    GetCharacterMovement()->MaxWalkSpeed = Speed;
 
-    OverlapComponent = FindComponentByClass<UCapsuleComponent>(); 
+    OverlapComponent = FindComponentByClass<UCapsuleComponent>();
     paperFlipbookComponent = FindComponentByClass<UPaperFlipbookComponent>();
 
     //UPaperFlipbook* WalkAnim = LoadObject<UPaperFlipbook>(nullptr, TEXT("/Script/Paper2D.PaperFlipbook'/Game/Animations/Character/TNT_Blue_Walk.TNT_Blue_Walk'"));
 
-    Timer = 0.0f; 
+    Timer = 0.0f;
     // if (playerController && playerController->playingWidget)
     // {
     //     playerController->playingWidget->HPBar->SetPercent(GetHealthPercent());
     //     UpdateMoneyCount(Money);
     // }
-    
+
 
     // GI
 
     // 생성자나 BeginPlay에서 설정
-    SetReplicates(true);
-    SetReplicateMovement(true); // 위치, 회전 등 자동 동기화
+    // SetReplicates(true);
+    // SetReplicateMovement(true); // 위치, 회전 등 자동 동기화
 
+    SpriteComponent = FindComponentByClass<UPaperFlipbookComponent>();
 
+    if (GetCharacterMovement())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("CharacterMovementComponent is VALID..."));
+    }
+
+    prevLocation = GetActorLocation();
 }
 
 
@@ -78,31 +85,56 @@ void AGoblin::Tick(float DeltaTime)
     if (!IsDead())
     {
         UpdateAnimation();
-    }
+        FlipCharacter();
+
+        if (IsMyChar() && prevLocation != GetActorLocation()) {//FVector::DistSquared(prevLocation, GetActorLocation()) > KINDA_SMALL_NUMBER) {
+            SendMoveRequestOnTick();
+            UE_LOG(LogTemp, Warning, TEXT("LOCATION: %f | %f "), GetActorLocation().X, GetActorLocation().Y);
+        }
     
+    }
+
 
     if (!playerController)
     {
         playerController = Cast<ATinySwordPlayerController>(GetController());
     }
 
-    // if (!IsDead() && playerController)
-    // {
-    //     // playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
-
-    //     if (IsDead())
-    //     {
-    //         // HandleDeath(); 
-    //         // GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    //     }
-    // }
-
-
-    if (bIsMovingToTarget && FVector::Dist(GetActorLocation(), LastTargetLocation) < 0.01f)
-    {
-        bIsMovingToTarget = false; 
+    if (!SpriteComponent){
+        SpriteComponent = FindComponentByClass<UPaperFlipbookComponent>();
     }
 
+    
+
+    // 보간 
+    // GameMode OnMoveNoti에서 SimpleMoveToLocation 실행 후에도 위치 차이 존재 -> 보간 필요 
+    if (bShouldInterp && !IsMyChar())
+    {
+        FVector CurrentLocation = GetActorLocation(); 
+        FVector Direc = (targetLocation - CurrentLocation).GetSafeNormal(); // 방향 활용 위해 단위벡터로 변환
+        float Dist = FVector::Dist2D(CurrentLocation, targetLocation); 
+
+        if (Dist > 0.5f) 
+        {
+            // FVector newLocation = FMath::VInterpTo(CurrentLocation, targetLocation, DeltaTime, 150.0f); 
+            // SetActorLocation(newLocation); 
+            AddMovementInput(Direc, 150.0f);
+            // GetCharacterMovement()->AddInputVector(Direc * 100.0f);
+            
+        }
+        else
+        {
+            SetActorLocation(targetLocation); 
+            bShouldInterp = false; 
+
+            FVector Direction = (targetLocation - CurrentLocation).GetSafeNormal(); 
+           
+            UE_LOG(LogTemp, Warning, TEXT("CurrentLocation: %f | %f | %f"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
+            UE_LOG(LogTemp, Warning, TEXT("TargetLocation: %f | %f | %f"), targetLocation.X, targetLocation.Y, targetLocation.Z);
+        }
+    }
+
+    
     
 }
 
@@ -119,36 +151,62 @@ void AGoblin::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 
 void AGoblin::MoveRight(float Value)
 {
-    if (FMath::Abs(Value) > KINDA_SMALL_NUMBER) // if (Value != 0.0f)
-    {
-
-        SendMoveRequestMsg(GetTagId(), 0, 0, Value>0.0, Value<0.0);
-
-        AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
-
-        FlipCharacter(Value);
-    }
+    // if (FMath::Abs(Value) > KINDA_SMALL_NUMBER) // if (Value != 0.0f)
+    // {
+    //     // SendMoveRequestMsg(GetTagId(), 0, 0, Value>0.0, Value<0.0);
+        
+    //     // FlipCharacter(Value);
+    // }
+    AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
 }
 
 void AGoblin::UpDown(float Value)
 {
-    if (FMath::Abs(Value) > KINDA_SMALL_NUMBER)
-    {
-        SendMoveRequestMsg(GetTagId(), Value<0.0, Value>0.0, 0, 0);
-        AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
-    }
+    // if (FMath::Abs(Value) > KINDA_SMALL_NUMBER)
+    // {
+    //     // SendMoveRequestMsg(GetTagId(), Value<0.0, Value>0.0, 0, 0);
+    //     AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
+    // }
+    AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value);
 }
 
 // Animations
-void AGoblin::FlipCharacter(int MoveDirec)
+void AGoblin::FlipCharacter()
 {
-    UPaperFlipbookComponent* SpriteComponent = FindComponentByClass<UPaperFlipbookComponent>(); 
+    // UPaperFlipbookComponent*
+    // SpriteComponent = FindComponentByClass<UPaperFlipbookComponent>();
 
     if (SpriteComponent)
     {
-        if (MoveDirec == 1) SpriteComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
-        else if (MoveDirec == -1) SpriteComponent->SetRelativeScale3D(FVector(-1.5f, 1.5f, 1.5f));
+        FVector Velocity = GetVelocity();
+
+        // LastMoveDirec : Goblin이 마지막으로 바라 본 방향
+        // X축 이동 속도가 충분히 커야 바라 보는 방향 업데이트 
+        if (FMath::Abs(Velocity.X) > KINDA_SMALL_NUMBER)
+        {
+            LastMoveX = Velocity.X; 
+        }
+
+        // Y축으로만 이동하는 과정에서 Flip되는 것 방지
+        // 진행 방향에 따른 Sprite Flip
+        if (FMath::Abs(LastMoveX) >  KINDA_SMALL_NUMBER) //= FMath::Abs(Velocity.Y))
+        {
+            if (LastMoveX > KINDA_SMALL_NUMBER) SpriteComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
+            else if (LastMoveX < -KINDA_SMALL_NUMBER) SpriteComponent->SetRelativeScale3D(FVector(-1.5f, 1.5f, 1.5f));
+        }
     }
+
+}
+
+void AGoblin::SendMoveRequestOnTick()
+{
+    // if (prevLocation != GetActorLocation())
+    // {
+        
+    // }
+
+    SendMoveRequestMsg(GetTagId());
+    prevLocation = GetActorLocation();
 }
 
 void AGoblin::PlayDeadAnim()
@@ -165,47 +223,48 @@ void AGoblin::PlayDeadAnim()
 
 void AGoblin::UpdateAnimation()
 {
-    if (bIsAttacking) return; 
-    
+    if (bIsAttacking) return;
 
+    // 현재 속도
     FVector Velocity = GetVelocity();
+
 
     if (!Velocity.IsNearlyZero()) {
         FVector MoveDirec = Velocity.GetSafeNormal();
         //FlipCharacter(MoveDirec);
     }
 
-    bool IsMoving = Velocity.SizeSquared() > KINDA_SMALL_NUMBER; 
+    bool IsMoving = Velocity.SizeSquared() > KINDA_SMALL_NUMBER;
 
     if (IsMoving && WalkAnim && paperFlipbookComponent->GetFlipbook() != WalkAnim)
     {
         paperFlipbookComponent->SetFlipbook(WalkAnim);
- 
+
     }
     else if (!IsMoving && IdleAnim && paperFlipbookComponent->GetFlipbook() != IdleAnim)
     {
         paperFlipbookComponent->SetFlipbook(IdleAnim);
-        
-        
+
+
     }
 }
 
 
 void AGoblin::ResetToIdle()
 {
-    bIsAttacking = false; 
+    bIsAttacking = false;
     if (paperFlipbookComponent && IdleAnim) paperFlipbookComponent->SetFlipbook(IdleAnim);
 }
 
 
 void AGoblin::PlayAttackAnimation()
 {
-    if (bIsAttacking) return; 
-    bIsAttacking = true; 
+    if (bIsAttacking) return;
+    bIsAttacking = true;
 
     if (paperFlipbookComponent && AttackAnim) paperFlipbookComponent->SetFlipbook(AttackAnim);
 
-    if (AttackAnim) 
+    if (AttackAnim)
     {
         float AnimDur = AttackAnim->GetTotalDuration();
         GetWorldTimerManager().SetTimer(
@@ -226,7 +285,7 @@ void AGoblin::ShowLoseWidget()
         UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), LoseWidgetClass);
         if (Widget)
         {
-            Widget->AddToViewport(); 
+            Widget->AddToViewport();
         }
     }
 }
@@ -238,7 +297,7 @@ void AGoblin::ShowWinWidget()
         UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), WinWidgetClass);
         if (Widget)
         {
-            Widget->AddToViewport(); 
+            Widget->AddToViewport();
         }
     }
 }
@@ -254,7 +313,7 @@ void AGoblin::SetTagId(int32 newTagId)
 //     if (playerController) playerController;
 //     else
 //     {
-//         playerController = Cast<ATinySwordPlayerController>(GetController()); 
+//         playerController = Cast<ATinySwordPlayerController>(GetController());
 //         if (playerController) return playerController;
 //         else {
 //             UE_LOG(LogTemp, Warning, TEXT("PLAYER CONTROLLER IS NOT VALID... (Goblin.cpp)"));
@@ -267,7 +326,7 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
 {
     Super::NotifyActorBeginOverlap(OtherActor);
 
-    if (!OtherActor || OtherActor==this) return; 
+    if (!OtherActor || OtherActor==this) return;
 
     if (!playerController || !playerController->IsA(ATinySwordPlayerController::StaticClass()))
     {
@@ -275,16 +334,16 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
         return;
     }
 
-    if (OtherActor->IsA(ABaseMeat::StaticClass())) 
+    if (OtherActor->IsA(ABaseMeat::StaticClass()))
     {
         UE_LOG(LogTemp, Warning, TEXT("Overlap with Meat"));
-        ABaseMeat* meat = Cast<ABaseMeat>(OtherActor); 
-        
+        ABaseMeat* meat = Cast<ABaseMeat>(OtherActor);
+
         SendGetItemRequestMsg(MEAT, meat->GetTagId());
         IncreaseHealth(10);
         // meat->Destroy();
-       
-        if (playerController && playerController->playingWidget) 
+
+        if (playerController && playerController->playingWidget)
         {
             playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
         }
@@ -293,13 +352,13 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
             UE_LOG(LogTemp, Error, TEXT("PLAYER CONTROLLER IS NULL"));
         }
 
-        
+
 
     }
     if (OtherActor->IsA(ABaseGoldBag::StaticClass()))
     {
         UE_LOG(LogTemp, Warning, TEXT("Overlap with GoldBag"));
-        ABaseGoldBag* gold = Cast<ABaseGoldBag>(OtherActor); 
+        ABaseGoldBag* gold = Cast<ABaseGoldBag>(OtherActor);
 
         /////////////////////
         // IncreaseMoney(10);
@@ -307,8 +366,8 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
         ////////////////////
 
         SendGetItemRequestMsg(GOLDBAG, gold->GetTagId());
-        IncreaseMoney(10); 
-        // gold->Destroy(); 
+        IncreaseMoney(10);
+        // gold->Destroy();
 
     }
 }
@@ -324,20 +383,20 @@ void AGoblin::NotifyActorEndOverlap(AActor *OtherActor)
 float AGoblin::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
     UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>!!!!! Called TakeDamage"));
-    ABaseBomb* impactedBomb = Cast<ABaseBomb>(DamageCauser); 
-    if (impactedBomb && impactedBomb->GetTagId()==TagId) return 0.0f; 
+    ABaseBomb* impactedBomb = Cast<ABaseBomb>(DamageCauser);
+    if (impactedBomb && impactedBomb->GetTagId()==TagId) return 0.0f;
 
-    float DamageToApply = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); 
-    DamageToApply = FMath::Min(Health, DamageToApply); 
+    float DamageToApply = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+    DamageToApply = FMath::Min(Health, DamageToApply);
 
     if (!IsDead())
     {
-        Health -= DamageToApply; 
+        Health -= DamageToApply;
         playerController->playingWidget->UpdateHealthBar(GetHealthPercent());
 
         if (IsDead())
         {
-            HandleDeath(); 
+            HandleDeath();
             GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         }
     }
@@ -353,9 +412,9 @@ bool AGoblin::IsDead() const
 void AGoblin::Attack()
 {
     if (IsDead()) return;
-    
+
     PlayAttackAnimation();
-    IsAttack = true; 
+    IsAttack = true;
     FVector Start, End;
 
     // Get Dynamite's collision
@@ -364,13 +423,13 @@ void AGoblin::Attack()
     {
         float Radius = SphereCollision->GetUnscaledSphereRadius();
         Start = SphereCollision->GetComponentLocation();
-        Start.X -= Radius; 
-        End = Start; 
-        End.X += Radius; 
+        Start.X -= Radius;
+        End = Start;
+        End.X += Radius;
     }
 
-    FHitResult HitResult; 
-    FCollisionQueryParams CollisionParams; 
+    FHitResult HitResult;
+    FCollisionQueryParams CollisionParams;
     CollisionParams.AddIgnoredActor(this);
 
     // Line Trace
@@ -381,8 +440,8 @@ void AGoblin::Attack()
         if (HitActor)
         {
             UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>>>>>> HIT ACTOR AVAILABLE"));
-            
-            FDamageEvent DamageEvent; 
+
+            FDamageEvent DamageEvent;
             //HitActor->TakeDamage(Damage, DamageEvent, nullptr, this);
 
             if (AGoblin* targetPlayer = Cast<AGoblin>(HitActor))
@@ -390,60 +449,60 @@ void AGoblin::Attack()
                 UE_LOG(LogTemp, Warning, TEXT("Target is PLAYER"));
                 if (targetPlayer && !targetPlayer->IsDead())
                 {
-                    SendAttackRequestMsg(GetTagId(), GOBLIN, targetPlayer->GetTagId(), 
+                    SendAttackRequestMsg(GetTagId(), GOBLIN, targetPlayer->GetTagId(),
                                         Vector(targetPlayer->GetActorLocation()), Vector(GetActorLocation()), Damage);
                     return;
-                    
+
                 }
-                    
-                
+
+
             }
             else if (ABaseBomb* targetBomb = Cast<ABaseBomb>(HitActor))
             {
                 UE_LOG(LogTemp, Warning, TEXT("Target is BOMB"));
-                if (targetBomb->GetTagId() == GetTagId()) 
+                if (targetBomb->GetTagId() == GetTagId())
                 {
                     SendAttackRequestMsg(GetTagId(), NONEACTOR, 0, Vector(0, 0, 0), Vector(GetActorLocation()), Damage);
-                    return; 
+                    return;
                 }
 
-                if (targetBomb) 
+                if (targetBomb)
                 {
-                    SendAttackRequestMsg(GetTagId(), BOMB, targetBomb->GetTagId(), 
+                    SendAttackRequestMsg(GetTagId(), BOMB, targetBomb->GetTagId(),
                                     Vector(targetBomb->GetActorLocation()), Vector(GetActorLocation()), Damage);
                     return;
                 }
-                    
+
             }
             else if (ABaseCastle* targetCastle = Cast<ABaseCastle>(HitActor))
             {
                 UE_LOG(LogTemp, Warning, TEXT("Target is CASTLE"));
 
-                if (targetCastle->GetTagId() == GetTagId() && !targetCastle->IsCollapse()) 
+                if (targetCastle->GetTagId() == GetTagId() && !targetCastle->IsCollapse())
                 {
                     SendAttackRequestMsg(GetTagId(), NONEACTOR, 0, Vector(0, 0, 0), Vector(GetActorLocation()), Damage);
-                    return; 
+                    return;
                 }
 
 
                 if (targetCastle)
                 {
-                    SendAttackRequestMsg(GetTagId(), CASTLE, targetCastle->GetTagId(), 
+                    SendAttackRequestMsg(GetTagId(), CASTLE, targetCastle->GetTagId(),
                                     Vector(targetCastle->GetActorLocation()), Vector(GetActorLocation()), Damage);
                     return;
                 }
-                    
+
             }
             else if (ABaseAISheep* targetSheep = Cast<ABaseAISheep>(HitActor))
             {
                 UE_LOG(LogTemp, Warning, TEXT("Target is SHEEP"));
                 if (targetSheep)
                 {
-                    SendAttackRequestMsg(GetTagId(), SHEEP, targetSheep->GetTagId(), 
+                    SendAttackRequestMsg(GetTagId(), SHEEP, targetSheep->GetTagId(),
                                     Vector(targetSheep->GetActorLocation()), Vector(GetActorLocation()), Damage);
                     return;
                 }
-                    
+
             }
             else if (ABaseGoldMine* targetGoldMine = Cast<ABaseGoldMine>(HitActor))
             {
@@ -454,11 +513,11 @@ void AGoblin::Attack()
                                     Vector(targetGoldMine->GetActorLocation()), Vector(GetActorLocation()), Damage);
                     return;
                 }
-                    
+
             }
-            
+
         }
-        
+
     }
     SendAttackRequestMsg(GetTagId(), NONEACTOR, 0, Vector(0, 0, 0), Vector(GetActorLocation()), Damage);
 }
@@ -468,7 +527,7 @@ void AGoblin::Attack()
 // Control Variable
 void AGoblin::IncreaseMoney(float Amount)
 {
-    Money += Amount; 
+    Money += Amount;
     UpdateMoneyCount_(Money);
 }
 
@@ -490,7 +549,7 @@ void AGoblin::DecreaseHealth(float Amount)
 void AGoblin::IncreaseHealth(float Amount)
 {
     if (Health+Amount > MaxHealth) Health = MaxHealth;
-    else Health += Amount; 
+    else Health += Amount;
 }
 /////////////
 
@@ -510,14 +569,14 @@ void AGoblin::UpdateMoneyCount_(int money)
     UE_LOG(LogTemp, Warning, TEXT("Entered in UpdateMoneyCount"));
     if (!playerController)
     {
-        playerController = Cast<ATinySwordPlayerController>(GetController()); 
+        playerController = Cast<ATinySwordPlayerController>(GetController());
     }
 
     if (playerController)
     {
         UE_LOG(LogTemp, Warning, TEXT("Goblin -> PlayerController is valid"));
-        UPlayingWidget* playing = playerController->GetPlayingWidget(); 
-        if (playing) 
+        UPlayingWidget* playing = playerController->GetPlayingWidget();
+        if (playing)
         {
             UE_LOG(LogTemp, Warning, TEXT("Goblin-> playingWidget is not null"));
             playing->UpdateMoneyCount(money);
@@ -525,18 +584,18 @@ void AGoblin::UpdateMoneyCount_(int money)
         else
         {
             UE_LOG(LogTemp, Warning, TEXT("[PLAYING WIDGET IS NULL]"));
-            playerController->FindPlayingWidget(); 
+            playerController->FindPlayingWidget();
             playerController->GetPlayingWidget()->UpdateMoneyCount(money);
         }
     }
-    
-    // playerController가 널인지, playingWidget이 널인지 분리해서 판별해야 함. 
+
+    // playerController가 널인지, playingWidget이 널인지 분리해서 판별해야 함.
 
 }
 
 void AGoblin::HandleDeath()
 {
-    // play anim 
+    // play anim
     PlayDeadAnim();
 
     // enable collision
@@ -554,20 +613,18 @@ void AGoblin::SetPlayerController(ATinySwordPlayerController *newPlayerControlle
 }
 
 
-
 void AGoblin::SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft)
 {
-
-    Move::Request Request; 
+    Move::Request Request;
     Request.MoveActorType = GOBLIN;
-    Request.MoveActorTagId = ActorTagId; 
-    Request.bMoveUp = bMoveUp; 
-    Request.bMoveDown = bMoveDown; 
-    Request.bMoveRight = bMoveRight; 
+    Request.MoveActorTagId = ActorTagId;
+    Request.bMoveUp = bMoveUp;
+    Request.bMoveDown = bMoveDown;
+    Request.bMoveRight = bMoveRight;
     Request.bMoveLeft = bMoveLeft;
     Request.Location = GetActorLocation(); /////////////
 
-    FArrayWriter WriterArray; 
+    FArrayWriter WriterArray;
     WriterArray.Serialize((UTF8CHAR*)&Request, sizeof(Request));
     TSharedPtr<FBufferArchive> Packet = FTCPSocketClient_Async::CreatePacket((short)MOVE_REQUEST, WriterArray.GetData(), WriterArray.Num());
 
@@ -580,38 +637,38 @@ void AGoblin::SendAttackRequestMsg(short ActorTagId, ActorType TargetActorType, 
 
     UE_LOG(LogTemp, Warning, TEXT("[SEND] ATTACK REQUEST MSG"));
 
-    Attack::Request Request; 
-    Request.TargetActorType = TargetActorType; 
-    Request.AttackerActorType = GOBLIN; 
-    Request.TargetTagId = TargetTagId; 
-    Request.AttackerTagId = ActorTagId;// GetTagId(); 
-    Request.TargetLocation = TargetLocation; 
-    Request.AttackLocation = AttackLocation; 
-    Request.Damage = damage; 
+    Attack::Request Request;
+    Request.TargetActorType = TargetActorType;
+    Request.AttackerActorType = GOBLIN;
+    Request.TargetTagId = TargetTagId;
+    Request.AttackerTagId = ActorTagId;// GetTagId();
+    Request.TargetLocation = TargetLocation;
+    Request.AttackLocation = AttackLocation;
+    Request.Damage = damage;
 
     UE_LOG(LogTemp, Warning, TEXT("[ATTACK REQUEST MSG] Success input Attack::Request value."));
-    FArrayWriter WriterArray; 
+    FArrayWriter WriterArray;
     WriterArray.Serialize((UTF8CHAR*)&Request, sizeof(Request));
     TSharedPtr<FBufferArchive> Packet = FTCPSocketClient_Async::CreatePacket((short)ATTACK_REQUEST, WriterArray.GetData(), WriterArray.Num());
 
     // UE_LOG(LogTemp, Warning, TEXT("End Create Packet / Before Call BeginSendPhase..."));
     // GameMode->GetTCPSocketClient().BeginSendPhase(Packet);
     GI->GetTCPClient()->BeginSendPhase(Packet);
-    //GI->GetTCPClient()->BeginRecvPhase(); 
+    //GI->GetTCPClient()->BeginRecvPhase();
 
 }
 
 void AGoblin::SendGetItemRequestMsg(ActorType ItemType, short ItemTagId)
 {
     UE_LOG(LogTemp, Warning, TEXT("[SEND] GETITEM REQUEST MSG"));
-    GetItem::Request Request; 
+    GetItem::Request Request;
     Request.ItemType = ItemType;
     Request.ItemTagId = ItemTagId;
-    Request.PlayerTagId = GetTagId(); 
-    Request.Location = Vector(GetActorLocation()); 
-    Request.IncreaseVal = 10; 
+    Request.PlayerTagId = GetTagId();
+    Request.Location = Vector(GetActorLocation());
+    Request.IncreaseVal = 10;
 
-    FArrayWriter WriterArray; 
+    FArrayWriter WriterArray;
     WriterArray.Serialize((UTF8CHAR*)&Request, sizeof(Request));
     TSharedPtr<FBufferArchive> Packet = FTCPSocketClient_Async::CreatePacket((short)GETITEM_REQUEST, WriterArray.GetData(), WriterArray.Num());
     // GameMode->GetTCPSocketClient().BeginSendPhase(Packet);
@@ -622,89 +679,89 @@ void AGoblin::SendGetItemRequestMsg(ActorType ItemType, short ItemTagId)
 /////////////////////////////////////////////////////
 //void AGoblin::SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft)
 //{
-//    struct Move::Response *response = new Move::Response(); 
-//    response->H.Command = 3;//0x11; 
+//    struct Move::Response *response = new Move::Response();
+//    response->H.Command = 3;//0x11;
 //    response->ActorType = ActorType;
-//    response->ActorIndex = ActorIndex; 
-//    response->bMoveUp = bMoveUp; 
-//    response->bMoveDown = bMoveDown; 
-//    response->bMoveRight = bMoveRight; 
-//    response->bMoveLeft = bMoveLeft; 
+//    response->ActorIndex = ActorIndex;
+//    response->bMoveUp = bMoveUp;
+//    response->bMoveDown = bMoveDown;
+//    response->bMoveRight = bMoveRight;
+//    response->bMoveLeft = bMoveLeft;
 //    response->Speed = Speed;
 //    GameMode->messageQueue.push((struct HEAD *)response);
 //}
 //
 //void AGoblin::SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y)
 //{
-//    struct Move::Notification *noti = new Move::Notification(); 
-//    noti->H.Command = 4;//0x12; 
-//    noti->ActorType = actorType; 
-//    noti->ActorIndex = actorIndex; 
-//    noti->X = X; 
-//    noti->Y = Y; 
+//    struct Move::Notification *noti = new Move::Notification();
+//    noti->H.Command = 4;//0x12;
+//    noti->ActorType = actorType;
+//    noti->ActorIndex = actorIndex;
+//    noti->X = X;
+//    noti->Y = Y;
 //    GameMode->messageQueue.push((struct HEAD *)noti);
 //}
 //
 //void AGoblin::SendAttackResponseMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage)
 //{
-//    struct Attack::Response *response = new Attack::Response(); 
-//    response->H.Command = 5;//0x21; 
-//    response->AttackerType = attackerType; 
-//    response->AttackerIndex = attackerIndex; 
+//    struct Attack::Response *response = new Attack::Response();
+//    response->H.Command = 5;//0x21;
+//    response->AttackerType = attackerType;
+//    response->AttackerIndex = attackerIndex;
 //    response->TargetType = targetType;
-//    response->TargetIndex = targetIndex; 
-//    response->Damage = damage; 
+//    response->TargetIndex = targetIndex;
+//    response->Damage = damage;
 //    response->hityn = 1;
 //    GameMode->messageQueue.push((struct HEAD *)response);
-//} 
+//}
 //
 //void AGoblin::SendAttackNotiMsg(int attackerType, int attackerIndex, int targetType, int targetIndex, int damage, int targetHp, float X, float Y)
 //{
-//    struct Attack::Notification *noti = new Attack::Notification(); 
-//    noti->H.Command = 6;//0x22; 
-//    noti->AttackerType = attackerType; 
-//    noti->AttackerIndex = attackerIndex; 
-//    noti->targetType = targetType; 
-//    noti->targetIndex = targetIndex; 
-//    noti->Damage = damage; 
-//    noti->targetHp = targetHp; 
-//    noti->X = X; 
-//    noti->Y = Y; 
+//    struct Attack::Notification *noti = new Attack::Notification();
+//    noti->H.Command = 6;//0x22;
+//    noti->AttackerType = attackerType;
+//    noti->AttackerIndex = attackerIndex;
+//    noti->targetType = targetType;
+//    noti->targetIndex = targetIndex;
+//    noti->Damage = damage;
+//    noti->targetHp = targetHp;
+//    noti->X = X;
+//    noti->Y = Y;
 //    GameMode->messageQueue.push((struct HEAD *)noti);
 //}
 //
 //void AGoblin::SendGetItemResponseMsg(int itemType)
 //{
-//    struct GetItem::Response *response = new GetItem::Response(); 
-//    response->H.Command = 9;//0x41; 
-//    response->successyn = 1; 
+//    struct GetItem::Response *response = new GetItem::Response();
+//    response->H.Command = 9;//0x41;
+//    response->successyn = 1;
 //    response->playerIndex = GetTagId();
-//    response->ItemType = itemType; 
+//    response->ItemType = itemType;
 //    GameMode->messageQueue.push((struct HEAD *)response);
 //}
 //
 //void AGoblin::SendGetItemNotiMsg(int itemType, int itemIndex, float X, float Y)
 //{
-//    struct GetItem::Notification *noti = new GetItem::Notification(); 
-//    noti->H.Command = 10;//0x42; 
-//    noti->playerIndex = GetTagId(); 
-//    noti->playerHp = GetHealth(); 
-//    noti->playerCoin = GetMoneyCount(); 
-//    noti->ItemType = itemType; 
-//    noti->ItemIndex = itemIndex; 
-//    noti->X = X; 
-//    noti->Y = Y; 
+//    struct GetItem::Notification *noti = new GetItem::Notification();
+//    noti->H.Command = 10;//0x42;
+//    noti->playerIndex = GetTagId();
+//    noti->playerHp = GetHealth();
+//    noti->playerCoin = GetMoneyCount();
+//    noti->ItemType = itemType;
+//    noti->ItemIndex = itemIndex;
+//    noti->X = X;
+//    noti->Y = Y;
 //    GameMode->messageQueue.push((struct HEAD *)noti);
 //}
 //
 //void AGoblin::SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y)
 //{
-//    struct Destroy::Response *response = new Destroy::Response(); 
-//    response->H.Command = 15;//0x71; 
-//    response->ActorType = actorType; 
-//    response->ActorIndex = actorIndex; 
-//    response->X = X; 
-//    response->Y = Y; 
+//    struct Destroy::Response *response = new Destroy::Response();
+//    response->H.Command = 15;//0x71;
+//    response->ActorType = actorType;
+//    response->ActorIndex = actorIndex;
+//    response->X = X;
+//    response->Y = Y;
 //    GameMode->messageQueue.push((struct HEAD *)response);
 //    UE_LOG(LogTemp, Warning, TEXT("Send Destroy Response Message..."));
 //
@@ -712,12 +769,12 @@ void AGoblin::SendGetItemRequestMsg(ActorType ItemType, short ItemTagId)
 //
 //void AGoblin::SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y)
 //{
-//    struct Destroy::Notification *noti = new Destroy::Notification(); 
+//    struct Destroy::Notification *noti = new Destroy::Notification();
 //    noti->H.Command = 16;//0x72;
-//    noti->ActorType = actorType; 
-//    noti->ActorIndex = actorIndex; 
-//    noti->X = X; 
-//    noti->Y = Y; 
+//    noti->ActorType = actorType;
+//    noti->ActorIndex = actorIndex;
+//    noti->X = X;
+//    noti->Y = Y;
 //    GameMode->messageQueue.push((struct HEAD *)noti);
 //
 //}

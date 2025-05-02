@@ -11,6 +11,8 @@
 #include "AsyncNetworking.h"
 #include "Serialization/ArrayWriter.h"
 #include "protocol.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 #include "Goblin.generated.h"
 
 /**
@@ -26,9 +28,6 @@ class TINYSWORD_API AGoblin : public APaperZDCharacter
 	
 public:
 	AGoblin(); 
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    class UCharacterMovementComponent* GoblinMovement;
 
 	// override
 	virtual void Tick(float DeltaTime) override; 
@@ -71,7 +70,6 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* OverlapComponent;
 
-	// ATinySwordPlayerController* GetPlayerController(); //  { return playerController; }
 
 	// for UI 
 	UFUNCTION(BlueprintCallable)
@@ -113,12 +111,14 @@ public:
 	FVector LastTargetLocation; 
 	bool bIsMovingToTarget= false; 
 
-	void FlipCharacter(int MoveDirec);
+	void FlipCharacter();
 	
-	// void SetLocation(const FVector &newLocation) { SetActorLocation(newLocation);}
-	/*void SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft); 
-	void SendMoveNotiMsg(int actorType, int actorIndex, float X, float Y);*/
 
+	UPaperFlipbookComponent* SpriteComponent;
+
+	bool bShouldInterp = false; 
+	FVector targetLocation;
+	float LastMoveX = 0.0f; 
 
 ///////////////////////////////////////
 	void ShowLoseWidget(); 
@@ -144,12 +144,16 @@ protected:
 	UPaperFlipbookComponent* paperFlipbookComponent;
 
 	FVector2D MoveDir; 
+	
 
 private:
 	UPROPERTY(EditAnywhere)
 	float Speed = 100.0f; // 80
 
+	// float InterpSpeed = 100.0f;
 	
+	void SendMoveRequestOnTick();
+	FVector prevLocation;
 
 	void PlayDeadAnim();
 
@@ -180,7 +184,7 @@ private:
 
 	void ResetToIdle();
 
-	void SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft);
+	void SendMoveRequestMsg(short ActorTagId, bool bMoveUp = false, bool bMoveDown = false, bool bMoveRight = false, bool bMoveLeft = false);
 	void SendAttackRequestMsg(short ActorTagId, ActorType TargetActorType, short TargetTagId, Vector TargetLocation, Vector AttackLocation, int damage);
 	void SendGetItemRequestMsg(ActorType ItemType, short ItemTagId);
 
