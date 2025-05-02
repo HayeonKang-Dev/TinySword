@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
+// #include "AsyncNetworking.h"
 
 #include "CoreMinimal.h"
 #include "Engine/World.h"
@@ -26,9 +27,10 @@
 
 #include "Templates/SharedPointer.h"
 
-// FTCPSocketClient_Async::FTCPSocketClient_Async(UMyGameInstance* InGameInstance)
-//     : GameInstance(InGameInstance), Socket(nullptr){}
 
+/// @brief 소켓 연결 확인
+/// @param Socket 
+/// @return 
 bool IsSocketConnected(TSharedPtr<FSocket> Socket)
 {
     if (!Socket.IsValid())
@@ -41,36 +43,15 @@ bool IsSocketConnected(TSharedPtr<FSocket> Socket)
     return Socket->Recv(&Test, 1, BytesRead, ESocketReceiveFlags::Peek);
 }
 
-// bool RecvFullPacket(TSharedPtr<FSocket> Socket, uint8* Buffer, int32 BufferSize)
-// {
-//     int32 TotalReceived = 0;
-//     int32 NumRead = 0;
-
-//     while (TotalReceived < BufferSize)
-//     {
-//         if (!Socket->Recv(Buffer + TotalReceived, BufferSize - TotalReceived, NumRead, ESocketReceiveFlags::None))
-//         {
-//             UE_LOG(LogTemp, Error, TEXT("Recv Failed: Connection closed or error occurred."));
-//             return false;
-//         }
-
-//         if (NumRead == 0)
-//         {
-//             UE_LOG(LogTemp, Warning, TEXT("Recv returned 0 bytes. Connection might be closing."));
-//             return false;
-//         }
-
-//         TotalReceived += NumRead;
-//     }
-
-//     return true;
-// }
-
+/// @brief GameInstance, GameMode 할당 
+/// @param world AsyncNetworking 코드에서는 world 참조가 불가능하므로, 파라미터로 받아 저장해둘 것
 void FTCPSocketClient_Async::Initialize(UWorld *world)
 {
+    // IP, Port 할당
     FString IPAddress = TEXT("127.0.0.1");
     uint16 PortNumber = 25000;
 
+    // GameInstance, GameMode, World 할당 
     GI = UTinySwordGameInstance::GetInstance(world);
     GameMode = Cast<ATinySwordGameMode>(world->GetAuthGameMode());
     World = world;
@@ -80,21 +61,25 @@ void FTCPSocketClient_Async::Initialize(UWorld *world)
         UE_LOG(LogTemp, Error, TEXT("[NULLPTR] GAMEMODE IS NULL"));
     }
 
+    // OpenWorld 시 GameMode가 초기화되므로, GameInstance에 네트워크 객체 저장해 관리
+    // 레벨 변경 후 GameInstance에 저장했던 네트워크 객체 가져와 재할당
     if (GI)
     {
+        // 네트워크 객체, 소켓 할당
         TCPClient = GI->GetTCPClient();
-        TSharedPtr<FSocket> socket = TSharedPtr<FSocket>(FTcpSocketBuilder(TEXT("ClientSocket")).Build());
+        TSharedPtr<FSocket> socket = TSharedPtr<FSocket>(FTcpSocketBuilder(TEXT("ClientSocket")).Build()); // 스마트 포인터로 소켓 관리 
         if (!socket.IsValid())
         {
             UE_LOG(LogTemp, Error, TEXT("Failed to Create the SOCKET"));
             return;
         }
 
+        // Nagle 비활성화 : 패킷 즉시 전송하도록 소켓 세팅 변경
         socket->SetNoDelay(true);
         if (TCPClient)
         {
             TCPClient->SetSocket(socket);
-            TCPClient->GetSocket()->SetNonBlocking(true); ////////////////////////////
+            TCPClient->GetSocket()->SetNonBlocking(true); // 비동기 설정
         }
     }
 
@@ -119,8 +104,7 @@ void FTCPSocketClient_Async::Initialize(UWorld *world)
 // 헤더와 payload를 결합한 패킷 생성 함수
 TSharedPtr<FBufferArchive> FTCPSocketClient_Async::CreatePacket(short MessageType, const void *PayloadData, int32 PayloadSize)
 {
-    // UE_LOG(LogTemp, Warning, TEXT("Entered in CreatePacket..."));
-    // 새로운 패킷 버퍼를 생성합니다.
+    // 새로운 패킷 버퍼 생성
     TSharedPtr<FBufferArchive> Packet = MakeShareable(new FBufferArchive());
 
     // 헤더 생성:
@@ -132,62 +116,11 @@ TSharedPtr<FBufferArchive> FTCPSocketClient_Async::CreatePacket(short MessageTyp
     *Packet << Header;
 
     // UE_LOG(LogTemp, Warning, TEXT("Before Serialize"));
-    // 이어서 payload를 버퍼에 기록합니다.
+    // 이어서 payload를 버퍼에 기록
     Packet->Serialize(const_cast<void *>(PayloadData), PayloadSize);
 
     return Packet;
 }
-
-// void FTCPSocketClient_Async::Connect()
-// {
-//     // TSharedPtr<FSocket> socket = TSharedPtr<FSocket>(FTcpSocketBuilder(TEXT("ClientSocket")).Build());
-
-//     // Socet = FTcpSocketBuilder(TEXT("ClientSocket"));
-
-//     // if (!socket.IsValid())
-//     // {
-//     //     UE_LOG(LogTemp, Error, TEXT("Failed to Create the SOCKET"));
-//     //     return;
-//     // }
-
-//     // FString IPAddress = TEXT("127.0.0.1");
-//     // uint16 PortNumber = 25000;
-
-//     // UWorld* World = GEngine->GetWorldContexts()[0].World();
-//     if (GI && TCPClient)
-//     {
-//         UE_LOG(LogTemp, Warning, TEXT("Entered in Casting instance"));/////////////////////////////
-
-//         // TCPClient = GI->GetTCPClient();
-//         if (!TCPClient.IsValid())
-//         {
-//             UE_LOG(LogTemp, Error, TEXT("GameInstance is NULL"));
-//         }
-//         // TSharedPtr<FSocket> SharedSocket = socket;
-//         // TCPClient->SetSocket(socket);
-
-//         // if (TCPClient.IsValid() && TCPClient->GetSocket().IsValid())
-//         // {
-//         //     if (FTCPSocketClientUtils::Connect(TCPClient->GetSocket().Get(), IPAddress, PortNumber))
-//         //     {
-//         //         UE_LOG(LogTemp, Warning, TEXT("Socket Connected"));
-//         //         TCPClient->GetSocket()->SetNonBlocking(true); // false
-
-//         //     }
-//         //     else
-//         //     {
-//         //         UE_LOG(LogTemp, Error, TEXT("Socket NOT CONNECTED"));
-//         //         if (TCPClient.IsValid() && TCPClient->GetSocket().IsValid())
-//         //         {
-//         //             FTCPSocketClientUtils::DestroySocket(TCPClient->GetSocket().Get());
-//         //             TCPClient->GetSocket().Reset();
-//         //         }
-
-//         //     }
-//         // }
-//     }
-
-// }
 
 void FTCPSocketClient_Async::Disconnect()
 {
@@ -209,7 +142,6 @@ TSharedPtr<FBufferArchive> FTCPSocketClient_Async::CreatePacket(uint32 Type, con
     int32 PayloadSize = Convert.Length(); // UTF8 바이트 수
 
     // 새 CreatePacket 함수의 첫번째 인자는 short 타입이어야 하므로 변환
-    // TSharedPtr<FBufferArchive> Packet = CreatePacket(static_cast<short>(Type), Convert.Get(), PayloadSize);
     TSharedPtr<FBufferArchive> Packet = CreatePacket(static_cast<short>(Type), reinterpret_cast<const void *>(Convert.Get()), PayloadSize);
 
     return Packet;
@@ -218,19 +150,12 @@ TSharedPtr<FBufferArchive> FTCPSocketClient_Async::CreatePacket(uint32 Type, con
 void FTCPSocketClient_Async::BeginSendPhase(TSharedPtr<FBufferArchive> Packet)
 {
 
-    // UE_LOG(LogTemp, Log, TEXT("BeginSendPhase"));
 
-    if (!TCPClient.IsValid()) // || !TCPClient->GetSocket().IsValid())
+    if (!TCPClient.IsValid())
     {
         UE_LOG(LogTemp, Error, TEXT("TCPClient is NULL"));
-        // if (World) Initialize(World);
-        // if (!World) UE_LOG(LogTemp, Fatal, TEXT("WORLD IS NULL (Async.cpp 246)"));
         return;
     }
-    // else if (TCPClient.IsValid())
-    // {
-    //     // UE_LOG(LogTemp, Warning, TEXT("TCPClient is not null!"));
-    // }
 
     if (!TCPClient->GetSocket().IsValid())
     {
@@ -238,9 +163,6 @@ void FTCPSocketClient_Async::BeginSendPhase(TSharedPtr<FBufferArchive> Packet)
         return;
     }
 
-    // UE_LOG(LogTemp, Warning, TEXT("Socket connection State: %d"), (int32)TCPClient->GetSocket().Get()->GetConnectionState());
-
-    //////////////////////////////////////
     AsyncTask(ENamedThreads::AnyThread, [this, Packet, TCPClient = TCPClient]()
               {
 			// if (TCPClient->GetSocket().Get() == nullptr)
@@ -261,13 +183,8 @@ void FTCPSocketClient_Async::BeginSendPhase(TSharedPtr<FBufferArchive> Packet)
 			// send all things in queue
 			int32 NumSend;
 			bool bSuccess = TCPClient->GetSocket().Get()->Send(Packet->GetData(), Packet->Num(), NumSend);
-            
-            // if (bSuccess)
-            // {
-            //     UE_LOG(LogTemp, Warning, TEXT("Sent %d Bytes out of %d"), NumSend, Packet->Num());
-            // }
 
-            // this
+            
 			AsyncTask(ENamedThreads::GameThread, [this, bSuccess, TCPClient = TCPClient]() 
 				{
 					if (TCPClient->GetSocket().Get() == nullptr|| TCPClient == nullptr)
@@ -289,7 +206,6 @@ void FTCPSocketClient_Async::BeginSendPhase(TSharedPtr<FBufferArchive> Packet)
 						EndSendPhase();
 					}
 				}); });
-    // UE_LOG(LogTemp, Warning, TEXT("Socket connection State: %d"), (int32)TCPClient->GetSocket().Get()->GetConnectionState());
 }
 
 void FTCPSocketClient_Async::EndSendPhase()
@@ -300,7 +216,6 @@ void FTCPSocketClient_Async::EndSendPhase()
 
 void FTCPSocketClient_Async::BeginRecvPhase()
 {
-    // UE_LOG(LogTemp, Log, TEXT("BeginRecvPhase"));
 
     if (!GI || !GI->GetTCPClient().IsValid())
     {
@@ -331,11 +246,10 @@ void FTCPSocketClient_Async::BeginRecvPhase()
         int32 HeaderSize = FMessageHeader::RequestLength;
         HeaderBuffer.AddZeroed(HeaderSize);
 
-        // RECV **header**
+        // 1. RECV "header"
         bool bSuccessRecvHeader = false; 
         int32 NumRead = 0; 
 
-        // 여기에서도 game mode null 
         bSuccessRecvHeader = LocalTCPClient->GetSocket().Get()->Recv( // Socket
                 HeaderBuffer.GetData(), HeaderBuffer.Num(), NumRead, ESocketReceiveFlags::Type::None); // WaitAll
         
@@ -347,7 +261,7 @@ void FTCPSocketClient_Async::BeginRecvPhase()
         
         if (bSuccessRecvHeader)
         {
-            // RECV **payload**
+            // 2. RECV "payload"
             HEAD Header;
             FMemory::Memcpy(&Header, HeaderBuffer.GetData(), sizeof(Header));
             // 이 시점에 game mode null 
@@ -355,11 +269,8 @@ void FTCPSocketClient_Async::BeginRecvPhase()
 
             int32 PayloadSize = Header.Length - 4; // sizeof(Size) + sizeof(Type) = 4 
 
-            // UE_LOG(LogTemp, Warning, TEXT("[Payload SIZE: %d]"), PayloadSize);
             if (PayloadSize < 0)
             {
-                //UE_LOG(LogTemp, Error, TEXT("PayloadSize < 0"));
-
                 OnRecvFailed(); 
                 EndRecvPhase(); 
                 return;
@@ -379,13 +290,10 @@ void FTCPSocketClient_Async::BeginRecvPhase()
             AsyncTask(ENamedThreads::GameThread, [this, bSuccessRecvPayload, Payload, Header, LocalTCPClient]()
             {
                 // Socket
-                // if (LocalTCPClient->GetSocket().Get() == nullptr || this == nullptr) return;
                 if (!LocalTCPClient->GetSocket().IsValid()) return;
                 if (bSuccessRecvPayload)
                 {
-                    // UE_LOG(LogTemp, Warning, TEXT("Header.Index: %d"), Header.Index);
                     OnRecvCompleted(Header.Index, Payload);
-                    // OnRecvCompleted(Header.Index, const_cast<HEAD*>(&Header)); //////////
                     EndRecvPhase();
                 }
                 else
@@ -422,7 +330,7 @@ void FTCPSocketClient_Async::BeginRecvPhase()
 void FTCPSocketClient_Async::EndRecvPhase()
 {
     // UE_LOG(LogTemp, Log, TEXT("EndRecvPhase"));
-    // BeginSendPhase(); // Q. -> 뭘 보내? Recv 끝나고나서?
+    // BeginSendPhase(); 
 }
 
 void FTCPSocketClient_Async::OnSendCompleted()
@@ -438,50 +346,6 @@ void FTCPSocketClient_Async::OnSendFailed()
 }
 /////////////////////////////////////////////////////////////////////////////
 
-// void* FTCPSocketClient_Async::GetDataPtr(const uint8* Data) {
-//     if (!Data)
-//     {
-//         UE_LOG(LogTemp, Error, TEXT("Invalid Data Pointer"));
-//         return nullptr;
-//     }
-//     HEAD* Header = reinterpret_cast<HEAD*>(const_cast<uint8*>(Data));
-//     // 바이트 순서 변환 (필요한 경우)
-//     uint16 PacketLength = ntohs(Header->Length);
-
-//     // HEAD* Header = reinterpret_cast<HEAD*>(const_cast<uint8*>(Data));
-//     // void* DataPtr;
-
-//     UE_LOG(LogTemp, Warning, TEXT("Header->Length: %d"), Header->Length); //////ntohs
-
-//     if (Header->Length <= sizeof(HEAD)) // 패킷 길이 확인
-//     {
-//         UE_LOG(LogTemp, Error, TEXT("Invalid packet length"));
-//         return nullptr;
-//     }
-
-//     //void*
-//     // return DataPtr = reinterpret_cast<void*>(const_cast<uint8*>(Data) + sizeof(HEAD)); // 헤더 이후 데이터
-//     return reinterpret_cast<void*>(const_cast<uint8*>(Data) + sizeof(HEAD));
-// }
-// void* FTCPSocketClient_Async::GetDataPtr(const uint8* Data) {
-//     if (!Data) {
-//         UE_LOG(LogTemp, Error, TEXT("Invalid Data Pointer"));
-//         return nullptr;
-//     }
-//     HEAD* Header = reinterpret_cast<HEAD*>(const_cast<uint8*>(Data)); ////////
-
-//     uint16 PacketLength = Header->Length; //ntohs
-//     UE_LOG(LogTemp, Warning, TEXT("Header->Length: %d"), PacketLength);
-//     UE_LOG(LogTemp, Warning, TEXT("sizeof(HEAD): %d"), sizeof(HEAD));
-
-//     // if (PacketLength <= sizeof(HEAD)) { // <=
-//     //     UE_LOG(LogTemp, Error, TEXT("Invalid packet length: %d"), PacketLength);
-//     //     return nullptr;
-//     // }
-//     // return reinterpret_cast<void*>(const_cast<uint8*>(Data) + sizeof(HEAD));
-//     // return reinterpret_cast<HEAD*>(const_cast<uint8*>(Data));
-//     return reinterpret_cast<void*>(Header);
-// }
 
 void *FTCPSocketClient_Async::GetDataPtr(const uint8 *Data, int32 DataSize)
 {
@@ -503,20 +367,9 @@ void *FTCPSocketClient_Async::GetDataPtr(const uint8 *Data, int32 DataSize)
 ///////////////////////////////////////////////////////////////
 
 void FTCPSocketClient_Async::OnRecvCompleted(short Index, const TArray<uint8> &InPayload)
-// void FTCPSocketClient_Async::OnRecvCompleted(short Index, HEAD* InPayload)
 {
 
     GameMode = Cast<ATinySwordGameMode>(GI->GetWorld()->GetAuthGameMode());
-    // if (Index > 0 && Index < 22 && PROTOCOLS[Index])
-    //     (this->*PROTOCOLS[data->Command])(InPayload.GetData());
-
-    // UE_LOG(LogTemp, Warning, TEXT("Entered in OnRecvCompleted: >>>%d<<<"), (PROTOCOL_IDS)Index);
-
-    // const uint8* Data = InPayload.GetData();
-    // int32 DataSize = InPayload.Num();
-    // HEAD* Header = reinterpret_cast<HEAD*>(GetDataPtr(Data, DataSize));
-
-    /////////// 왜 게임모드 null?
     if (!GameMode)
     {
         UE_LOG(LogTemp, Fatal, TEXT("[NULLPTR]GAMEMODE IS NULL (Async, OnRecvCompleted)"));
@@ -527,30 +380,26 @@ void FTCPSocketClient_Async::OnRecvCompleted(short Index, const TArray<uint8> &I
     {
     case GAMESTART_NOTIFICATION:
     {
-
-        // GameMode->OpenPlayingLevel(); // -> 여기서 Unreal Crash...
-        // UE_LOG(LogTemp, Warning, TEXT("[RECEIVED] >>>>>>>>>>>> GAME START <<<<<<<<<<<<<<"));
-
-        // open level
-        // UE_LOG(LogTemp, Warning, TEXT("Select Cnt: %d"), SelectCnt);
         if (GameMode)
         {
             GameMode->OpenPlayingLevel();
-             
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("GAME MODE IS NULL (ASYNC)"));
         }
             
         break;
     }
-    case CHARACTERSELECT_RESPONSE:
-    {
-        // UE_LOG(LogTemp, Warning, TEXT("[RECEIVED] CHARACTERSELECT_RESPONSE"));
+    // case CHARACTERSELECT_RESPONSE:
+    // {
+    //     // UE_LOG(LogTemp, Warning, TEXT("[RECEIVED] CHARACTERSELECT_RESPONSE"));
 
-        break;
-    }
+    //     break;
+    // }
     case CHARACTERSELECT_NOTIFICATION:
     {
         SelectCnt++;
-        // UE_LOG(LogTemp, Warning, TEXT("[RECEIVED] CHARACTER_NOTIFICATION"));
 
         CharacterSelect::Notification *Noti =
             const_cast<CharacterSelect::Notification *>(reinterpret_cast<const CharacterSelect::Notification *>(InPayload.GetData()));
@@ -561,40 +410,31 @@ void FTCPSocketClient_Async::OnRecvCompleted(short Index, const TArray<uint8> &I
             break;
         }
 
-        /////////////////////
-        // GameMode = Cast<ATinySwordGameMode>(GI->GetWorld()->GetAuthGameMode());
         if (!GameMode)
         {
             UE_LOG(LogTemp, Fatal, TEXT("[NULLPTR] GAME MODE IS NULL"));
         }
 
         GameMode->OnCharacterSelectNotification(Noti);
-        /////////////////////////////////////////
-        // GameMode->OnCharacterSelectNotification(reinterpret_cast<HEAD*>(GetDataPtr(InPayload.GetData()))); // 올바르게 변환하여 전달
         break;
     }
 
-    case MOVE_RESPONSE:
-    {
-        // UE_LOG(LogTemp, Warning, TEXT("[RECEIVED] MOVE_RESPONSE"));
-        // Move::Response Response;
+    // case MOVE_RESPONSE:
+    // {
+    //     // UE_LOG(LogTemp, Warning, TEXT("[RECEIVED] MOVE_RESPONSE"));
+    //     // Move::Response Response;
 
-        // FMemory::Memcpy(&Response, InPayload.GetData(), sizeof(Response));
-        // if (Response.bIsSuccess)
-        // {
+    //     // FMemory::Memcpy(&Response, InPayload.GetData(), sizeof(Response));
+    //     // if (Response.bIsSuccess)
+    //     // {
 
-        // }
+    //     // }
 
-        break;
-    }
+    //     break;
+    // }
 
     case MOVE_NOTIFICATION:
     {
-        // UE_LOG(LogTemp, Log, TEXT("[RECEIVED] MOVE_NOTIFICATION"));
-        // 액터 찾아서 위치 이동
-        // GameMode->OnMoveNotification(reinterpret_cast<HEAD*>(GetDataPtr(InPayload.GetData())));
-        // GameMode->OnMoveNotification(InPayload);
-
         Move::Notification *Noti =
             const_cast<Move::Notification *>(reinterpret_cast<const Move::Notification *>(InPayload.GetData()));
 
@@ -603,13 +443,13 @@ void FTCPSocketClient_Async::OnRecvCompleted(short Index, const TArray<uint8> &I
         break;
     }
 
-    case ATTACK_RESPONSE:
-    {
-        // Attack::Response Response;
-        // FMemory::Memcpy(&Response, InPayload.GetData(), sizeof(Response));
-        // UE_LOG(LogTemp, Log, TEXT("[RECEIVED] ATTACK_RESPONSE: %d"), Response.bSuccess);
-        break;
-    }
+    // case ATTACK_RESPONSE:
+    // {
+    //     // Attack::Response Response;
+    //     // FMemory::Memcpy(&Response, InPayload.GetData(), sizeof(Response));
+    //     // UE_LOG(LogTemp, Log, TEXT("[RECEIVED] ATTACK_RESPONSE: %d"), Response.bSuccess);
+    //     break;
+    // }
     case ATTACK_NOTIFICATION:
     {
         UE_LOG(LogTemp, Log, TEXT("[RECEIVED] ATTACK_NOTIFICATION"));
@@ -625,24 +465,18 @@ void FTCPSocketClient_Async::OnRecvCompleted(short Index, const TArray<uint8> &I
     case SPAWN_NOTIFICATION:
     {
         UE_LOG(LogTemp, Log, TEXT("[RECEIVED] SPAWN_NOTIFICATION"));
-        // 위치에 액터 스폰
-        // GameMode->OnSpawnNotification(InPayload); //////////////////
 
         Spawn::Notification *Noti =
             const_cast<Spawn::Notification *>(reinterpret_cast<const Spawn::Notification *>(InPayload.GetData()));
         GameMode->OnSpawnNotification(Noti);
 
-        // GameMode->SaveAllPathsToTextFile();
 
         break;
     }
 
     case GETITEM_NOTIFICATION:
     {
-        // 위치 보간
-        // 아이템 액터 destroy
         UE_LOG(LogTemp, Log, TEXT("[RECEIVED] GETITEM_NOTIFICATION"));
-        // GameMode->OnGetItemNotification(InPayload);
 
         GetItem::Notification *Noti =
             const_cast<GetItem::Notification *>(reinterpret_cast<const GetItem::Notification *>(InPayload.GetData()));
@@ -654,9 +488,7 @@ void FTCPSocketClient_Async::OnRecvCompleted(short Index, const TArray<uint8> &I
     case DEAD_NOTIFICATION:
     {
         // CASTLE, GOLDMINE : collapse 스프라이트 변경
-
         // BOMB, SHEEP : destroy
-
         // GOBLIN : Animation 재생
         UE_LOG(LogTemp, Log, TEXT("[RECEIVED] DEAD_NOTIFICATION"));
         Dead::Notification *Noti =
@@ -669,7 +501,6 @@ void FTCPSocketClient_Async::OnRecvCompleted(short Index, const TArray<uint8> &I
     case BOMBEXPLODE_NOTIFICATION:
     {
         UE_LOG(LogTemp, Log, TEXT("[RECEIVED] BOMBEXPLODE_NOTIFICATION"));
-        // GameMode->OnBombExpNotification(reinterpret_cast<HEAD*>(GetDataPtr(InPayload.GetData())));
 
         BombExplode::Notification *Noti =
             const_cast<BombExplode::Notification *>(reinterpret_cast<const BombExplode::Notification *>(InPayload.GetData()));
@@ -695,35 +526,6 @@ void FTCPSocketClient_Async::OnRecvCompleted(short Index, const TArray<uint8> &I
         break;
     }
     }
-
-    // TArray<uint8> Payload;
-    // Payload.Append(InPayload);
-
-    // FString Data(Payload.Num(), (char*)Payload.GetData());
-    // UE_LOG(LogTemp, Log, TEXT("OnRecvCompleted recv data success. data : %s Payload : %d size : %d"), *Data, Payload.Num(), Data.Len());
-
-    // CUSTOM
-    // Ex. Attack::Notification
-    // if (InPayload.Num() < sizeof(Attack::Notification))
-    // {
-    //     UE_LOG(LogTemp, Error, TEXT("Payload size is too small"));
-    //     return;
-    // }
-
-    // // Read Data
-    // const Attack::Notification* noti = reinterpret_cast<const Attack::Notification*>(InPayload.GetData());
-    // UE_LOG(LogTemp, Log, TEXT("Received Attack::Notification"));
-    // UE_LOG(LogTemp, Log, TEXT("AttackerActorType: %d"), noti->AttackerType);
-
-    /*struct HEAD* data = reinterpret_cast<struct HEAD*>(InPayload.GetData());
-    if (data->Command > 0 && data->Command < 22 && PROTOCOLS[data->Command])
-    {
-        (this->*PROTOCOLS[data->Command])(data);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("Invalid Protocol Command: %d"), data->Command);
-    }*/
 }
 
 void FTCPSocketClient_Async::OnRecvFailed()
