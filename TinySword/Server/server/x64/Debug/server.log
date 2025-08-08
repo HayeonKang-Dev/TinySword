@@ -1,0 +1,22 @@
+﻿  Actor.cpp
+  Attack.cpp
+  BombManager.cpp
+  CastleManager.cpp
+  CharacterSelect.cpp
+  GameEnd.cpp
+  GameReady.cpp
+  GameStart.cpp
+  GetItem.cpp
+  GoldmineManager.cpp
+  IocpServer.cpp
+C:\WorkSpace\Server\server\IocpServer.cpp(378,9): warning C4101: 'buffRecv' :참조되지 않은 지역 변수입니다.
+C:\WorkSpace\Server\server\IocpServer.cpp(379,9): warning C4101: 'buffSend' :참조되지 않은 지역 변수입니다.
+  ItemManager.cpp
+  Manager.cpp
+  Move.cpp
+  PlayerObject.cpp
+  Protocol.cpp
+  SheepManager.cpp
+  Spawn.cpp
+  코드를 생성하고 있습니다...
+  server.vcxproj -> C:\WorkSpace\Server\x64\Debug\server.exe

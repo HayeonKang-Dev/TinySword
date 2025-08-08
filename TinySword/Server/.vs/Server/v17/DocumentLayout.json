@@ -1,0 +1,361 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\WorkSpace\\Server\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\IocpServer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\IocpServer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\Protocol.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\Protocol.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\Protocol.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\Protocol.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\CharacterSelect.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\CharacterSelect.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\IocpServer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\IocpServer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\Attack.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\Attack.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\GetItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\GetItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\GameReady.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\GameReady.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\Spawn.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\Spawn.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\Move.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\Move.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\GameEnd.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\GameEnd.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\GameStart.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\GameStart.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\BombManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\BombManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\PlayerObject.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\PlayerObject.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\PlayerObject.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\PlayerObject.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\SheepManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\SheepManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\GoldmineManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\GoldmineManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\CastleManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\CastleManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\Actor.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\Actor.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|C:\\WorkSpace\\Server\\server\\ItemManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{0661A5EC-552D-49D8-BC9E-EAEDE3FA5590}|server\\server.vcxproj|solutionrelative:server\\ItemManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "IocpServer.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\IocpServer.cpp",
+              "RelativeDocumentMoniker": "server\\IocpServer.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\IocpServer.cpp",
+              "RelativeToolTip": "server\\IocpServer.cpp",
+              "ViewState": "AgIAAFIBAAAAAAAAAAAtwGwBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T01:25:49.112Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Protocol.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\Protocol.cpp",
+              "RelativeDocumentMoniker": "server\\Protocol.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\Protocol.cpp",
+              "RelativeToolTip": "server\\Protocol.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T05:38:11.66Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Move.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\Move.cpp",
+              "RelativeDocumentMoniker": "server\\Move.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\Move.cpp",
+              "RelativeToolTip": "server\\Move.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T06:27:03.732Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Spawn.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\Spawn.cpp",
+              "RelativeDocumentMoniker": "server\\Spawn.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\Spawn.cpp",
+              "RelativeToolTip": "server\\Spawn.cpp",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T06:41:04.398Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Attack.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\Attack.cpp",
+              "RelativeDocumentMoniker": "server\\Attack.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\Attack.cpp",
+              "RelativeToolTip": "server\\Attack.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T06:27:56.145Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "IocpServer.h",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\IocpServer.h",
+              "RelativeDocumentMoniker": "server\\IocpServer.h",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\IocpServer.h",
+              "RelativeToolTip": "server\\IocpServer.h",
+              "ViewState": "AgIAABcAAAAAAAAAAADgvx0AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-03-20T01:06:31.193Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Protocol.h",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\Protocol.h",
+              "RelativeDocumentMoniker": "server\\Protocol.h",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\Protocol.h",
+              "RelativeToolTip": "server\\Protocol.h",
+              "ViewState": "AgIAAM4AAAAAAAAAAAAawOcAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-03-20T04:42:24.671Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CharacterSelect.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\CharacterSelect.cpp",
+              "RelativeDocumentMoniker": "server\\CharacterSelect.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\CharacterSelect.cpp",
+              "RelativeToolTip": "server\\CharacterSelect.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T06:19:12.398Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "GetItem.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\GetItem.cpp",
+              "RelativeDocumentMoniker": "server\\GetItem.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\GetItem.cpp",
+              "RelativeToolTip": "server\\GetItem.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T06:48:48.42Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "GameReady.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\GameReady.cpp",
+              "RelativeDocumentMoniker": "server\\GameReady.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\GameReady.cpp",
+              "RelativeToolTip": "server\\GameReady.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T06:44:03.208Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "GameStart.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\GameStart.cpp",
+              "RelativeDocumentMoniker": "server\\GameStart.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\GameStart.cpp",
+              "RelativeToolTip": "server\\GameStart.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T06:43:35.758Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "PlayerObject.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\PlayerObject.cpp",
+              "RelativeDocumentMoniker": "server\\PlayerObject.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\PlayerObject.cpp",
+              "RelativeToolTip": "server\\PlayerObject.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T05:05:51.856Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "GameEnd.cpp",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\GameEnd.cpp",
+              "RelativeDocumentMoniker": "server\\GameEnd.cpp",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\GameEnd.cpp",
+              "RelativeToolTip": "server\\GameEnd.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-20T06:44:34.246Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "BombManager.h",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\BombManager.h",
+              "RelativeDocumentMoniker": "server\\BombManager.h",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\BombManager.h",
+              "RelativeToolTip": "server\\BombManager.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-03-20T05:46:43.125Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "PlayerObject.h",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\PlayerObject.h",
+              "RelativeDocumentMoniker": "server\\PlayerObject.h",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\PlayerObject.h",
+              "RelativeToolTip": "server\\PlayerObject.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-03-20T05:03:57.539Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "CastleManager.h",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\CastleManager.h",
+              "RelativeDocumentMoniker": "server\\CastleManager.h",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\CastleManager.h",
+              "RelativeToolTip": "server\\CastleManager.h",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAB0AAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-03-20T06:11:50.085Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "SheepManager.h",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\SheepManager.h",
+              "RelativeDocumentMoniker": "server\\SheepManager.h",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\SheepManager.h",
+              "RelativeToolTip": "server\\SheepManager.h",
+              "ViewState": "AgIAAJkAAAAAAAAAAAAAALIAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-03-20T06:15:35.962Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "GoldmineManager.h",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\GoldmineManager.h",
+              "RelativeDocumentMoniker": "server\\GoldmineManager.h",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\GoldmineManager.h",
+              "RelativeToolTip": "server\\GoldmineManager.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC0AAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-03-20T06:12:32.349Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Actor.h",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\Actor.h",
+              "RelativeDocumentMoniker": "server\\Actor.h",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\Actor.h",
+              "RelativeToolTip": "server\\Actor.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-03-20T01:13:57.323Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "ItemManager.h",
+              "DocumentMoniker": "C:\\WorkSpace\\Server\\server\\ItemManager.h",
+              "RelativeDocumentMoniker": "server\\ItemManager.h",
+              "ToolTip": "C:\\WorkSpace\\Server\\server\\ItemManager.h",
+              "RelativeToolTip": "server\\ItemManager.h",
+              "ViewState": "AgIAAEgAAAAAAAAAAAAAADUAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-03-20T06:12:50.041Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

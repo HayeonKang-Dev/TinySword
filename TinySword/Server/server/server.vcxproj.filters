@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\Message">
+      <UniqueIdentifier>{acb7f7be-8a97-4262-ad4e-3c3ce481baba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Actors">
+      <UniqueIdentifier>{7c62c796-2799-4faf-b86b-33e66a351ed0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Actors">
+      <UniqueIdentifier>{ac743636-0608-4539-9b5c-940e77584b12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\DB">
+      <UniqueIdentifier>{b8502b33-3b2b-40b6-81dd-1e79f9e4c114}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IocpServer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>헤더 파일\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="BombManager.h">
+      <Filter>헤더 파일\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="CastleManager.h">
+      <Filter>헤더 파일\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="GoldmineManager.h">
+      <Filter>헤더 파일\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemManager.h">
+      <Filter>헤더 파일\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerObject.h">
+      <Filter>헤더 파일\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="SheepManager.h">
+      <Filter>헤더 파일\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager.h">
+      <Filter>헤더 파일\Actors</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="IocpServer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>소스 파일\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerObject.cpp">
+      <Filter>소스 파일\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Protocol.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterSelect.cpp">
+      <Filter>소스 파일\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="Move.cpp">
+      <Filter>소스 파일\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="Attack.cpp">
+      <Filter>소스 파일\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="Spawn.cpp">
+      <Filter>소스 파일\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStart.cpp">
+      <Filter>소스 파일\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="GameReady.cpp">
+      <Filter>소스 파일\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEnd.cpp">
+      <Filter>소스 파일\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="GetItem.cpp">
+      <Filter>소스 파일\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="CastleManager.cpp">
+      <Filter>소스 파일\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="GoldmineManager.cpp">
+      <Filter>소스 파일\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="SheepManager.cpp">
+      <Filter>소스 파일\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager.cpp">
+      <Filter>소스 파일\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemManager.cpp">
+      <Filter>소스 파일\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="BombManager.cpp">
+      <Filter>소스 파일\Actors</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
