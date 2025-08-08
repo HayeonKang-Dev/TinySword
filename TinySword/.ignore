@@ -1,3 +1,12 @@
-.vscode
-Content
-Intermediate
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.sln
+*.ipch
+
+# Unreal Engine 빌드 캐시
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
