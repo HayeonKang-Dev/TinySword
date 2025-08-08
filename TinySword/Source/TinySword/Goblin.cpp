@@ -26,6 +26,11 @@
 AGoblin::AGoblin()
 {
     // GetCharacterMovement();
+
+    IdleState = MakeUnique<FGoblinIdleState>();
+    WalkState = MakeUnique<FGoblinWalkState>();
+    AttackState = MakeUnique<FGoblinAttackState>();
+    DeadState = MakeUnique<FGoblinDeadState>();
 }
 
 bool AGoblin::IsMyChar()
@@ -46,6 +51,11 @@ void AGoblin::BeginPlay()
     Health = MaxHealth;
     Money = 0;
     GetCharacterMovement()->MaxWalkSpeed = Speed;
+    if (IsMyChar()) {
+        bFacingX = 0; 
+        LastMoveX = 1.5f; 
+    }
+
 
     OverlapComponent = FindComponentByClass<UCapsuleComponent>();
     paperFlipbookComponent = FindComponentByClass<UPaperFlipbookComponent>();
@@ -74,6 +84,8 @@ void AGoblin::BeginPlay()
     }
 
     prevLocation = GetActorLocation();
+
+    SetState(IdleState.Get());
 }
 
 
@@ -84,15 +96,31 @@ void AGoblin::Tick(float DeltaTime)
 
     if (!IsDead())
     {
-        UpdateAnimation();
+        // UpdateAnimation();
+        if (CurrentState)
+        {
+            CurrentState->Update(this);
+        }
         FlipCharacter();
+
+        
+
+        if (IsMyChar()) {
+            FVector Velocity = GetVelocity();
+            // X축 이동 방향을 기준으로 방향 설정
+            if (FMath::Abs(Velocity.X) > KINDA_SMALL_NUMBER)
+            {
+                bFacingX = (Velocity.X > 0) ? 0 : 1;
+            }
+        }
+        
 
         if (IsMyChar() && prevLocation != GetActorLocation()) {//FVector::DistSquared(prevLocation, GetActorLocation()) > KINDA_SMALL_NUMBER) {
             SendMoveRequestOnTick();
             UE_LOG(LogTemp, Warning, TEXT("LOCATION: %f | %f "), GetActorLocation().X, GetActorLocation().Y);
         }
-    
     }
+    
 
 
     if (!playerController)
@@ -157,6 +185,7 @@ void AGoblin::MoveRight(float Value)
         
     //     // FlipCharacter(Value);
     // }
+
     AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
 }
 
@@ -173,28 +202,21 @@ void AGoblin::UpDown(float Value)
 // Animations
 void AGoblin::FlipCharacter()
 {
-    // UPaperFlipbookComponent*
-    // SpriteComponent = FindComponentByClass<UPaperFlipbookComponent>();
 
-    if (SpriteComponent)
-    {
-        FVector Velocity = GetVelocity();
+    if (!SpriteComponent) return; 
 
-        // LastMoveDirec : Goblin이 마지막으로 바라 본 방향
-        // X축 이동 속도가 충분히 커야 바라 보는 방향 업데이트 
-        if (FMath::Abs(Velocity.X) > KINDA_SMALL_NUMBER)
-        {
-            LastMoveX = Velocity.X; 
-        }
-
-        // Y축으로만 이동하는 과정에서 Flip되는 것 방지
-        // 진행 방향에 따른 Sprite Flip
-        if (FMath::Abs(LastMoveX) >  KINDA_SMALL_NUMBER) //= FMath::Abs(Velocity.Y))
-        {
-            if (LastMoveX > KINDA_SMALL_NUMBER) SpriteComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
-            else if (LastMoveX < -KINDA_SMALL_NUMBER) SpriteComponent->SetRelativeScale3D(FVector(-1.5f, 1.5f, 1.5f));
-        }
+    if (IsMyChar()) {
+        FVector Velocity = GetVelocity(); 
+        if (FMath::Abs(Velocity.X) > KINDA_SMALL_NUMBER) LastMoveX = Velocity.X; 
     }
+    else {
+        LastMoveX = (bFacingX==0)? 1.5f : -1.5f; 
+    }
+
+    // if (FMath::Abs(LastMoveX) > KINDA_SMALL_NUMBER) {
+    float FlipScaleX = (LastMoveX>0) ? 1.5f : -1.5f; 
+    SpriteComponent->SetRelativeScale3D(FVector(FlipScaleX, 1.5f, 1.5f)); 
+    // }
 
 }
 
@@ -253,7 +275,18 @@ void AGoblin::UpdateAnimation()
 void AGoblin::ResetToIdle()
 {
     bIsAttacking = false;
-    if (paperFlipbookComponent && IdleAnim) paperFlipbookComponent->SetFlipbook(IdleAnim);
+
+    if (paperFlipbookComponent) 
+    {
+        if (GetVelocity().IsNearlyZero())
+        {
+            if (IdleAnim) paperFlipbookComponent->SetFlipbook(IdleAnim); 
+        } 
+        else
+        {
+            if (WalkAnim) paperFlipbookComponent->SetFlipbook(WalkAnim);
+        }
+    }
 }
 
 
@@ -308,19 +341,6 @@ void AGoblin::SetTagId(int32 newTagId)
     TagId = newTagId;
 }
 
-// ATinySwordPlayerController *AGoblin::GetPlayerController()
-// {
-//     if (playerController) playerController;
-//     else
-//     {
-//         playerController = Cast<ATinySwordPlayerController>(GetController());
-//         if (playerController) return playerController;
-//         else {
-//             UE_LOG(LogTemp, Warning, TEXT("PLAYER CONTROLLER IS NOT VALID... (Goblin.cpp)"));
-//         }
-//     }
-//     return nullptr;
-// }
 //////////////
 void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
 {
@@ -339,9 +359,13 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
         UE_LOG(LogTemp, Warning, TEXT("Overlap with Meat"));
         ABaseMeat* meat = Cast<ABaseMeat>(OtherActor);
 
-        SendGetItemRequestMsg(MEAT, meat->GetTagId());
-        IncreaseHealth(10);
-        // meat->Destroy();
+        if (meat && meat->bCanPickup){
+            SendGetItemRequestMsg(MEAT, meat->GetTagId());
+            IncreaseHealth(10);
+            // meat->Destroy();
+        }
+
+        
 
         if (playerController && playerController->playingWidget)
         {
@@ -351,7 +375,6 @@ void AGoblin::NotifyActorBeginOverlap(AActor *OtherActor)
         {
             UE_LOG(LogTemp, Error, TEXT("PLAYER CONTROLLER IS NULL"));
         }
-
 
 
     }
@@ -413,8 +436,9 @@ void AGoblin::Attack()
 {
     if (IsDead()) return;
 
-    PlayAttackAnimation();
-    IsAttack = true;
+    //PlayAttackAnimation();
+    //IsAttack = true;
+    //bIsAttacking = true;
     FVector Start, End;
 
     // Get Dynamite's collision
@@ -596,7 +620,8 @@ void AGoblin::UpdateMoneyCount_(int money)
 void AGoblin::HandleDeath()
 {
     // play anim
-    PlayDeadAnim();
+    //PlayDeadAnim();
+    SetState(DeadState.Get());
 
     // enable collision
     SetActorEnableCollision(false);
@@ -613,16 +638,13 @@ void AGoblin::SetPlayerController(ATinySwordPlayerController *newPlayerControlle
 }
 
 
-void AGoblin::SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft)
+void AGoblin::SendMoveRequestMsg(short ActorTagId/*, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft*/)
 {
     Move::Request Request;
     Request.MoveActorType = GOBLIN;
     Request.MoveActorTagId = ActorTagId;
-    Request.bMoveUp = bMoveUp;
-    Request.bMoveDown = bMoveDown;
-    Request.bMoveRight = bMoveRight;
-    Request.bMoveLeft = bMoveLeft;
-    Request.Location = GetActorLocation(); /////////////
+    Request.FacingX = bFacingX; 
+    Request.Location = GetActorLocation(); 
 
     FArrayWriter WriterArray;
     WriterArray.Serialize((UTF8CHAR*)&Request, sizeof(Request));
@@ -675,6 +697,28 @@ void AGoblin::SendGetItemRequestMsg(ActorType ItemType, short ItemTagId)
     GI->GetTCPClient()->BeginSendPhase(Packet);
 }
 
+void AGoblin::SetState(IGoblinState *NewState)
+{
+    if (!NewState || CurrentState == NewState) return;
+    
+    if (CurrentState)
+    {
+        CurrentState->OnExit(this);
+    }
+
+    CurrentState = NewState;
+    CurrentState->OnEnter(this);
+}
+
+void AGoblin::ResetStateBySpeed()
+{
+    // 현재 속도가 0에 가까울 때, 상태를 Idle로 전환 
+    if (GetVelocity().IsNearlyZero()) SetState(IdleState.Get()); 
+    // 움직이고 있다면, 상태를 Walk로 전환 
+    else SetState(WalkState.Get());
+
+    if (CurrentState) CurrentState->Update(this);
+}
 
 /////////////////////////////////////////////////////
 //void AGoblin::SendMoveResponseMsg(int ActorType, int ActorIndex, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft)

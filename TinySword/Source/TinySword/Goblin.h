@@ -12,6 +12,7 @@
 #include "Serialization/ArrayWriter.h"
 #include "protocol.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GoblinState.h"
 
 #include "Goblin.generated.h"
 
@@ -19,6 +20,12 @@
  * 
  */
 class ATinySwordGameMode;
+
+class IGoblinState;
+class FGoblinIdleState; 
+class FGoblinWalkState; 
+class FGoblinAttackState; 
+class FGoblinDeadState;
 
 
 UCLASS()
@@ -58,8 +65,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category="State")
 	float Money = 0; 
 
-	UPROPERTY(EditAnywhere, Category="Combat")
-	bool IsAttack = false; 
+	// UPROPERTY(EditAnywhere, Category="Combat")
+	// bool IsAttack = false; 
 
 	UPROPERTY(EditAnywhere, Category="TagId")
 	int TagId = 0; 
@@ -89,6 +96,9 @@ public:
 
 	void UpdateAnimation();
 	void PlayAttackAnimation();
+
+
+	//void SetState(IGoblinState* NewState);
 
 	
 	// Actions
@@ -132,6 +142,8 @@ public:
 
 	bool IsMyChar(); 
 
+
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -162,29 +174,21 @@ private:
 	ATinySwordGameMode* GameMode; 
 	UTinySwordGameInstance* GI;
 
-	UPROPERTY(EditAnywhere, Category="Animation")
-	UPaperFlipbook* IdleAnim; 
 	
-	UPROPERTY(EditAnywhere, Category="Animation")
-	UPaperFlipbook* WalkAnim;
 
-	UPROPERTY(EditAnywhere, Category="Animation")
-	UPaperFlipbook* AttackAnim;
-
-	UPROPERTY(EditAnywhere, Category="Animation")
-	UPaperFlipbook* DeadAnim;
+	//IGoblinState* CurrentState = ;
 
 	FTimerHandle TimerHandleAttack;
 
 
-	bool bIsAttacking; 
+	bool bIsAttacking = false; 
 	
 
 	
 
 	void ResetToIdle();
 
-	void SendMoveRequestMsg(short ActorTagId, bool bMoveUp = false, bool bMoveDown = false, bool bMoveRight = false, bool bMoveLeft = false);
+	void SendMoveRequestMsg(short ActorTagId); //, bool bMoveUp = false, bool bMoveDown = false, bool bMoveRight = false, bool bMoveLeft = false);
 	void SendAttackRequestMsg(short ActorTagId, ActorType TargetActorType, short TargetTagId, Vector TargetLocation, Vector AttackLocation, int damage);
 	void SendGetItemRequestMsg(ActorType ItemType, short ItemTagId);
 
@@ -200,5 +204,38 @@ private:
 
 	void SendDestroyResponseMsg(int actorType, int actorIndex, float X, float Y); 
 	void SendDestroyNotiMsg(int actorType, int actorIndex, float X, float Y);*/
+
+public:
+	void ResetStateBySpeed();
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* IdleAnim; 
+	
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* WalkAnim;
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* AttackAnim;
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UPaperFlipbook* DeadAnim;
+
+	UPaperFlipbookComponent* GetPaperFlipbookComponent() { return paperFlipbookComponent;}
+
+	void SetState(IGoblinState* NewState);
+
+	TUniquePtr<FGoblinIdleState> IdleState;
+    TUniquePtr<FGoblinWalkState> WalkState;
+    TUniquePtr<FGoblinAttackState> AttackState;
+    TUniquePtr<FGoblinDeadState> DeadState;
+
+	void SetFacingX(bool FacingX) { bFacingX = FacingX; } 
  
+private:
+	IGoblinState* CurrentState;
+
+	bool bFacingX; 
+
 };
+
+
