@@ -26,6 +26,7 @@ ABaseMeat::ABaseMeat()
 void ABaseMeat::BeginPlay()
 {
 	Super::BeginPlay();
+	GetWorldTimerManager().SetTimer(PickupEnableTimerHandle, this, &ABaseMeat::EnablePickup, 0.5f, false); 
 	PlaySpawnAnim();
 }
 

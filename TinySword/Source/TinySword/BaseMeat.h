@@ -31,6 +31,13 @@ public:
 	
 	void SetTagId(int32 NewTagId);
 
+	UPROPERTY()
+	bool bCanPickup = false; 
+	
+	FTimerHandle PickupEnableTimerHandle;
+
+	void EnablePickup() { bCanPickup = true; }
+
 private:
 	int32 TagId;
 
