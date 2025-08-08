@@ -7,6 +7,7 @@
 
 typedef enum {
 	NONE,
+	DECLARE_PROTOCOL(LOGIN),
 	DECLARE_PROTOCOL(CHARACTERSELECT), 			// 1, 2, 3
 	DECLARE_PROTOCOL(MOVE), 					// 4, 5, 6
 	DECLARE_PROTOCOL(ATTACK), 					// 7, 8, 9
@@ -91,6 +92,25 @@ struct HEAD
 // #pragma pack(pop)
 
 
+struct Login
+{
+	struct Request
+	{
+		char useId[32]; 
+		char userPassword[32]; 
+	};
+
+	struct Response 
+	{
+		bool bSuccess; 
+	};
+
+	struct Notification
+	{
+
+	};
+};
+
 
 struct CharacterSelect
 {
@@ -118,6 +138,8 @@ struct Move
 		Vector Location; 
 		ActorType MoveActorType;
 		short MoveActorTagId;
+		bool FacingX; // 0: Right, 1: Left
+
 		bool bMoveUp, bMoveDown, bMoveRight, bMoveLeft;
 	};
 
@@ -131,6 +153,8 @@ struct Move
 		Vector Location;
 		ActorType MoveActorType;
 		short MoveActorTagId;
+		bool FacingX; 
+
 		bool bMoveUp, bMoveDown, bMoveRight, bMoveLeft;
 	};
 };
