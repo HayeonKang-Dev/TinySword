@@ -189,24 +189,3 @@ void ATinySwordPlayerController::FindPlayingWidget()
         }
     }
 }
-
-
-// void ATinySwordPlayerController::SendMoveRequestMsg(short ActorTagId, bool bMoveUp, bool bMoveDown, bool bMoveRight, bool bMoveLeft)
-// {
-
-//     Move::Request Request; 
-//     Request.MoveActorType = GOBLIN;
-//     Request.MoveActorTagId = ActorTagId; 
-//     Request.bMoveUp = bMoveUp; 
-//     Request.bMoveDown = bMoveDown; 
-//     Request.bMoveRight = bMoveRight; 
-//     Request.bMoveLeft = bMoveLeft;
-//     Request.Location = controlledChar->GetActorLocation(); /////////////
-
-//     FArrayWriter WriterArray; 
-//     WriterArray.Serialize((UTF8CHAR*)&Request, sizeof(Request));
-//     TSharedPtr<FBufferArchive> Packet = FTCPSocketClient_Async::CreatePacket((short)MOVE_REQUEST, WriterArray.GetData(), WriterArray.Num());
-
-//     // GameMode->GetTCPSocketClient().BeginSendPhase(Packet);
-//     GI->GetTCPClient()->BeginSendPhase(Packet);
-// }

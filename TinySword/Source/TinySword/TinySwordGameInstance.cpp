@@ -6,41 +6,6 @@
 #include "Kismet/GameplayStatics.h"
 
 
-// void UTinySwordGameInstance::Init()
-// {
-    
-//     Super::Init();
-//     cnt++;
-//     UE_LOG(LogTemp, Warning, TEXT("Game Instance - INIT : %d"), cnt);
-    
-
-//     if (!TCPClient.IsValid())
-//     {
-//         UE_LOG(LogTemp, Warning, TEXT("MakeShared TCPClient"));
-
-//         TCPClient = MakeShared<FTCPSocketClient_Async>();
-        
-//         if (TCPClient.IsValid() && !bIsConnect)
-//         {
-//             TCPClient->Connect();
-//             UE_LOG(LogTemp, Warning, TEXT("TCPClient->Connect() running."));
-//             bIsConnect = true; 
-
-//             // bHasInitialized = true;
-//         }
-//         else
-//         {
-//             UE_LOG(LogTemp, Warning, TEXT("TCPClient is not VALID"));
-//         }
-        
-//     }
-//     else
-//     {
-//         UE_LOG(LogTemp, Warning, TEXT("TCPClient is VALID "));
-//         TCPClient->Connect();
-//     }
-	
-// }
 
 void UTinySwordGameInstance::Init()
 {

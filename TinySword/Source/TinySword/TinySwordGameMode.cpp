@@ -530,7 +530,7 @@ void ATinySwordGameMode::SpawnMeat(FVector Location, short tagId)
 
     // Adjust Spawn Location (Lower Z)
     FVector SpawnLocation = Location;
-    //SpawnLocation.Z = 45.f;
+    SpawnLocation.Z = -310.0f; // 45.f;
 
     // Spawn Meat & Set Meat TagId
     AActor* SpawnedActor; 
@@ -674,6 +674,7 @@ void ATinySwordGameMode::OnMoveNotification(struct Move::Notification *data)
             FVector Direc = (TargetLocation - CurrentLocation).GetSafeNormal(); // data->Location.ToFVector() - goblin->GetActorLocation(); 
             float Dist = FVector::Dist(CurrentLocation, TargetLocation);
             
+            goblin->SetFacingX(data->FacingX); 
 
             AAIController* AICon = Cast<AAIController>(goblin->GetController());
             if (AICon) // && Dist > 5.0f)
@@ -981,7 +982,7 @@ void ATinySwordGameMode::OnGetItemNotification(struct GetItem::Notification *dat
 
 void ATinySwordGameMode::OnDeadNotification(struct Dead::Notification *data)
 {
-    UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>> ENTERED IN ON DEAD NOTIFICATION"));
+    UE_LOG(LogTemp, Warning, TEXT(">>>>>>>>>>>>>>> ENTERED IN ON DEAD NOTIFICATION: %d"), data->DeadActorType);
     // struct Dead::Notification *noti = (struct Dead::Notification *)data; 
 
     // GOBLIN Dead -> Goblin.HandleDeath
@@ -994,11 +995,12 @@ void ATinySwordGameMode::OnDeadNotification(struct Dead::Notification *data)
 
     // GOLDMINE Dead -> Change Sprite
 
-    switch (data->DeadActorType)
+    switch ((ActorType)data->DeadActorType)
     {
-    UE_LOG(LogTemp, Log, TEXT("Entered in DeadActorType Switch-case"));
+    
     case GOBLIN:
     {
+        UE_LOG(LogTemp, Log, TEXT("Entered in DeadActorType Switch-case"));
         AGoblin* goblin = FindGoblinById(GoblinMap, data->DeadActorTagId); 
         if (!goblin) 
         {
@@ -1006,25 +1008,8 @@ void ATinySwordGameMode::OnDeadNotification(struct Dead::Notification *data)
             return; 
         }
 
-        // Interpolation(goblin, data->Location.ToFVector(), 0.05); // 보간 
-        // goblin->SetHealth(0);
-        // goblin->DecreaseHealth(100);
-        if (goblin->IsMyChar()) goblin->HandleDeath(); 
-
-        // 같은 TagId 가진 CASTLE도 무너졌는지 확인 
-        // ABaseCastle* castle = FindCastleById(ActiveCastleMap, goblin->GetTagId());
-        // if (castle&& castle->IsCollapse() && goblin->IsMyChar())
-        // {
-        //     goblin->ShowLoseWidget();
-        //     DeadPlayerSet++;
-        //     UE_LOG(LogTemp, Warning, TEXT("DEAD PLAYER SET CNT: %d"), DeadPlayerSet);
-        //     if (DeadPlayerSet==3)
-        //     {
-        //         FindAliveGoblin()->ShowWinWidget();
-        //     }
-        // }
-
-        // 
+        goblin->HandleDeath(); 
+        
 
         break;
     }
@@ -1116,6 +1101,7 @@ void ATinySwordGameMode::OnBombExpNotification(struct BombExplode::Notification 
     if (!bomb) return; 
 
     bomb->PlayBrinkAnim(); 
+    bomb->PlayExplodeAnim();
 
     // 1.9초 후 동작하도록 타이머 설정 (람다 사용)
     FTimerHandle TimerHandle;
