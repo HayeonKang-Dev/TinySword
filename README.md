@@ -3,4 +3,4 @@
 <p align="center">
   <img width="600" height="auto" alt="image" src="https://github.com/user-attachments/assets/4608d248-37b0-4407-ae62-f639cf564222" />
 </p>
-<img width="370" height="105" alt="image" src="https://github.com/user-attachments/assets/daca8c37-2839-44ef-89b6-25494be1852c" />
+<img width="120" height="auto" alt="image" src="https://github.com/user-attachments/assets/daca8c37-2839-44ef-89b6-25494be1852c" />
