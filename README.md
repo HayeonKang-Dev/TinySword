@@ -8,10 +8,10 @@
   **양을 공격해 고기를 얻을 수 있다!**
 </p>
 <p>
-  <img width="822" height="542" alt="image" src="https://github.com/user-attachments/assets/6edb908e-4519-411c-81bc-803832b749ae" />
+  <img width="150" height="auto" alt="image" src="https://github.com/user-attachments/assets/6edb908e-4519-411c-81bc-803832b749ae" />
   **금광에서 금가방을 얻자!**
 </p>
 <p>
-  <img width="118" height="175" alt="image" src="https://github.com/user-attachments/assets/55683e9a-84be-46c0-a7e4-9bdf14857390" />
+  <img width="100" height="auto" alt="image" src="https://github.com/user-attachments/assets/55683e9a-84be-46c0-a7e4-9bdf14857390" />
   **모은 금으로 폭탄을 스폰해 나의 동료를 스폰해보자!**
 </p>
