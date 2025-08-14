@@ -3,9 +3,9 @@
 <p align="center">
   <img width="600" height="auto" alt="image" src="https://github.com/user-attachments/assets/4608d248-37b0-4407-ae62-f639cf564222" />
 </p>
----
 
-<table>
+<div align="center">
+  <table>
   <tr>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/daca8c37-2839-44ef-89b6-25494be1852c" width="120" alt="양->고기" />
@@ -19,7 +19,7 @@
       <img src="https://github.com/user-attachments/assets/55683e9a-84be-46c0-a7e4-9bdf14857390" width="60" alt="폭탄" />
       <p><strong>모은 금으로 폭탄을 스폰해보자!</strong></p>
     </td>
-  </tr>
-</table>
+    </tr>
+  </table>
+</div>
 
----
