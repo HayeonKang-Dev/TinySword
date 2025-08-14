@@ -1,24 +1,7 @@
 ## Tiny Sword 
 ### 적군의 성을 파괴하고 마지막 1인이 되어라!
+
+
 <p align="center">
-  <img width="600" height="auto" alt="image" src="https://github.com/user-attachments/assets/4608d248-37b0-4407-ae62-f639cf564222" />
+<img width="1919" height="1079" alt="스크린샷 2025-08-14 181434" src="https://github.com/user-attachments/assets/3f59f74b-6acb-4a45-a0b5-b54c0dbdb0e2" />
 </p>
-
-<div align="center">
-<table>
-<tr>
-<td align="center">
-<img src="https://github.com/user-attachments/assets/daca8c37-2839-44ef-89b6-25494be1852c" width="120" alt="양->고기" />
-
-</td>
-<td align="center">
-<img src="https://github.com/user-attachments/assets/6edb908e-4519-411c-81bc-803832b749ae" width="250" alt="금광" />
-
-</td>
-<td align="center">
-<img src="https://github.com/user-attachments/assets/55683e9a-84be-46c0-a7e4-9bdf14857390" width="60" alt="폭탄" />
-
-</td>
-</tr>
-</table>
-</div>
