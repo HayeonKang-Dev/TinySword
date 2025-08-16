@@ -7,4 +7,4 @@
 </p>
 
 [<img width="100" height="auto" alt="image" src="https://github.com/user-attachments/assets/e0ec78c6-7c0d-474e-9ded-ade27adac28a" />
-]([https://www.youtube.com/watch?v=6fCNAN0Z3Zc](https://www.youtube.com/watch?v=IAcIKz_0OaE))
+](https://www.youtube.com/watch?v=IAcIKz_0OaE)
