@@ -42,20 +42,25 @@
 IOCP 기반 멀티스레드 서버가 모든 소켓 I/O를 비동기로 처리합니다.  
 주요 책임은 **연결 관리 → 패킷 파싱/검증 → 게임 상태 갱신 → 브로드캐스트** 입니다.
 
-### 핵심 컴포넌트
+### 서버 핵심 컴포넌트
 
 - **IocpServer**
-  - `WSASend/WSARecv` 비동기 I/O, 컴플리션 큐 구동
-  - `ProcessMessage()`, `ManageClients()`, `BroadcastToAll()`
+  - TCP Accept 및 클라이언트 세션 관리
+  - IOCP 완료 포트를 통한 비동기 I/O 처리
+  - Worker Thread Pool 및 Timer Thread 생성/관리
+  - 클라이언트 연결/해제 이벤트 처리
+
+- **Worker Threads**
+  - IOCP Queue에서 완료된 I/O 작업 수신
+  - 수신 패킷 파싱 및 프로토콜 검증
+  - 게임 로직 처리 (이동, 공격, 상태 변경 등)
+  - PlayerObject 및 Manager 상태 갱신
+  - BroadcastToAll을 통한 클라이언트 동기화 패킷 전송
+  
 - **Timer Thread**
-  - 주기 송신 작업 전담(예: Sheep 이동 틱, Bomb 폭발 타이머)
-- **PlayerObject**
-  - 소켓/HP/골드/위치 등 플레이어 상태, `SendPacket()`, `UpdatePosition()`
-- **Managers**
-  - `SheepManager`: NPC 이동/충돌
-  - `BombManager`: 폭발 타이밍/범위 판정
-  - `CastleManager`: 성 HP/파괴 이벤트
-  - `ItemManager`: GoldBag/Meat 스폰·삭제
+  - 고정 틱(Tick) 간격으로 게임 상태 업데이트 (Sheep, Bomb 
+  - 주기적인 동기화 패킷 전송
+  
 
 #### 서버 흐름(요약)
 
@@ -138,9 +143,13 @@ sequenceDiagram
 
   Note over S: Timer Thread 주기 송신<br/>- Sheep 이동 상태<br/>- Bomb Tick/폭발
 ```
+## 패킷 처리 파이프라인
+1. 클라이언트 → 서버: TCP 소켓으로 패킷 전송
+2. IOCP Queue: 비동기 수신 완료 이벤트 대기
+3. Worker Thread: 패킷 파싱 → 검증 → 게임 로직 실행 → 상태 갱신
+4. BroadcastToAll: 변경된 상태를 모든 클라이언트에 전송
 
-
-#### 주요 패킷
+### 주요 패킷
 
 | 이름                | 송신              | 목적       | 주요 필드                 |
 | ----------------- | --------------- | -------- | --------------------- |
@@ -149,7 +158,7 @@ sequenceDiagram
 | **SpawnPacket**   | Server → All    | 액터 생성    | type, spawnPos, tagId |
 | **DestroyPacket** | Server → All    | 액터 제거    | actorId, reason       |
 
-주요 특징
+### 주요 특징
 
 - **실시간 동기화**: 이동, 공격, NPC, 아이템 상태가 모든 클라이언트에 즉시 반영됩니다.
 
