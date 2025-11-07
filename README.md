@@ -70,6 +70,8 @@ flowchart TD
   E --> G[Managers 갱신]
   F --> H[BroadcastToAll]
   G --> H
+```
+
 
 ## 🎨 클라이언트 구조 (Unreal Engine 2D)
 
@@ -115,6 +117,7 @@ flowchart TD
   C --> G[BaseCastle]
   C --> H[BaseGoldBag]
   C --> I[BaseBomb]
+```
 
 
 ## 🔗 서버 ↔ 클라이언트 통신 흐름
